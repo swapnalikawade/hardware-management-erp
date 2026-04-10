@@ -1,0 +1,1489 @@
+<div class="company-container">
+  <!-- HEADER -->
+  <div class="container-fluid py-3">
+    <div class="row align-items-start">
+      <!-- Left Section -->
+      <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
+        <h2 class="company-name">
+          {{ headCompanyName }}
+        </h2>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+          <span class="company-email">{{ userName }}</span>
+          <span class="breadcrumb-date">{{ today | date: "dd MMM yyyy" }}</span>
+        </div>
+      </div>
+
+      <!-- Right Section: Always top-right -->
+      <div
+        class="col-lg-6 col-md-6 col-sm-12 d-flex justify-content-md-end justify-content-start"
+      >
+        <h6 class="breadcrumb">
+          <i class="bi bi-house-door-fill me-1"></i>
+          Home
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-layers-fill me-1"></i>
+          Master
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-box-seam-fill me-1"></i>
+          Asset
+        </h6>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS-->
+  <div class="tabs-wrapper">
+    <div class="tabs-container">
+      <div
+        class="tab"
+        *ngFor="let tab of tabs"
+        [class.active]="activeTab === tab.key"
+        (click)="activeTab = tab.key"
+      >
+        <i [class]="tab.icon"></i> {{ tab.label }}
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMS ARE IN CARD -->
+  <div class="form-card">
+    <!-- DETAILS FORM -->
+    <div *ngIf="activeTab === 'details'" class="company-details-container">
+      <i class="fa-solid fa-boxes-stacked"></i> Asset Details
+      <hr class="mt-0 mb-3" />
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <!-- Show entries -->
+        <div class="toolbar-item show-entries">
+          <label for="showEntries">Show</label>
+          <select id="showEntries" (change)="onChangeItemsPerPage($event)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>entries</span>
+        </div>
+
+        <!-- Export buttons -->
+        <div class="toolbar-item export-buttons">
+          <button class="btn-doc" (click)="exportDoc()">
+            <i class="bi bi-file-earmark-word"></i> DOC
+          </button>
+
+          <button class="btn-pdf" (click)="exportPDF()">
+            <i class="bi bi-file-earmark-pdf"></i> PDF
+          </button>
+
+          <button class="btn-excel" (click)="exportExcel()">
+            <i class="bi bi-file-earmark-excel"></i> Excel
+          </button>
+        </div>
+
+        <!-- Search + Delete -->
+        <div class="search-delete-group">
+          <!-- DELETE BUTTON -->
+          <div class="delete-btn" *ngIf="selectedRows.length > 0">
+            <button (click)="deleteSelectedRows()">
+              <i class="fa-solid fa-trash"></i> Delete
+            </button>
+          </div>
+
+          <!-- SEARCH BOX -->
+          <div class="search-box">
+            <input
+              type="text"
+              placeholder="Search..."
+              (input)="applyFilter($event)"
+            />
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-scroll-wrapper">
+        <table class="table table-bordered w-auto big-table">
+          <!-- ================= TABLE HEADER ================= -->
+          <thead>
+            <tr>
+              <th>
+                <input type="checkbox" (change)="toggleAll($event)" />
+              </th>
+
+              <th>
+                Allocation ID
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationId', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Allocation Code
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationCode', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationCode', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Allocation Date
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationDate', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Allocation Type
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationType', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationType', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Requested By
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationRequestedBy', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationRequestedBy', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Approved By
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationApprovedBy', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationApprovedBy', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Asset ID
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationAssetId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationAssetId', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Asset Name
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationAssetName', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationAssetName', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Asset Type
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationAssetType', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationAssetType', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Asset Make
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationAssetMake', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationAssetMake', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Model
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationModel', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationModel', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Serial Number
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationSerialNumber', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationSerialNumber', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Allocate To
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationAllocateTo', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationAllocateTo', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Employee Name
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationEmployeeName', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationEmployeeName', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Department
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationDepartment', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationDepartment', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Location
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationLocation', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationLocation', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Start Date
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationStartDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationStartDate', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Return Date
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="
+                    sortTable('assetallocationExpectedReturnDate', 'asc')
+                  "
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="
+                    sortTable('assetallocationExpectedReturnDate', 'desc')
+                  "
+                ></i>
+              </th>
+
+              <th>
+                Acknowledged By
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationAcknowledgedBy', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationAcknowledgedBy', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Acknowledgement Date
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="
+                    sortTable('assetallocationAcknowledgementDate', 'asc')
+                  "
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="
+                    sortTable('assetallocationAcknowledgementDate', 'desc')
+                  "
+                ></i>
+              </th>
+
+              <th>
+                Remarks
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetallocationRemarks', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetallocationRemarks', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Status
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetallocationStatus', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetallocationStatus', 'desc')"
+                ></i>
+              </th>
+
+              <th>Action</th>
+            </tr>
+          </thead>
+          <!-- ================= TABLE BODY ================= -->
+          <tbody>
+            <tr
+              *ngFor="
+                let row of filteredData
+                  | slice
+                    : (currentPage - 1) * itemsPerPage
+                    : currentPage * itemsPerPage;
+                let i = index
+              "
+            >
+              <td>
+                <input
+                  type="checkbox"
+                  [checked]="selectedRows.includes(row)"
+                  (change)="toggleRowSelection(row, $event)"
+                />
+              </td>
+
+              <td>
+                <span
+                  class="leave-link"
+                  [ngClass]="{
+                    'active-id':
+                      selectedRow?.assetallocationId === row.assetallocationId,
+                  }"
+                  (click)="openDetails(row)"
+                >
+                  {{ row.assetallocationId }}
+                </span>
+              </td>
+
+              <td>{{ row.assetallocationCode }}</td>
+              <td>{{ row.assetallocationDate }}</td>
+              <td>{{ row.assetallocationType }}</td>
+              <td>{{ row.assetallocationRequestedBy }}</td>
+              <td>{{ row.assetallocationApprovedBy }}</td>
+
+              <td>{{ row.assetallocationAssetId }}</td>
+              <td>{{ row.assetallocationAssetName }}</td>
+              <td>{{ row.assetallocationAssetType }}</td>
+              <td>{{ row.assetallocationAssetMake }}</td>
+              <td>{{ row.assetallocationModel }}</td>
+              <td>{{ row.assetallocationSerialNumber }}</td>
+
+              <td>{{ row.assetallocationAllocateTo }}</td>
+              <td>{{ row.assetallocationEmployeeName }}</td>
+              <td>{{ row.assetallocationDepartment }}</td>
+              <td>{{ row.assetallocationLocation }}</td>
+
+              <td>{{ row.assetallocationStartDate }}</td>
+              <td>{{ row.assetallocationExpectedReturnDate }}</td>
+
+              <td>{{ row.assetallocationAcknowledgedBy }}</td>
+              <td>{{ row.assetallocationAcknowledgementDate }}</td>
+              <td>{{ row.assetallocationRemarks }}</td>
+
+              <td>
+                <span
+                  [ngClass]="{
+                    'status-active': row.assetallocationStatus === 'Active',
+                    'status-inactive': row.assetallocationStatus !== 'Active',
+                  }"
+                >
+                  <span *ngIf="row.assetallocationStatus === 'Active'">✔</span>
+                  <span *ngIf="row.assetallocationStatus !== 'Active'">❌</span>
+                  {{ row.assetallocationStatus }}
+                </span>
+              </td>
+
+              <!-- ACTION -->
+
+              <td>
+                <button class="btn-edit" (click)="onEdit(row, i)">
+                  <i class="bi bi-pencil-square me-1"></i> Edit
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="no-data-message" *ngIf="filteredData.length === 0">
+        <i class="bi bi-database-x"></i>
+        No Data Found
+      </div>
+      <!-- Pagination -->
+      <div class="pagination">
+        <button
+          (click)="changePage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+
+        <button
+          *ngFor="let page of [].constructor(totalPages); let p = index"
+          (click)="changePage(p + 1)"
+          [class.active]="currentPage === p + 1"
+        >
+          {{ p + 1 }}
+        </button>
+
+        <button
+          (click)="changePage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+
+    <!-- NEW RECORD FORM -->
+    <!-- NEW RECORD FORM -->
+    <div *ngIf="activeTab === 'newRecord'" class="new-record-container">
+      <!-- Title + Add More button -->
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="section-title">
+          <i
+            class="bi"
+            [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle-fill'"
+          ></i>
+          {{
+            isEditMode
+              ? "Update Assets Return Details"
+              : "Add New Assets Return Details"
+          }}
+        </h3>
+
+        <!-- Add More Button -->
+        <button class="add-more-btn" *ngIf="!isEditMode" (click)="addForm()">
+          <i class="bi bi-plus"></i> Add More
+        </button>
+      </div>
+
+      <hr class="mt-0 mb-3" />
+
+      <!-- Dynamic Forms -->
+      <div
+        *ngFor="let form of forms; let i = index"
+        class="new-record-card mb-4 p-3 border rounded"
+      >
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="section-title">
+            {{
+              isEditMode
+                ? "Update Assets Allocation Details (ID: " +
+                  tableData[editIndex!].assetallocationId +
+                  ")"
+                : "Add  Assets Allocation  Details " + (i + 1)
+            }}
+          </h5>
+          <!-- REMOVE BUTTON (NOT for first form) -->
+          <button
+            *ngIf="i > 0"
+            class="btn btn-sm btn-light"
+            (click)="removeForm(i)"
+          >
+            <i class="bi bi-x-lg me-2"></i> Remove
+          </button>
+        </div>
+
+        <!-- FORM -->
+        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
+          <div class="row mb-3">
+            <div class="row mb-3">
+              <!-- Allocation Code -->
+              <div class="col-md-4">
+                <label
+                  >Allocation Code <span class="text-danger">*</span></label
+                >
+                <input
+                  class="form-control"
+                  required
+                  placeholder="e.g. ALC-1001"
+                  pattern="^ALC-\d{3,}$"
+                  #allocationCode="ngModel"
+                  [(ngModel)]="forms[i].assetallocationCode"
+                  name="assetallocationCode{{ i }}"
+                />
+                <div
+                  class="invalid-feedback"
+                  *ngIf="allocationCode.errors?.['required']"
+                >
+                  Allocation Code is required
+                </div>
+                <div
+                  class="invalid-feedback"
+                  *ngIf="allocationCode.errors?.['pattern']"
+                >
+                  Format should be like <b>ALC-1001</b>
+                </div>
+              </div>
+
+              <!-- Allocation Date -->
+              <div class="col-md-4">
+                <label
+                  >Allocation Date <span class="text-danger">*</span></label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  required
+                  #allocationDate="ngModel"
+                  [(ngModel)]="forms[i].assetallocationDate"
+                  name="assetallocationDate{{ i }}"
+                />
+                <div
+                  class="invalid-feedback"
+                  *ngIf="allocationDate.errors?.['required']"
+                >
+                  Allocation Date is required
+                </div>
+              </div>
+
+              <!-- Allocation Type -->
+              <div class="col-md-4">
+                <label
+                  >Allocation Type <span class="text-danger">*</span></label
+                >
+                <select
+                  class="form-control"
+                  required
+                  #allocationType="ngModel"
+                  [(ngModel)]="forms[i].assetallocationType"
+                  name="assetallocationType{{ i }}"
+                >
+                  <option value="" disabled>Select allocation type</option>
+                  <option value="Temporary">Temporary</option>
+                  <option value="Permanent">Permanent</option>
+                </select>
+                <div
+                  class="invalid-feedback"
+                  *ngIf="allocationType.errors?.['required']"
+                >
+                  Allocation Type is required
+                </div>
+              </div>
+
+              <!-- Requested By -->
+              <div class="col-md-4">
+                <label>Requested By</label>
+
+                <input
+                  class="form-control"
+                  placeholder="e.g. Amit Sharma"
+                  #assetallocationRequestedBy="ngModel"
+                  [ngClass]="{
+                    'is-invalid':
+                      assetallocationRequestedBy.invalid &&
+                      (assetallocationRequestedBy.touched ||
+                        assetallocationRequestedBy.dirty),
+                  }"
+                  [(ngModel)]="forms[i].assetallocationRequestedBy"
+                  name="assetallocationRequestedBy{{ i }}"
+                />
+
+                <div
+                  class="invalid-feedback"
+                  *ngIf="assetallocationRequestedBy.errors?.['pattern']"
+                >
+                  Only letters allowed (min 3 chars)
+                </div>
+              </div>
+              <!-- Approved By -->
+              <div class="col-md-4">
+                <label>Approved By</label>
+
+                <input
+                  class="form-control"
+                  placeholder="e.g. Rohit Patil"
+                  pattern="^[a-zA-Z ]{3,40}$"
+                  #approvedBy="ngModel"
+                  [ngClass]="{
+                    'is-invalid':
+                      approvedBy.invalid &&
+                      (approvedBy.touched || approvedBy.dirty),
+                  }"
+                  [(ngModel)]="forms[i].assetallocationApprovedBy"
+                  name="assetallocationApprovedBy{{ i }}"
+                />
+
+                <div
+                  class="invalid-feedback"
+                  *ngIf="approvedBy.errors?.['pattern']"
+                >
+                  Only letters allowed (min 3 chars)
+                </div>
+              </div>
+
+              <!-- Status -->
+              <!--<div class="col-md-4">
+    <label>Status <span class="text-danger">*</span></label>
+    <select
+      class="form-control"
+      required
+      #status="ngModel"
+      [ngClass]="{ 'is-invalid': status.invalid && (status.touched || status.dirty) }"
+      [(ngModel)]="form.newRecord.status"
+      name="status{{ i }}"
+    >
+      <option value="" disabled>Select status</option>
+      <option value="Pending">Pending</option>
+      <option value="Approved">Approved</option>
+      <option value="In Progress">In Progress</option>
+      <option value="Returned">Returned</option>
+    </select>
+    <div class="invalid-feedback" *ngIf="status.errors?.['required']">
+      Status is required
+    </div>
+  </div>-->
+
+              <!-- Asset Type -->
+              <div class="col-md-4">
+                <label>Asset <span class="text-danger">*</span></label>
+
+                <select
+                  class="form-control"
+                  required
+                  #assetSelect="ngModel"
+                  [ngClass]="{
+                    'is-invalid':
+                      assetSelect.invalid &&
+                      (assetSelect.touched || assetSelect.dirty),
+                  }"
+                  [(ngModel)]="forms[i].assetallocationAssetId"
+                  name="assetallocationAssetId{{ i }}"
+                  (change)="onAssetChange(i)"
+                >
+                  <option value="" disabled>Select Asset</option>
+
+                  <option *ngFor="let a of assetTypes" [value]="a.assetId">
+                    {{ a.assetId }} - {{ a.assetName }}
+                  </option>
+                </select>
+
+                <div
+                  class="invalid-feedback"
+                  *ngIf="assetSelect.errors?.['required']"
+                >
+                  Asset is required
+                </div>
+              </div>
+
+              <!-- Department -->
+              <div class="col-md-4">
+                <label>Department <span class="text-danger">*</span></label>
+
+                <select
+                  class="form-control"
+                  required
+                  #assetallocationDepartment="ngModel"
+                  [(ngModel)]="forms[i].assetallocationDepartment"
+                  name="assetallocationDepartment{{ i }}"
+                  [ngClass]="{
+                    'is-invalid':
+                      assetallocationDepartment.invalid &&
+                      (assetallocationDepartment.touched ||
+                        assetallocationDepartment.dirty),
+                  }"
+                >
+                  <option value="">-- Select Department --</option>
+
+                  <option
+                    *ngFor="let dept of departments"
+                    [value]="dept.departmentId"
+                  >
+                    {{ dept.departmentName }}
+                  </option>
+                </select>
+
+                <div
+                  class="invalid-feedback"
+                  *ngIf="assetallocationDepartment.errors?.['required']"
+                >
+                  Department is required
+                </div>
+              </div>
+              <!-- Allocate To -->
+              <div class="col-md-4">
+                <label
+                  >Allocate To (Employee)
+                  <span class="text-danger">*</span></label
+                >
+
+                <select
+                  class="form-control"
+                  required
+                  #allocateToSelect="ngModel"
+                  [ngClass]="{
+                    'is-invalid':
+                      allocateToSelect.invalid &&
+                      (allocateToSelect.touched || allocateToSelect.dirty),
+                  }"
+                  [(ngModel)]="forms[i].assetallocationAllocateTo"
+                  name="assetallocationAllocateTo{{ i }}"
+                  (change)="onEmployeeChange(i)"
+                >
+                  <option value="" disabled>Select Employee</option>
+
+                  <option *ngFor="let e of employees" [value]="e.employeeId">
+                    {{ e.employeeId }} - {{ e.employeeName }}
+                  </option>
+                </select>
+
+                <div
+                  class="invalid-feedback"
+                  *ngIf="allocateToSelect.errors?.['required']"
+                >
+                  Employee is required
+                </div>
+              </div>
+              <!-- Allocation Start Date -->
+              <div class="col-md-4">
+                <label>
+                  Allocation Start Date <span class="text-danger">*</span>
+                </label>
+
+                <input
+                  type="date"
+                  class="form-control"
+                  required
+                  #assetallocationStartDate="ngModel"
+                  [ngClass]="{
+                    'is-invalid':
+                      assetallocationStartDate.invalid &&
+                      (assetallocationStartDate.touched ||
+                        assetallocationStartDate.dirty),
+                  }"
+                  [(ngModel)]="forms[i].assetallocationStartDate"
+                  name="assetallocationStartDate{{ i }}"
+                />
+
+                <div
+                  class="invalid-feedback"
+                  *ngIf="assetallocationStartDate.errors?.['required']"
+                >
+                  Allocation Start Date is required
+                </div>
+              </div>
+              <!-- Expected Return Date (Temporary साठी compulsory) -->
+              <div class="col-md-4">
+                <label>Expected Return Date</label>
+
+                <input
+                  type="date"
+                  class="form-control"
+                  [required]="forms[i].assetallocationType === 'Temporary'"
+                  [disabled]="forms[i].assetallocationType !== 'Temporary'"
+                  #assetallocationExpectedReturnDate="ngModel"
+                  [ngClass]="{
+                    'is-invalid':
+                      assetallocationExpectedReturnDate.invalid &&
+                      (assetallocationExpectedReturnDate.touched ||
+                        assetallocationExpectedReturnDate.dirty) &&
+                      forms[i].assetallocationType === 'Temporary',
+                  }"
+                  [(ngModel)]="forms[i].assetallocationExpectedReturnDate"
+                  name="assetallocationExpectedReturnDate{{ i }}"
+                />
+
+                <div
+                  class="invalid-feedback"
+                  *ngIf="
+                    forms[i].assetallocationType === 'Temporary' &&
+                    assetallocationExpectedReturnDate.errors?.['required']
+                  "
+                >
+                  Expected Return Date is required for Temporary allocation
+                </div>
+              </div>
+              <!-- Asset Make -->
+              <div class="col-md-4">
+                <label>Asset Make</label>
+
+                <select
+                  class="form-control"
+                  [(ngModel)]="forms[i].assetallocationAssetMake"
+                  name="assetallocationAssetMake{{ i }}"
+                >
+                  <option value="">-- Select Make --</option>
+
+                  <option
+                    *ngFor="let make of assetMakes"
+                    [value]="make.assetMakeName"
+                  >
+                    {{ make.assetMakeName }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Model -->
+              <div class="col-md-4">
+                <label>Model</label>
+
+                <input
+                  class="form-control"
+                  placeholder="e.g. Latitude 5420"
+                  pattern="^[a-zA-Z0-9 .,&'-]{2,40}$"
+                  #assetallocationModel="ngModel"
+                  [ngClass]="{
+                    'is-invalid':
+                      assetallocationModel.invalid &&
+                      (assetallocationModel.touched ||
+                        assetallocationModel.dirty),
+                  }"
+                  [(ngModel)]="forms[i].assetallocationModel"
+                  name="assetallocationModel{{ i }}"
+                />
+
+                <div
+                  class="invalid-feedback"
+                  *ngIf="assetallocationModel.errors?.['pattern']"
+                >
+                  Enter valid model name
+                </div>
+              </div>
+              <!-- Serial Number -->
+              <div class="col-md-3">
+                <label>Serial Number</label>
+
+                <input
+                  class="form-control"
+                  placeholder="e.g. SN-9A83K21"
+                  pattern="^[A-Za-z0-9\-]{5,30}$"
+                  #assetallocationSerialNumber="ngModel"
+                  [ngClass]="{
+                    'is-invalid':
+                      assetallocationSerialNumber.invalid &&
+                      (assetallocationSerialNumber.touched ||
+                        assetallocationSerialNumber.dirty),
+                  }"
+                  [(ngModel)]="forms[i].assetallocationSerialNumber"
+                  name="assetallocationSerialNumber{{ i }}"
+                />
+
+                <div
+                  class="invalid-feedback"
+                  *ngIf="assetallocationSerialNumber.errors?.['pattern']"
+                >
+                  Only letters, numbers & hyphen allowed (min 5 chars)
+                </div>
+              </div>
+
+              <!-- Location -->
+              <div class="col-md-3">
+                <label>Location</label>
+
+                <input
+                  class="form-control"
+                  placeholder="e.g. Pune Office / Mumbai Branch"
+                  pattern="^[a-zA-Z0-9 .,&'-]{3,40}$"
+                  #assetallocationLocation="ngModel"
+                  [ngClass]="{
+                    'is-invalid':
+                      assetallocationLocation.invalid &&
+                      (assetallocationLocation.touched ||
+                        assetallocationLocation.dirty),
+                  }"
+                  [(ngModel)]="forms[i].assetallocationLocation"
+                  name="assetallocationLocation{{ i }}"
+                />
+
+                <div
+                  class="invalid-feedback"
+                  *ngIf="assetallocationLocation.errors?.['pattern']"
+                >
+                  Enter valid location (min 3 characters)
+                </div>
+              </div>
+              <!-- Acknowledged By -->
+              <div class="col-md-3">
+                <label>Acknowledged By</label>
+
+                <input
+                  class="form-control"
+                  placeholder="e.g. Amit Sharma"
+                  pattern="^[a-zA-Z ]{3,40}$"
+                  #assetallocationAcknowledgedBy="ngModel"
+                  [ngClass]="{
+                    'is-invalid':
+                      assetallocationAcknowledgedBy.invalid &&
+                      (assetallocationAcknowledgedBy.touched ||
+                        assetallocationAcknowledgedBy.dirty),
+                  }"
+                  [(ngModel)]="forms[i].assetallocationAcknowledgedBy"
+                  name="assetallocationAcknowledgedBy{{ i }}"
+                />
+
+                <div
+                  class="invalid-feedback"
+                  *ngIf="assetallocationAcknowledgedBy.errors?.['pattern']"
+                >
+                  Only letters allowed (min 3 characters)
+                </div>
+              </div>
+
+              <!-- Acknowledgement Date -->
+              <div class="col-md-3">
+                <label>Acknowledgement Date</label>
+
+                <input
+                  type="date"
+                  class="form-control"
+                  #assetallocationAcknowledgementDate="ngModel"
+                  [(ngModel)]="forms[i].assetallocationAcknowledgementDate"
+                  name="assetallocationAcknowledgementDate{{ i }}"
+                  [max]="today"
+                />
+              </div>
+
+              <!-- Remarks -->
+              <div class="col-md-12">
+                <label>Remarks</label>
+
+                <textarea
+                  class="form-control"
+                  rows="2"
+                  maxlength="250"
+                  placeholder="Any additional notes (optional)"
+                  [(ngModel)]="forms[i].assetallocationRemarks"
+                  name="assetallocationRemarks{{ i }}"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- SAVE + RESET -->
+          <div
+            class="mt-3 d-flex gap-2 justify-content-end"
+            *ngIf="i === forms.length - 1"
+          >
+            <button type="button" class="btn-save" (click)="saveAllRecords()">
+              <i class="bi bi-floppy-fill"></i>
+              {{ isEditMode ? "Update" : "Save All" }}
+            </button>
+
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="cancelRecord(recordForm)"
+            >
+              <i class="bi bi-arrow-counterclockwise"></i> Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- BULK IMPORT FORM -->
+    <div
+      *ngIf="activeTab === 'bulkImport'"
+      class="bulk-import-container container-fluid"
+    >
+      <!-- Bulk Import Records Title -->
+      <h3 class="section-title mb-3">
+        <i class="bi bi-file-earmark-arrow-up"></i>
+        Bulk Import Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- Important Notice -->
+      <div class="important-box mb-4">
+        <h4 class="mb-2">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          Important Notice
+        </h4>
+        <ul class="mb-0">
+          <li>
+            It is Extremely Important to put the System in maintenance mode to
+            perform Bulk Import operations.
+          </li>
+          <li>DO NOT IMPORT BULK DATA WHILE SYSTEM IS UNDER USE.</li>
+          <li>ONLY EXPORT/TRAINED EMPLOYEES SHOULD USE THIS SECTION.</li>
+        </ul>
+      </div>
+      <!-- File Upload Section -->
+      <div class="file-upload-section">
+        <h4 class="mb-2">
+          <i class="bi bi-upload"></i>
+          Upload File to Import
+        </h4>
+        <p>Select file to import(Only doc,excel,csv,txt files):</p>
+        <!-- Responsive Wrapper -->
+        <div class="upload-controls mb-3">
+          <!-- File Input -->
+          <input
+            type="file"
+            class="form-control file-input"
+            (change)="onFileSelected($event)"
+          />
+          <!-- Buttons Wrapper -->
+          <div class="buttons-wrapper">
+            <button type="button" class="btn-upload" (click)="uploadFile()">
+              Upload File
+            </button>
+            <button
+              type="button"
+              class="btn-download"
+              (click)="downloadSampleCSV()"
+            >
+              <i class="bi bi-file-earmark-arrow-down"></i>
+              Download Sample CSV
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BULK EXPORT FORM -->
+    <div *ngIf="activeTab === 'bulkExport'" class="bulk-export-container">
+      <!-- Bulk Export Records Title -->
+      <h3 class="section-title">
+        <i class="bi bi-file-earmark-arrow-down"></i>
+        Bulk Export Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- File Export Options -->
+      <div class="export-options">
+        <h4><i class="bi bi-gear-fill"></i> File Export Options</h4>
+        <!-- Filters in Horizontal Line -->
+        <div class="filter-column">
+          <div class="container">
+            <div class="row g-3">
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="startDate" class="form-label">Start Date:</label>
+                  <input
+                    type="text"
+                    id="startDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="startDate"
+                    (input)="formatDate($event, 'start')"
+                  />
+                </div>
+                <!-- Validation message (optional) -->
+                <p
+                  *ngIf="startDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ startDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="endDate" class="form-label">End Date:</label>
+                  <input
+                    type="text"
+                    id="endDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="endDate"
+                    (input)="formatDate($event, 'end')"
+                  />
+                </div>
+                <p
+                  *ngIf="endDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ endDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="fileType" class="form-label">File Type:</label>
+                  <select
+                    id="fileType"
+                    [(ngModel)]="fileType"
+                    class="form-select"
+                  >
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">Excel (.xlsx)</option>
+                    <option value="pdf">PDF</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="export-buttons justify-content-end">
+          <button type="button" class="btn-reset" (click)="resetFilters()">
+            <i class="bi bi-arrow-counterclockwise"></i>
+            Reset Filters
+          </button>
+          <button type="button" class="btn-get" (click)="getFile()">
+            <i class="bi bi-download"></i>
+            Get File
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HELP SECTION -->
+    <div *ngIf="activeTab === 'help'" class="help-page-bg container-fluid py-4">
+      <h3 class="section-title mb-2">Help & Guidelines</h3>
+      <hr class="mt-0 mb-3" />
+
+      <h4 class="fw-bold text-primary mb-3">
+        Department Management Module – User Manual
+      </h4>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the Department module. Follow the
+        instructions carefully to avoid incorrect data.
+      </div>
+
+      <!-- MAIN HELP TABLE -->
+      <div class="table-responsive mb-5">
+        <table class="table table-bordered align-top">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Tab</th>
+              <th>Purpose</th>
+              <th>Instructions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Details</td>
+              <td>View and manage department records</td>
+              <td>
+                • View department data and status<br />
+                • Search, filter, and sort records<br />
+                • Click <b>Edit</b> to update record
+              </td>
+            </tr>
+
+            <tr>
+              <td>2</td>
+              <td>New Record</td>
+              <td>Add new department</td>
+              <td>
+                • Click <b>New Record</b><br />
+                • Enter all required fields<br />
+                • Use <b>Add More</b> for multiple entries<br />
+                • Click <b>Save All</b>
+              </td>
+            </tr>
+
+            <tr>
+              <td>3</td>
+              <td>Bulk Import</td>
+              <td>Import multiple department details</td>
+              <td>
+                • Upload CSV / Excel / DOCX / PDF / TXT<br />
+                • File must match system format<br />
+                • Errors shown if data is invalid
+              </td>
+            </tr>
+
+            <tr>
+              <td>4</td>
+              <td>Bulk Export</td>
+              <td>Download department data</td>
+              <td>
+                • Apply filters if needed<br />
+                • Select export format<br />
+                • File downloads instantly
+              </td>
+            </tr>
+
+            <tr>
+              <td>5</td>
+              <td>Help</td>
+              <td>Usage guidance & examples</td>
+              <td>
+                • Refer examples before entry<br />
+                • Follow validation messages<br />
+                • Use for troubleshooting
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SINGLE RECORD EXAMPLE -->
+      <h5 class="fw-semibold text-info">Example: Adding Single Department</h5>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the Department module. Follow the
+        instructions carefully to avoid incorrect data.
+      </div>
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Department</td>
+              <td>Fill details and click Save</td>
+              <td>Record visible in Details tab</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MULTIPLE RECORD EXAMPLE -->
+      <h5 class="fw-semibold text-info">
+        Example: Adding Multiple Department Details
+      </h5>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the Department module. Follow the
+        instructions carefully to avoid incorrect data.
+      </div>
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Multiple</td>
+              <td>Use Add More and Save All</td>
+              <td>All records saved</td>
+            </tr>
+            <tr>
+              <td>Bulk Import</td>
+              <td>Import File</td>
+              <td>Upload valid file</td>
+              <td>Valid records imported</td>
+            </tr>
+            <tr>
+              <td>Bulk Export</td>
+              <td>Export</td>
+              <td>Select format</td>
+              <td>File downloaded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- asset allocation VIEW MODAL -->
+<div class="modal" [class.show]="showViewModal">
+  <div class="modal-content">
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h5>Allocation Details (ID: {{ selectedRow?.assetallocationId }})</h5>
+      <button class="close-btn1" (click)="closeViewModal()">×</button>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body">
+      <table class="popup-table">
+        <tr>
+          <th>Allocation ID</th>
+          <td>{{ selectedRow?.assetallocationId }}</td>
+        </tr>
+
+        <tr>
+          <th>Allocation Code</th>
+          <td>{{ selectedRow?.assetallocationCode }}</td>
+        </tr>
+
+        <tr>
+          <th>Allocation Date</th>
+          <td>{{ selectedRow?.assetallocationDate }}</td>
+        </tr>
+
+        <tr>
+          <th>Allocation Type</th>
+          <td>{{ selectedRow?.assetallocationType }}</td>
+        </tr>
+
+        <tr>
+          <th>Requested By</th>
+          <td>{{ selectedRow?.assetallocationRequestedBy }}</td>
+        </tr>
+
+        <tr>
+          <th>Approved By</th>
+          <td>{{ selectedRow?.assetallocationApprovedBy }}</td>
+        </tr>
+
+        <tr>
+          <th>Status</th>
+          <td>{{ selectedRow?.assetallocationStatus }}</td>
+        </tr>
+
+        <!-- Asset Info -->
+
+        <tr>
+          <th>Asset ID</th>
+          <td>{{ selectedRow?.assetallocationAssetId }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset Name</th>
+          <td>{{ selectedRow?.assetallocationAssetName }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset Type</th>
+          <td>{{ selectedRow?.assetallocationAssetType }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset Make</th>
+          <td>{{ selectedRow?.assetallocationAssetMake }}</td>
+        </tr>
+
+        <tr>
+          <th>Model</th>
+          <td>{{ selectedRow?.assetallocationModel }}</td>
+        </tr>
+
+        <tr>
+          <th>Serial Number</th>
+          <td>{{ selectedRow?.assetallocationSerialNumber }}</td>
+        </tr>
+
+        <!-- Employee Info -->
+
+        <tr>
+          <th>Allocated To</th>
+          <td>{{ selectedRow?.assetallocationAllocateTo }}</td>
+        </tr>
+
+        <tr>
+          <th>Employee Name</th>
+          <td>{{ selectedRow?.assetallocationEmployeeName }}</td>
+        </tr>
+
+        <tr>
+          <th>Department</th>
+          <td>{{ selectedRow?.assetallocationDepartment }}</td>
+        </tr>
+
+        <tr>
+          <th>Location</th>
+          <td>{{ selectedRow?.assetallocationLocation }}</td>
+        </tr>
+
+        <!-- Allocation Dates -->
+
+        <tr>
+          <th>Allocation Start Date</th>
+          <td>{{ selectedRow?.assetallocationStartDate }}</td>
+        </tr>
+
+        <tr>
+          <th>Expected Return Date</th>
+          <td>{{ selectedRow?.assetallocationExpectedReturnDate }}</td>
+        </tr>
+
+        <!-- Asset Condition -->
+
+        <tr>
+          <th>Asset Condition</th>
+          <td>{{ selectedRow?.assetallocationCondition }}</td>
+        </tr>
+
+        <tr>
+          <th>Acknowledged By</th>
+          <td>{{ selectedRow?.assetallocationAcknowledgedBy }}</td>
+        </tr>
+
+        <tr>
+          <th>Acknowledgement Date</th>
+          <td>{{ selectedRow?.assetallocationAcknowledgementDate }}</td>
+        </tr>
+
+        <tr>
+          <th>Remarks</th>
+          <td>{{ selectedRow?.assetallocationRemarks }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

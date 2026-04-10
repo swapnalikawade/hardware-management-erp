@@ -1,0 +1,270 @@
+/* Logo Wrapper (remove square bg, make clean round) */
+.logo-wrapper {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-wrapper img {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: transparent;
+}
+
+/* Company Name (Blue + Attractive) */
+.company-name {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #0d6efd; /* Same blue */
+  text-transform: uppercase;
+}
+
+.company-name::after {
+  content: "";
+  display: block;
+  width: 46px;
+  height: 3px;
+  background: linear-gradient(90deg, #0d6efd, #6ea8fe);
+  margin: 6px auto 0;
+  border-radius: 10px;
+}
+
+/* Small tagline */
+.company-tagline {
+  font-size: 11px;
+  color: #7a7a7a;
+  margin-top: 4px;
+  letter-spacing: 0.3px;
+}
+
+/* Password with eye icon */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 40px;
+}
+
+.password-wrapper i {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #6c757d;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.password-wrapper i:hover {
+  color: #0d6efd;
+}
+
+/* Background */
+
+.login-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d6efd, #e9f1ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bgFade 1.2s ease-in-out;
+}
+
+/* Card */
+.login-card {
+  width: 380px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 30px 28px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  transform: translateY(20px);
+  opacity: 0;
+  animation: cardIn 0.8s ease-out forwards;
+}
+
+.login-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+}
+
+/* Logo */
+.logo-box {
+  text-align: center;
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+.logo-box img {
+  height: 72px;
+  margin-bottom: 8px;
+  animation: popIn 0.6s ease-out;
+}
+
+.logo-box h3 {
+  margin: 0;
+  color: #0d6efd;
+  font-weight: 600;
+}
+
+/*.logo-box p {
+  margin: 0;
+  font-size: 13px;
+  color: gray;
+}*/
+
+/* Fields */
+.form-group {
+  margin-bottom: 14px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 0.6s ease-out forwards;
+}
+
+.form-group:nth-child(1) {
+  animation-delay: 0.35s;
+}
+.form-group:nth-child(2) {
+  animation-delay: 0.45s;
+}
+
+.form-group label {
+  font-size: 13px;
+  color: #555;
+}
+
+.form-control {
+  height: 40px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: 0.25s;
+  border: 1px solid #dcdcdc;
+}
+
+.form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+/* Button */
+.btn-login {
+  width: 100%;
+  height: 42px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0d6efd, #1f7bff);
+  color: white;
+  font-weight: 600;
+  margin-top: 12px;
+  transition: 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeUp 0.6s ease-out forwards;
+  animation-delay: 0.55s;
+}
+
+.btn-login:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(13, 110, 253, 0.35);
+}
+
+.btn-login:active {
+  transform: scale(0.98);
+}
+
+/* Error */
+.error-msg {
+  color: #e53935;
+  font-size: 13px;
+  margin-bottom: 6px;
+  text-align: center;
+  animation: shake 0.35s ease-in-out;
+}
+
+/* Footer */
+.footer-text {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 11px;
+  color: gray;
+  opacity: 0;
+  animation: fadeUp 0.6s ease-out forwards;
+  animation-delay: 0.7s;
+}
+
+/* Animations */
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+  75% {
+    transform: translateX(-3px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes bgFade {
+  from {
+    filter: brightness(0.9);
+  }
+  to {
+    filter: brightness(1);
+  }
+}

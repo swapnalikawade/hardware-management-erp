@@ -1,0 +1,1236 @@
+<div class="company-container">
+  <!-- HEADER -->
+  <div class="container-fluid py-3">
+    <div class="row align-items-start">
+      <!-- Left Section -->
+      <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
+        <h2 class="company-name">
+          {{ headCompanyName }}
+        </h2>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+          <span class="company-email">{{ userName }}</span>
+          <span class="breadcrumb-date">{{ today | date: "dd MMM yyyy" }}</span>
+        </div>
+      </div>
+
+      <!-- Right Section: Always top-right -->
+      <div
+        class="col-lg-6 col-md-6 col-sm-12 d-flex justify-content-md-end justify-content-start"
+      >
+        <h6 class="breadcrumb">
+          <i class="bi bi-house-fill me-1"></i>
+          Home
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-layers-fill me-1"></i>
+          Master
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-clipboard-check-fill me-1"></i>
+          Call Logging
+        </h6>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS-->
+  <div class="tabs-wrapper">
+    <div class="tabs-container">
+      <div
+        class="tab"
+        *ngFor="let tab of tabs"
+        [class.active]="activeTab === tab.key"
+        (click)="activeTab = tab.key"
+      >
+        <i [class]="tab.icon"></i> {{ tab.label }}
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMS ARE IN CARD -->
+  <div class="form-card">
+    <!-- DETAILS FORM -->
+    <div *ngIf="activeTab === 'details'" class="company-details-container">
+      <i class="bi bi-headset"></i>
+      Call Logging Details
+      <hr class="mt-0 mb-3" />
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <!-- Show entries -->
+        <div class="toolbar-item show-entries">
+          <label for="showEntries">Show</label>
+          <select id="showEntries" (change)="onChangeItemsPerPage($event)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>entries</span>
+        </div>
+
+        <!-- Export buttons -->
+        <div class="toolbar-item export-buttons">
+          <button class="btn-doc" (click)="exportDoc()">
+            <i class="bi bi-file-earmark-word-fill me-1"></i> DOC
+          </button>
+
+          <button class="btn-pdf" (click)="exportPDF()">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF
+          </button>
+
+          <button class="btn-excel" (click)="exportExcel()">
+            <i class="bi bi-file-earmark-excel-fill me-1"></i> Excel
+          </button>
+        </div>
+
+        <!-- Search + Delete -->
+        <div class="search-delete-group">
+          <!-- DELETE BUTTON -->
+          <div class="delete-btn" *ngIf="selectedRows.length > 0">
+            <button (click)="deleteSelectedRows()">
+              <i class="bi bi-trash-fill"></i>
+              Delete
+            </button>
+          </div>
+
+          <!-- SEARCH BOX -->
+          <div class="search-box">
+            <input
+              type="text"
+              placeholder="Search..."
+              (input)="applyFilter($event)"
+            />
+            <i class="bi bi-search"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-scroll-wrapper">
+        <table class="table table-bordered w-auto big-table">
+          <thead class="table-light">
+            <tr>
+              <th>
+                <input type="checkbox" (change)="toggleAll($event)" />
+              </th>
+
+              <!-- Call ID -->
+              <th>
+                Call ID
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('callLogId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('callLogId', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Department -->
+              <th>
+                Department
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('departmentId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('departmentId', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee ID -->
+              <th>
+                Employee ID
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('EmployeeId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('EmployeeId', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee Name -->
+              <th>
+                Employee Name
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('EmployeeName', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('EmployeeName', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Contact -->
+              <th>
+                Contact Number
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('ContactNumber', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('ContactNumber', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Email -->
+              <th>
+                Email
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('emailAddress', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('emailAddress', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Location -->
+              <th>
+                Locatio
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('location', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('location', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Asset -->
+              <th>
+                Asset ID
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetId', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Asset Name
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assetName', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assetName', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Problem -->
+              <th>
+                Problem Type
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('problemType', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('problemType', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Priority -->
+              <th>
+                Priority
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('callPriority', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('callPriority', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Status -->
+              <th>
+                Status
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('callStatus', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('callStatus', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Technician -->
+              <th>
+                Assigned Technician
+                <i
+                  class="bi bi-arrow-up sort-icon"
+                  (click)="sortTable('assignedTechnician', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down sort-icon"
+                  (click)="sortTable('assignedTechnician', 'desc')"
+                ></i>
+              </th>
+
+              <th>Action</th>
+            </tr>
+          </thead>
+          <!-- ================= TABLE BODY ================= -->
+          <tbody>
+            <tr
+              *ngFor="
+                let row of filteredData
+                  | slice
+                    : (currentPage - 1) * itemsPerPage
+                    : currentPage * itemsPerPage;
+                let i = index
+              "
+            >
+              <!-- Checkbox -->
+              <td>
+                <input
+                  type="checkbox"
+                  [checked]="selectedRows.includes(row)"
+                  (change)="toggleRowSelection(row, $event)"
+                />
+              </td>
+
+              <!-- Call ID -->
+              <td>
+                <span
+                  class="leave-link"
+                  [ngClass]="{
+                    'active-id': selectedRow?.callLogId === row.callLogId,
+                  }"
+                  (click)="openDetails(row)"
+                >
+                  {{ row.callLogId }}
+                </span>
+              </td>
+
+              <!-- Department -->
+              <td>{{ row.departmentId }}</td>
+
+              <!-- Employee -->
+              <td>{{ row.EmployeeId }}</td>
+              <td>{{ row.EmployeeName }}</td>
+
+              <!-- Contact -->
+              <td>{{ row.ContactNumber }}</td>
+
+              <!-- Email -->
+              <td>{{ row.emailAddress }}</td>
+
+              <!-- Location -->
+              <td>{{ row.location }}</td>
+
+              <!-- Asset -->
+              <td>{{ row.assetId }}</td>
+              <td>{{ row.assetName }}</td>
+
+              <!-- Problem -->
+              <td>{{ row.problemType }}</td>
+
+              <!-- Priority -->
+              <td>{{ row.callPriority }}</td>
+
+              <!-- Status -->
+              <td>
+                <span
+                  [ngClass]="{
+                    'status-active': row.callStatus === 'Active',
+                    'status-inactive': row.callStatus !== 'Active',
+                  }"
+                >
+                  <span *ngIf="row.callStatus === 'Active'">✔</span>
+                  <span *ngIf="row.callStatus !== 'Active'">❌</span>
+                  {{ row.callStatus }}
+                </span>
+              </td>
+
+              <!-- Technician -->
+              <td>{{ row.assignedTechnician }}</td>
+
+              <!-- Action -->
+              <td class="text-center">
+                <button class="btn btn-sm btn-primary" (click)="onEdit(row, i)">
+                  <i class="bi bi-pencil-square me-1"></i>
+                  Edit
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="no-data-message" *ngIf="filteredData.length === 0">
+        <i class="bi bi-database-x"></i>
+        No Data Found
+      </div>
+      <!-- Pagination -->
+      <div class="pagination">
+        <button
+          (click)="changePage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+
+        <button
+          *ngFor="let page of [].constructor(totalPages); let p = index"
+          (click)="changePage(p + 1)"
+          [class.active]="currentPage === p + 1"
+        >
+          {{ p + 1 }}
+        </button>
+
+        <button
+          (click)="changePage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+    <!-- NEW RECORD FORM -->
+    <div *ngIf="activeTab === 'newRecord'" class="new-record-container">
+      <!-- Title + Add More button -->
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="section-title">
+          <i
+            [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle-fill'"
+          ></i>
+          {{
+            isEditMode
+              ? "Update Spare Entry  Details"
+              : "Add Spare Entry  Details"
+          }}
+        </h3>
+        <!-- Add More Button -->
+        <button class="add-more-btn" *ngIf="!isEditMode" (click)="addForm()">
+          <i class="bi bi-plus"></i> Add More
+        </button>
+      </div>
+
+      <hr class="mt-0 mb-3" />
+
+      <!-- Dynamic Forms -->
+      <div
+        *ngFor="let form of forms; let i = index"
+        class="new-record-card mb-4 p-3 border rounded"
+      >
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="section-title">
+            {{
+              isEditMode
+                ? "Update Spare Entry  Details (ID: " +
+                  tableData[editIndex!].callLogId +
+                  ")"
+                : "Add Spare Entry  Details " + (i + 1)
+            }}
+          </h5>
+          <!-- REMOVE BUTTON (NOT for first form) -->
+          <button
+            *ngIf="i > 0"
+            class="btn btn-sm btn-light"
+            (click)="removeForm(i)"
+          >
+            <i class="bi bi-x-lg me-2"></i>Remove
+          </button>
+        </div>
+
+        <!-- FORM -->
+        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
+          <div class="row mb-3">
+            <!-- Call Code -->
+
+            <div class="col-md-6">
+              <label>Department <span class="text-danger">*</span></label>
+
+              <select
+                class="form-control"
+                required
+                #department="ngModel"
+                [(ngModel)]="forms[i].departmentId"
+                name="departmentId"
+                [ngClass]="{
+                  'is-invalid':
+                    department.invalid &&
+                    (department.touched || department.dirty),
+                }"
+              >
+                <option value="">Select Department</option>
+
+                <option
+                  *ngFor="let dept of departments"
+                  [value]="dept.departmentId"
+                >
+                  {{ dept.departmentName }}
+                </option>
+              </select>
+
+              <div
+                class="invalid-feedback"
+                *ngIf="
+                  department.invalid && (department.touched || department.dirty)
+                "
+              >
+                Department is required
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label> Employee <span class="text-danger">*</span> </label>
+
+              <select
+                class="form-control"
+                name="EmployeeId"
+                required
+                [(ngModel)]="forms[i].EmployeeId"
+                #employee="ngModel"
+                (change)="onEmployeeChange(i)"
+                [ngClass]="{
+                  'is-invalid':
+                    employee.invalid && (employee.touched || employee.dirty),
+                }"
+              >
+                <option value="">Select Employee</option>
+
+                <option *ngFor="let emp of employees" [value]="emp.employeeId">
+                  {{ emp.employeeId }} - {{ emp.employeeName }}
+                </option>
+              </select>
+
+              <!-- Validation Message -->
+              <div
+                class="invalid-feedback"
+                *ngIf="employee.invalid && (employee.touched || employee.dirty)"
+              >
+                Employee is required
+              </div>
+            </div>
+            <!-- Contact Number -->
+            <!-- Contact Number -->
+            <div class="col-md-6">
+              <label>Contact Number <span class="text-danger">*</span></label>
+
+              <input
+                class="form-control"
+                required
+                placeholder="9876543210"
+                pattern="^[6-9]\d{9}$"
+                maxlength="10"
+                #contactNumber="ngModel"
+                [(ngModel)]="forms[i].ContactNumber"
+                name="ContactNumber"
+                [ngClass]="{
+                  'is-invalid':
+                    contactNumber.invalid &&
+                    (contactNumber.touched || contactNumber.dirty),
+                }"
+              />
+
+              <div
+                class="invalid-feedback"
+                *ngIf="contactNumber.errors?.['required']"
+              >
+                Contact Number is required
+              </div>
+
+              <div
+                class="invalid-feedback"
+                *ngIf="contactNumber.errors?.['pattern']"
+              >
+                Enter valid 10 digit number
+              </div>
+            </div>
+            <!-- Email Address -->
+            <div class="col-md-6">
+              <label>Email Address <span class="text-danger">*</span></label>
+
+              <input
+                type="email"
+                class="form-control"
+                required
+                placeholder="example@gmail.com"
+                #emailAddress="ngModel"
+                [(ngModel)]="forms[i].emailAddress"
+                name="emailAddress"
+                [ngClass]="{
+                  'is-invalid':
+                    emailAddress.invalid &&
+                    (emailAddress.touched || emailAddress.dirty),
+                }"
+              />
+
+              <div
+                class="invalid-feedback"
+                *ngIf="emailAddress.errors?.['required']"
+              >
+                Email address is required
+              </div>
+
+              <div
+                class="invalid-feedback"
+                *ngIf="emailAddress.errors?.['email']"
+              >
+                Enter valid email address
+              </div>
+            </div>
+            <!-- Location -->
+            <div class="col-md-4">
+              <label>Location <span class="text-danger">*</span></label>
+
+              <input
+                class="form-control"
+                required
+                placeholder="e.g. Pune Office"
+                #location="ngModel"
+                [(ngModel)]="forms[i].location"
+                name="location"
+                [ngClass]="{
+                  'is-invalid':
+                    location.invalid && (location.touched || location.dirty),
+                }"
+              />
+
+              <div
+                class="invalid-feedback"
+                *ngIf="location.errors?.['required']"
+              >
+                Location is required
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label> Asset <span class="text-danger">*</span> </label>
+
+              <select
+                class="form-control"
+                name="assetId"
+                required
+                [(ngModel)]="forms[i].assetId"
+                #asset="ngModel"
+                (change)="onAssetChange(form.assetId, i)"
+                [ngClass]="{
+                  'is-invalid': asset.invalid && (asset.touched || asset.dirty),
+                }"
+              >
+                <option value="">Select Asset</option>
+
+                <option *ngFor="let asset of assets" [value]="asset.assetId">
+                  {{ asset.assetId }} - {{ asset.assetName }}
+                </option>
+              </select>
+
+              <!-- Validation -->
+              <div
+                class="invalid-feedback"
+                *ngIf="asset.invalid && (asset.touched || asset.dirty)"
+              >
+                Asset is required
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label>Problem Type <span class="text-danger">*</span></label>
+
+              <select
+                class="form-control"
+                required
+                #problemType="ngModel"
+                [(ngModel)]="forms[i].problemType"
+                name="problemType"
+                [ngClass]="{
+                  'is-invalid':
+                    problemType.invalid &&
+                    (problemType.touched || problemType.dirty),
+                }"
+              >
+                <option value="">Select Problem Type</option>
+                <option value="Hardware">Hardware</option>
+                <option value="Software">Software</option>
+                <option value="Network">Network</option>
+              </select>
+
+              <div
+                class="invalid-feedback"
+                *ngIf="problemType.errors?.['required']"
+              >
+                Problem type is required
+              </div>
+            </div>
+            <div class="col-md-12">
+              <label
+                >Problem Description <span class="text-danger">*</span></label
+              >
+
+              <textarea
+                class="form-control"
+                rows="3"
+                required
+                #problemDescription="ngModel"
+                [(ngModel)]="forms[i].problemDescription"
+                name="problemDescription"
+                [ngClass]="{
+                  'is-invalid':
+                    problemDescription.invalid &&
+                    (problemDescription.touched || problemDescription.dirty),
+                }"
+              ></textarea>
+
+              <div
+                class="invalid-feedback"
+                *ngIf="problemDescription.errors?.['required']"
+              >
+                Problem description required
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label>Call Priority <span class="text-danger">*</span></label>
+
+              <select
+                class="form-control"
+                required
+                #callPriority="ngModel"
+                [(ngModel)]="forms[i].callPriority"
+                name="callPriority"
+              >
+                <option value="">Select Priority</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label>Call Status <span class="text-danger">*</span></label>
+
+              <select
+                class="form-control"
+                required
+                [(ngModel)]="forms[i].callStatus"
+                name="callStatus"
+              >
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+            <!-- Assigned Technician -->
+            <div class="col-md-4">
+              <label
+                >Assigned Technician <span class="text-danger">*</span></label
+              >
+
+              <input
+                class="form-control"
+                required
+                placeholder="Technician Name"
+                #assignedTechnician="ngModel"
+                [(ngModel)]="forms[i].assignedTechnician"
+                name="assignedTechnician"
+                [ngClass]="{
+                  'is-invalid':
+                    assignedTechnician.invalid &&
+                    (assignedTechnician.touched || assignedTechnician.dirty),
+                }"
+              />
+
+              <div
+                class="invalid-feedback"
+                *ngIf="assignedTechnician.errors?.['required']"
+              >
+                Technician name required
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label>Call Date Time</label>
+
+              <input
+                type="datetime-local"
+                class="form-control"
+                [(ngModel)]="forms[i].callDateTime"
+                name="callDateTime"
+              />
+            </div>
+            <div class="col-md-4">
+              <label>Close Date</label>
+
+              <input
+                type="date"
+                class="form-control"
+                [(ngModel)]="forms[i].closeDate"
+                name="closeDate"
+              />
+            </div>
+
+            <div class="col-md-4">
+              <label>Login ID</label>
+
+              <input
+                class="form-control"
+                readonly
+                [(ngModel)]="forms[i].loginId"
+                name="loginId"
+              />
+            </div>
+            <div class="col-md-12">
+              <label>Remarks</label>
+
+              <textarea
+                class="form-control"
+                rows="2"
+                [(ngModel)]="forms[i].remarks"
+                name="remarks"
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+
+          <div
+            class="mt-3 d-flex gap-2 justify-content-end"
+            *ngIf="i === forms.length - 1"
+          >
+            <button type="button" class="btn-save" (click)="saveAllRecords()">
+              <i class="bi bi-floppy-fill"></i>
+              {{ isEditMode ? "Update" : "Save All" }}
+            </button>
+
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="cancelRecord(recordForm)"
+            >
+              <i class="bi bi-arrow-counterclockwise"></i> Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- BULK IMPORT FORM -->
+    <div
+      *ngIf="activeTab === 'bulkImport'"
+      class="bulk-import-container container-fluid"
+    >
+      <!-- Bulk Import Records Title -->
+      <h3 class="section-title mb-3">
+        <i class="fa-solid fa-file-import"></i> Bulk Import Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- Important Notice -->
+      <div class="important-box mb-4">
+        <h4 class="mb-2">
+          <i class="fa-solid fa-triangle-exclamation"></i> Important Notice
+        </h4>
+        <ul class="mb-0">
+          <li>
+            It is Extremely Important to put the System in maintenance mode to
+            perform Bulk Import operations.
+          </li>
+          <li>DO NOT IMPORT BULK DATA WHILE SYSTEM IS UNDER USE.</li>
+          <li>ONLY EXPORT/TRAINED EMPLOYEES SHOULD USE THIS SECTION.</li>
+        </ul>
+      </div>
+      <!-- File Upload Section -->
+      <div class="file-upload-section">
+        <h4 class="mb-2">
+          <i class="fa-solid fa-upload"></i> Upload File to Import
+        </h4>
+        <p>Select file to import(Only doc,excel,csv,txt files):</p>
+        <!-- Responsive Wrapper -->
+        <div class="upload-controls mb-3">
+          <!-- File Input -->
+          <input
+            type="file"
+            class="form-control file-input"
+            (change)="onFileSelected($event)"
+          />
+          <!-- Buttons Wrapper -->
+          <div class="buttons-wrapper">
+            <button type="button" class="btn-upload" (click)="uploadFile()">
+              Upload File
+            </button>
+            <button
+              type="button"
+              class="btn-download"
+              (click)="downloadSampleCSV()"
+            >
+              <i class="fa-solid fa-file-arrow-down"></i> Download Sample CSV
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BULK EXPORT FORM -->
+    <div *ngIf="activeTab === 'bulkExport'" class="bulk-export-container">
+      <!-- Bulk Export Records Title -->
+      <h3 class="section-title">
+        <i class="fa-solid fa-file-export"></i> Bulk Export Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- File Export Options -->
+      <div class="export-options">
+        <h4><i class="fa-solid fa-gear"></i> File Export Options</h4>
+        <!-- Filters in Horizontal Line -->
+        <div class="filter-column">
+          <div class="container">
+            <div class="row g-3">
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="startDate" class="form-label">Start Date:</label>
+                  <input
+                    type="text"
+                    id="startDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="startDate"
+                    (input)="formatDate($event, 'start')"
+                  />
+                </div>
+                <!-- Validation message (optional) -->
+                <p
+                  *ngIf="startDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ startDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="endDate" class="form-label">End Date:</label>
+                  <input
+                    type="text"
+                    id="endDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="endDate"
+                    (input)="formatDate($event, 'end')"
+                  />
+                </div>
+                <p
+                  *ngIf="endDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ endDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="fileType" class="form-label">File Type:</label>
+                  <select
+                    id="fileType"
+                    [(ngModel)]="fileType"
+                    class="form-select"
+                  >
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">Excel (.xlsx)</option>
+                    <option value="pdf">PDF</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="export-buttons justify-content-end">
+          <button type="button" class="btn-reset" (click)="resetFilters()">
+            <i class="fa-solid fa-rotate-left"></i> Reset Filters
+          </button>
+          <button type="button" class="btn-get" (click)="getFile()">
+            <i class="fa-solid fa-download"></i> Get File
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HELP SECTION -->
+    <div *ngIf="activeTab === 'help'" class="help-page-bg container-fluid py-4">
+      <h3 class="section-title mb-2">Help & Guidelines</h3>
+      <hr class="mt-0 mb-3" />
+
+      <h4 class="fw-bold text-primary mb-3">
+        Department Management Module – User Manual
+      </h4>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the Department module. Follow the
+        instructions carefully to avoid incorrect data.
+      </div>
+
+      <!-- MAIN HELP TABLE -->
+      <div class="table-responsive mb-5">
+        <table class="table table-bordered align-top">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Tab</th>
+              <th>Purpose</th>
+              <th>Instructions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Details</td>
+              <td>View and manage department records</td>
+              <td>
+                • View department data and status<br />
+                • Search, filter, and sort records<br />
+                • Click <b>Edit</b> to update record
+              </td>
+            </tr>
+
+            <tr>
+              <td>2</td>
+              <td>New Record</td>
+              <td>Add new department</td>
+              <td>
+                • Click <b>New Record</b><br />
+                • Enter all required fields<br />
+                • Use <b>Add More</b> for multiple entries<br />
+                • Click <b>Save All</b>
+              </td>
+            </tr>
+
+            <tr>
+              <td>3</td>
+              <td>Bulk Import</td>
+              <td>Import multiple department details</td>
+              <td>
+                • Upload CSV / Excel / DOCX / PDF / TXT<br />
+                • File must match system format<br />
+                • Errors shown if data is invalid
+              </td>
+            </tr>
+
+            <tr>
+              <td>4</td>
+              <td>Bulk Export</td>
+              <td>Download department data</td>
+              <td>
+                • Apply filters if needed<br />
+                • Select export format<br />
+                • File downloads instantly
+              </td>
+            </tr>
+
+            <tr>
+              <td>5</td>
+              <td>Help</td>
+              <td>Usage guidance & examples</td>
+              <td>
+                • Refer examples before entry<br />
+                • Follow validation messages<br />
+                • Use for troubleshooting
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SINGLE RECORD EXAMPLE -->
+      <h5 class="fw-semibold text-info">Example: Adding Single Department</h5>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the Department module. Follow the
+        instructions carefully to avoid incorrect data.
+      </div>
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Department</td>
+              <td>Fill details and click Save</td>
+              <td>Record visible in Details tab</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MULTIPLE RECORD EXAMPLE -->
+      <h5 class="fw-semibold text-info">
+        Example: Adding Multiple Department Details
+      </h5>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the Department module. Follow the
+        instructions carefully to avoid incorrect data.
+      </div>
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Multiple</td>
+              <td>Use Add More and Save All</td>
+              <td>All records saved</td>
+            </tr>
+            <tr>
+              <td>Bulk Import</td>
+              <td>Import File</td>
+              <td>Upload valid file</td>
+              <td>Valid records imported</td>
+            </tr>
+            <tr>
+              <td>Bulk Export</td>
+              <td>Export</td>
+              <td>Select format</td>
+              <td>File downloaded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Call VIEW MODAL -->
+<div class="modal" [class.show]="showViewModal">
+  <div class="modal-content">
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h5>
+        <i class="fa-solid fa-phone"></i>
+        Call Details (ID: {{ selectedRow?.callLogId }})
+      </h5>
+      <button class="close-btn1" (click)="closeViewModal()">×</button>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body">
+      <table class="popup-table">
+        <tr>
+          <th>Call ID</th>
+          <td>{{ selectedRow?.callLogId }}</td>
+        </tr>
+
+        <tr>
+          <th>Department ID</th>
+          <td>{{ selectedRow?.departmentId }}</td>
+        </tr>
+
+        <tr>
+          <th>Employee ID</th>
+          <td>{{ selectedRow?.EmployeeId }}</td>
+        </tr>
+
+        <tr>
+          <th>Employee Name</th>
+          <td>{{ selectedRow?.EmployeeName }}</td>
+        </tr>
+
+        <tr>
+          <th>Contact Number</th>
+          <td>{{ selectedRow?.ContactNumber }}</td>
+        </tr>
+
+        <tr>
+          <th>Email Address</th>
+          <td>{{ selectedRow?.emailAddress }}</td>
+        </tr>
+
+        <tr>
+          <th>Location</th>
+          <td>{{ selectedRow?.location }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset ID</th>
+          <td>{{ selectedRow?.assetId }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset Name</th>
+          <td>{{ selectedRow?.assetName }}</td>
+        </tr>
+
+        <tr>
+          <th>Problem Type</th>
+          <td>{{ selectedRow?.problemType }}</td>
+        </tr>
+
+        <tr>
+          <th>Problem Description</th>
+          <td>{{ selectedRow?.problemDescription }}</td>
+        </tr>
+
+        <tr>
+          <th>Priority</th>
+          <td>{{ selectedRow?.callPriority }}</td>
+        </tr>
+
+        <tr>
+          <th>Assigned Technician</th>
+          <td>{{ selectedRow?.assignedTechnician }}</td>
+        </tr>
+
+        <tr>
+          <th>Call Date Time</th>
+          <td>{{ selectedRow?.callDateTime }}</td>
+        </tr>
+
+        <tr>
+          <th>Remarks</th>
+          <td>{{ selectedRow?.remarks }}</td>
+        </tr>
+
+        <tr>
+          <th>Close Date</th>
+          <td>{{ selectedRow?.closeDate }}</td>
+        </tr>
+
+        <tr>
+          <th>Status</th>
+          <td>
+            <span
+              [ngClass]="{
+                'status-active': selectedRow?.callStatus === 'Active',
+                'status-inactive': selectedRow?.callStatus !== 'Active',
+              }"
+            >
+              <span *ngIf="selectedRow?.callStatus === 'Active'">✔</span>
+              <span *ngIf="selectedRow?.callStatus !== 'Active'">❌</span>
+              {{ selectedRow?.callStatus }}
+            </span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

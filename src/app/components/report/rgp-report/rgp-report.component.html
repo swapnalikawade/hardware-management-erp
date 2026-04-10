@@ -1,0 +1,323 @@
+<div class="company-container">
+  <!-- HEADER -->
+  <div class="container-fluid py-3">
+    <div class="row align-items-start">
+      <!-- Left Section -->
+      <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
+        <h2 class="company-name">
+          {{ companyName }}
+        </h2>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+          <span class="company-email">{{ companyEmail }}</span>
+          <span class="breadcrumb-date">{{ today | date: "dd MMM yyyy" }}</span>
+        </div>
+      </div>
+
+      <!-- Right Section: Always top-right -->
+      <div
+        class="col-lg-6 col-md-6 col-sm-12 d-flex justify-content-md-end justify-content-start"
+      >
+        <h6 class="breadcrumb d-flex align-items-center">
+          <i class="bi bi-house-fill me-1"></i>
+          Home
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-layers-fill me-1"></i>
+          Master Report
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-people-fill me-1"></i>
+
+          RGP Report
+        </h6>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS-->
+  <div class="tabs-wrapper">
+    <div class="tabs-container">
+      <div
+        class="tab"
+        *ngFor="let tab of tabs"
+        [class.active]="activeTab === tab.key"
+        (click)="activeTab = tab.key"
+      >
+        <i [class]="tab.icon"></i> {{ tab.label }}
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW RECORD FORM -->
+  <div *ngIf="activeTab === 'newRecord'" class="new-record-container">
+    <hr class="mt-0 mb-3" />
+
+    <!-- Dynamic Forms -->
+    <div
+      *ngFor="let form of forms; let i = index"
+      class="new-record-card mb-4 p-3 border rounded"
+    >
+      <!-- FORM -->
+      <form
+        [formGroup]="reportForm"
+        (ngSubmit)="submitReport()"
+        class="report-form container-fluid"
+      >
+        <h2 class="d-flex align-items-center mb-4">
+          <i class="bi bi-file-earmark-bar-graph-fill me-2 text-primary"></i>
+          RGP Report – Date Wise
+        </h2>
+
+        <!-- ================= EXPORT TO ================= -->
+        <div class="card mb-4">
+          <div class="card-header fw-bold">Export To:</div>
+          <div
+            class="card-body d-flex justify-content-between align-items-center flex-wrap"
+          >
+            <div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  value="PDF"
+                  formControlName="exportType"
+                />
+                <label class="form-check-label">PDF</label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  value="DOC"
+                  formControlName="exportType"
+                />
+                <label class="form-check-label">MS Word</label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  value="EXCEL"
+                  formControlName="exportType"
+                />
+                <label class="form-check-label">Excel</label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  value="EXCEL_TABULAR"
+                  formControlName="exportType"
+                />
+                <label class="form-check-label">Excel Tabular</label>
+              </div>
+            </div>
+
+            <!-- PRINT -->
+            <div class="mt-3 mt-md-0">
+              <button
+                type="button"
+                class="btn btn-success px-3 py-1"
+                (click)="printReport()"
+              >
+                <i class="bi bi-printer-fill me-1"></i> Print
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card mb-4">
+          <div class="card-header fw-bold">Department Details</div>
+          <div class="card-body row g-3">
+            <div class="col-md-12">
+              <label class="form-label">Department</label>
+
+              <select
+                class="form-select"
+                formControlName="departmentId"
+                (change)="onDepartmentSelect($any($event.target).value)"
+                [ngClass]="{
+                  'is-invalid':
+                    reportForm.get('departmentId')?.invalid &&
+                    reportForm.get('departmentId')?.touched,
+                }"
+              >
+                <option value="">-- Select Department --</option>
+                <option *ngFor="let dept of departments" [value]="dept.id">
+                  {{ dept.id }} - {{ dept.name }}
+                </option>
+              </select>
+
+              <!-- ❗ Validation Message -->
+              <div
+                class="invalid-feedback"
+                *ngIf="
+                  reportForm.get('departmentId')?.invalid &&
+                  reportForm.get('departmentId')?.touched
+                "
+              >
+                Department is required
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= ASSET RETURN DETAILS ================= -->
+        <div class="card mb-4">
+          <div class="card-header fw-bold">Asset Return Details</div>
+
+          <div class="card-body row g-3">
+            <!-- Asset ID -->
+            <div class="col-md-6">
+              <label class="form-label">
+                Asset ID <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter Asset ID"
+                formControlName="assetId"
+                [ngClass]="{
+                  'is-invalid':
+                    (f['assetId'].touched || f['assetId'].dirty) &&
+                    f['assetId'].invalid,
+                }"
+              />
+
+              <div class="invalid-feedback">
+                <div *ngIf="f['assetCode'].errors?.['required']">
+                  Asset Code is required
+                </div>
+                <div *ngIf="f['assetCode'].errors?.['pattern']">
+                  Format must be AST-001
+                </div>
+              </div>
+            </div>
+
+            <!-- Asset Name -->
+            <div class="col-md-6">
+              <label class="form-label">
+                Asset Name <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter Asset Name"
+                formControlName="assetName"
+                [ngClass]="{
+                  'is-invalid':
+                    (f['assetName'].touched || f['assetName'].dirty) &&
+                    f['assetName'].invalid,
+                }"
+              />
+              <div class="invalid-feedback">
+                <div *ngIf="f['assetName'].errors?.['required']">
+                  Asset Name is required
+                </div>
+                <div *ngIf="f['assetName'].errors?.['minlength']">
+                  Minimum 3 characters required
+                </div>
+                <div *ngIf="f['assetName'].errors?.['pattern']">
+                  Only letters & spaces allowed
+                </div>
+              </div>
+            </div>
+
+            <!-- Asset Code -->
+            <div class="col-md-6">
+              <label class="form-label">
+                Asset Code <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter Asset Code"
+                formControlName="assetCode"
+                [ngClass]="{
+                  'is-invalid':
+                    (f['assetCode'].touched || f['assetCode'].dirty) &&
+                    f['assetCode'].invalid,
+                }"
+              />
+              <div class="invalid-feedback">
+                <div *ngIf="f['assetCode'].errors?.['required']">
+                  Asset Code is required
+                </div>
+                <div *ngIf="f['assetCode'].errors?.['pattern']">
+                  Format must be AST-001
+                </div>
+              </div>
+            </div>
+
+            <!-- Return Date -->
+            <div class="col-md-6">
+              <label class="form-label">
+                Return Date <span class="text-danger">*</span>
+              </label>
+              <input
+                type="date"
+                class="form-control"
+                formControlName="returnDate"
+                [ngClass]="{
+                  'is-invalid':
+                    (f['returnDate'].touched || f['returnDate'].dirty) &&
+                    f['returnDate'].invalid,
+                }"
+              />
+
+              <div class="invalid-feedback">
+                <div *ngIf="f['returnDate'].errors?.['required']">
+                  Return Date is required
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header fw-bold">Report Details</div>
+          <div class="card-body row g-3">
+            <div class="col-md-6">
+              <label class="form-label">From Date</label>
+              <input
+                type="date"
+                class="form-control"
+                formControlName="fromDate"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">To Date</label>
+              <input
+                type="date"
+                class="form-control"
+                formControlName="toDate"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= SUBMIT ================= -->
+        <div class="text-center mb-5 d-flex justify-content-center gap-3">
+          <!-- Generate -->
+          <button class="btn btn-primary px-3 py-2" type="submit">
+            <i class="bi bi-file-earmark-text-fill me-1"></i>
+            Generate Report
+          </button>
+
+          <!-- Reset -->
+          <button
+            class="btn btn-outline-secondary px-3 py-2"
+            type="button"
+            (click)="resetForm()"
+          >
+            <i class="bi bi-arrow-counterclockwise me-1"></i>
+            Reset
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

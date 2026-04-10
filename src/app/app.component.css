@@ -1,0 +1,266 @@
+/* ======= Toolbar ======= */
+.top-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  height: 64px;
+  background-color: #1976d2;
+  color: white;
+  z-index: 5;
+}
+
+.toolbar-title {
+  margin-left: 8px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-title {
+  font-weight: 500;
+  font-size: 18px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Search Box */
+.search-box {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid gray;
+  border-radius: 4px;
+  padding: 3px 8px;
+}
+.search-box input {
+  width: 200px;
+  font-size: 12px;
+  border: none;
+  outline: none;
+  margin-left: 4px;
+}
+
+/* ======= Sidenav & Content ======= */
+mat-toolbar {
+  z-index: 5;
+}
+
+.content {
+  padding: 24px;
+}
+
+mat-sidenav-container {
+  height: calc(100vh - 64px);
+}
+
+mat-sidenav,
+mat-sidenav-content {
+  transition: all 0.5s ease-in-out;
+}
+
+/* ======= Right-side Card ======= */
+.card-container {
+  position: fixed;
+  top: 64px;
+  right: 0;
+  height: calc(100vh - 64px);
+  width: 420px;
+  z-index: 1000;
+}
+
+.slide-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+}
+
+.flex-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+}
+
+.matTabHeader {
+  background: #004700;
+  color: #ffffff;
+  padding-left: 5px;
+}
+
+.mat-tab-content {
+  width: 100%;
+  height: auto;
+  padding: 20px;
+  font-size: 14px;
+}
+
+.mat-radio-button {
+  margin-left: 40px;
+}
+
+/* ======= Color Picker Section ======= */
+.box-container {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.color-box {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.color-box:hover {
+  transform: scale(1.05);
+}
+
+.check-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 22px;
+  color: white;
+  font-weight: bold;
+  text-shadow: 0px 0px 4px black;
+}
+
+.picker-container {
+  display: flex;
+  justify-content: center;
+}
+
+/* ======= Responsive Design ======= */
+
+/* Hide search field on tablets & smaller */
+@media (max-width: 992px) {
+  .search-box input {
+    width: 120px;
+  }
+}
+
+/* ======= Mobile view (<=768px) ======= */
+@media (max-width: 768px) {
+  .top-toolbar {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 8px 12px;
+  }
+
+  .toolbar-title {
+    font-size: 16px;
+  }
+
+  mat-icon {
+    color: rgba(255, 255, 255, 0.952) !important;
+  }
+
+  .left-section {
+    width: 100%;
+  }
+
+  .right-section {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+
+  .search-box {
+    display: none;
+  }
+
+  mat-sidenav {
+    position: fixed !important;
+    margin-top: 4rem;
+    z-index: 1100;
+    height: 100vh;
+  }
+
+  mat-sidenav-content {
+    margin-left: 0 !important;
+  }
+
+  .card-container {
+    width: 100%;
+    height: 100vh;
+    background-color: #ffffff;
+  }
+
+  .slide-card {
+    padding: 8px;
+  }
+}
+
+/* ======= Extra small devices (<=480px) ======= */
+@media (max-width: 480px) {
+  .mat-icon {
+    font-size: 20px;
+  }
+
+  .card-container {
+    width: 100%;
+  }
+
+  .toolbar-title {
+    font-size: 14px;
+  }
+}
+/* =============================== */
+/* PURCHASE ORDER HELP PAGE */
+/* =============================== */
+
+.help-page-bg {
+  font-size: 14px;
+  font-weight: 400;
+  color: #333;
+}
+
+/* Section title */
+.help-page-bg .section-title {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Table text */
+.help-page-bg table th,
+.help-page-bg table td {
+  font-size: 14px;
+  font-weight: 400;
+  vertical-align: top;
+}
+
+/* Note box */
+.alert-note {
+  background: #f8f9fa;
+  border-left: 4px solid #0d6efd;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #555;
+}
+
+/* Headings */
+.help-page-bg h5 {
+  font-size: 15px;
+  font-weight: 500;
+}
+/* Toast position fix */

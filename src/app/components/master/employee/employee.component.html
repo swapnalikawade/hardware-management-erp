@@ -1,0 +1,1334 @@
+<div class="company-container">
+  <!-- HEADER -->
+  <div class="container-fluid py-3">
+    <div class="row align-items-start">
+      <!-- Left Section -->
+      <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
+        <h2 class="company-name">
+          {{ headCompanyName }}
+        </h2>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+          <span class="company-employeeEmail">{{ userName }}</span>
+          <span class="breadcrumb-date">{{ today | date: "dd MMM yyyy" }}</span>
+        </div>
+      </div>
+
+      <!-- Right Section: Always top-right -->
+      <div
+        class="col-lg-6 col-md-6 col-sm-12 d-flex justify-content-md-end justify-content-start"
+      >
+        <h6 class="breadcrumb">
+          <i class="bi bi-house-fill me-1"></i>
+          Home
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-layers-fill me-1"></i>
+          Master
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-people-fill me-1"></i>
+          Employee
+        </h6>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS-->
+  <div class="tabs-wrapper">
+    <div class="tabs-container">
+      <div
+        class="tab"
+        *ngFor="let tab of tabs"
+        [class.active]="activeTab === tab.key"
+        (click)="activeTab = tab.key"
+      >
+        <i [class]="tab.icon"></i> {{ tab.label }}
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMS ARE IN CARD -->
+  <div class="form-card">
+    <!-- DETAILS FORM -->
+    <div *ngIf="activeTab === 'details'" class="company-details-container">
+      <h3 class="section-title">
+        <i class="bi bi-people-fill"></i> Employee Details
+      </h3>
+      <hr class="mt-0 mb-3" />
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <!-- Show entries -->
+        <div class="toolbar-item show-entries">
+          <label for="showEntries">Show</label>
+          <select id="showEntries" (change)="onChangeItemsPerPage($event)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>entries</span>
+        </div>
+
+        <!-- Export buttons -->
+        <div class="toolbar-item export-buttons">
+          <button class="btn-doc" (click)="exportDoc()">
+            <i class="bi bi-file-earmark-word-fill me-1"></i> DOC
+          </button>
+
+          <button class="btn-pdf" (click)="exportPDF()">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF
+          </button>
+
+          <button class="btn-excel" (click)="exportExcel()">
+            <i class="bi bi-file-earmark-excel-fill me-1"></i> Excel
+          </button>
+        </div>
+
+        <!-- Search + Delete -->
+        <div class="search-delete-group">
+          <!-- DELETE BUTTON -->
+          <div class="delete-btn" *ngIf="selectedRows.length > 0">
+            <button (click)="deleteSelectedRows()">
+              <i class="bi bi-trash-fill"></i> Delete
+            </button>
+          </div>
+
+          <!-- SEARCH BOX -->
+          <div class="search-box">
+            <input
+              type="text"
+              placeholder="Search..."
+              (input)="applyFilter($event)"
+            />
+            <i class="bi bi-search"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <input type="checkbox" (change)="toggleAll($event)" />
+              </th>
+
+              <!-- Employee ID -->
+              <th>
+                Employee ID (PK)
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeId', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee Name -->
+              <th>
+                Employee Name
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeName', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeName', 'desc')"
+                ></i>
+              </th>
+
+              <!-- DOB -->
+              <th>
+                Date Of Birth
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeDOB', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeDOB', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee Age -->
+              <th>
+                Employee Age
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeAge', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeAge', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee Married Status -->
+              <th>
+                Employee Married Status
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeMarriedStatus', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeMarriedStatus', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee Gender -->
+              <th>
+                Employee Gender
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeGender', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeGender', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee Email -->
+              <th>
+                Employee Email
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeEmail', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeEmail', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee Contact -->
+              <th>
+                Employee Contact
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeContact', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeContact', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee Address -->
+              <th>
+                Address
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeAddress', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeAddress', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee City -->
+              <th>
+                City
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeCity', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeCity', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee State -->
+              <th>
+                Employee State
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeState', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeState', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee Pin Code -->
+              <th>
+                Employee Pin Code
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeePinCode', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeePinCode', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee Country -->
+              <th>
+                Employee Country
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeCountry', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeCountry', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Employee Religion -->
+              <th>
+                Employee Religion
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeReligion', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeReligion', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Department Id -->
+              <th>
+                Department ID
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('departmentId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('departmentId', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Designation Id -->
+              <th>
+                Designation ID
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('designationId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('designationId', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Status -->
+              <th>
+                Status
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeStatus', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeStatus', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Created Date -->
+              <th>
+                Created Date
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeCreatedDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeCreatedDate', 'desc')"
+                ></i>
+              </th>
+              <th>
+                Created By
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('createdBy', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('createdBy', 'desc')"
+                ></i>
+              </th>
+
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="
+                let row of filteredData
+                  | slice
+                    : (currentPage - 1) * itemsPerPage
+                    : currentPage * itemsPerPage;
+                let i = index
+              "
+            >
+              <!-- Checkbox -->
+              <td>
+                <input
+                  type="checkbox"
+                  [checked]="selectedRows.includes(row)"
+                  (change)="toggleRowSelection(row, $event)"
+                />
+              </td>
+
+              <!-- Employee ID -->
+              <td>
+                <span
+                  class="leave-link"
+                  [ngClass]="{
+                    'active-id': selectedRow?.employeeId === row.employeeId,
+                  }"
+                  (click)="openDetails(row)"
+                >
+                  {{ row.employeeId }}
+                </span>
+              </td>
+
+              <!-- Employee Name -->
+              <td>{{ row.employeeName }}</td>
+
+              <!-- DOB -->
+              <td>{{ row.employeeDOB }}</td>
+
+              <!-- Age -->
+              <td>{{ row.employeeAge }}</td>
+
+              <!-- employeeMarriedStatus -->
+              <td>{{ row.employeeMarriedStatus }}</td>
+
+              <!-- employeeGender -->
+              <td>{{ row.employeeGender }}</td>
+
+              <!-- employeeEmail -->
+              <td>{{ row.employeeEmail }}</td>
+
+              <!-- Contact -->
+              <td>{{ row.employeeContact }}</td>
+
+              <!-- employeeAddress -->
+              <td>{{ row.employeeAddress }}</td>
+
+              <!-- City -->
+              <td>{{ row.employeeCity }}</td>
+
+              <!-- State -->
+              <td>{{ row.employeeState }}</td>
+
+              <!-- employeePinCode -->
+              <td>{{ row.employeePinCode }}</td>
+
+              <!-- employeeCountry -->
+              <td>{{ row.employeeCountry }}</td>
+
+              <!-- employeeReligion -->
+              <td>{{ row.employeeReligion }}</td>
+
+              <!-- Department -->
+              <td>{{ row.departmentId }}</td>
+
+              <!-- Designation -->
+              <td>{{ row.designationId }}</td>
+
+              <!-- Status -->
+              <td>
+                <span
+                  [ngClass]="{
+                    'status-active': row.employeeStatus === 'Active',
+                    'status-inactive': row.employeeStatus !== 'Active',
+                  }"
+                >
+                  <span *ngIf="row.employeeStatus === 'Active'">✔</span>
+                  <span *ngIf="row.employeeStatus !== 'Active'">❌</span>
+                  {{ row.employeeStatus }}
+                </span>
+              </td>
+
+              <!-- Created Date -->
+              <td>{{ row.employeeCreatedDate }}</td>
+              <td>{{ row.createdBy }}</td>
+
+              <!-- Action -->
+              <td>
+                <button class="btn-edit" (click)="onEdit(row, i)">
+                  <i class="bi bi-pencil-fill"></i> Edit
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="no-data-message" *ngIf="filteredData.length === 0">
+        <i class="bi bi-database-x"></i>
+        No Data Found
+      </div>
+      <!-- Pagination -->
+      <div class="pagination">
+        <button
+          (click)="changePage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+
+        <button
+          *ngFor="let page of [].constructor(totalPages); let p = index"
+          (click)="changePage(p + 1)"
+          [class.active]="currentPage === p + 1"
+        >
+          {{ p + 1 }}
+        </button>
+
+        <button
+          (click)="changePage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+
+    <!-- NEW RECORD FORM -->
+    <div *ngIf="activeTab === 'newRecord'" class="new-record-container">
+      <!-- Title + Add More button -->
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="section-title">
+          <i
+            [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle-fill'"
+          ></i>
+          {{
+            isEditMode ? "Update Employee Details" : "Add New Employee Details"
+          }}
+        </h3>
+
+        <button class="add-more-btn" *ngIf="!isEditMode" (click)="addForm()">
+          <i class="bi bi-plus-lg"></i> Add More
+        </button>
+      </div>
+
+      <hr class="mt-0 mb-3" />
+
+      <!-- Dynamic Forms -->
+      <div
+        *ngFor="let form of forms; let i = index"
+        class="new-record-card mb-4 p-3 border rounded"
+      >
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="section-title">
+            {{
+              isEditMode
+                ? "Update Employee Details"
+                : "Add Employee Details " + (i + 1)
+            }}
+          </h5>
+
+          <button
+            *ngIf="i > 0"
+            class="btn btn-sm btn-light"
+            (click)="removeForm(i)"
+          >
+            <i class="bi bi-x-lg me-2"></i> Remove
+          </button>
+        </div>
+
+        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
+          <div class="row mb-3">
+            <!-- Employee ID -->
+            <div class="col-md-4">
+              <label class="form-label">Employee Code *</label>
+
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter Employee Code"
+                [(ngModel)]="forms[i].employeeCode"
+                name="employeeCode{{ i }}"
+                required
+                #employeeCode="ngModel"
+                [ngClass]="{
+                  'is-invalid':
+                    (showErrors || employeeCode.touched) &&
+                    employeeCode.invalid,
+                }"
+              />
+
+              <div
+                class="text-danger mt-1"
+                *ngIf="
+                  (showErrors || employeeCode.touched) && employeeCode.errors
+                "
+              >
+                <div *ngIf="employeeCode.errors['required']">
+                  Employee Code is required.
+                </div>
+
+                <div *ngIf="employeeCode.errors['pattern']">
+                  Format must be <b>EMP-001</b>
+                </div>
+              </div>
+            </div>
+
+            <!-- Employee Name -->
+            <div class="col-md-4">
+              <label class="form-label">Employee Name *</label>
+
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter Employee Name (e.g. Snehal Patil)"
+                [(ngModel)]="forms[i].employeeName"
+                name="employeeName{{ i }}"
+                id="employeeName{{ i }}"
+                required
+                pattern="^[A-Za-z ]{3,}$"
+                #employeeName="ngModel"
+                [ngClass]="{
+                  'is-invalid':
+                    (showErrors || employeeName.touched) &&
+                    employeeName.invalid,
+                }"
+              />
+
+              <div
+                class="text-danger mt-1"
+                *ngIf="
+                  (showErrors || employeeName.touched) && employeeName.invalid
+                "
+              >
+                <div *ngIf="employeeName.errors?.['required']">
+                  Employee Name is required.
+                </div>
+                <div *ngIf="employeeName.errors?.['pattern']">
+                  Only alphabets allowed (min 3 characters).
+                </div>
+              </div>
+            </div>
+            <!-- DOB -->
+            <div class="col-md-4">
+              <label class="form-label">Date Of Birth *</label>
+              <input
+                type="date"
+                class="form-control"
+                [(ngModel)]="forms[i].employeeDOB"
+                (change)="calculateAge(forms[i].employeeDOB, i)"
+                name="employeeDOB{{ i }}"
+                id="employeeDOB{{ i }}"
+                required
+                #dob="ngModel"
+                [ngClass]="{
+                  'is-invalid': (showErrors || dob.touched) && dob.invalid,
+                }"
+              />
+              <div
+                class="text-danger mt-1"
+                *ngIf="(showErrors || dob.touched) && dob.invalid"
+              >
+                Date of Birth required.
+              </div>
+            </div>
+            <!-- Employee Age (Auto) -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Employee Age</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="forms[i].employeeAge"
+                name="employeeAge{{ i }}"
+                id="employeeAge{{ i }}"
+                readonly
+              />
+            </div>
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Marital Status *</label>
+              <select
+                class="form-select"
+                [(ngModel)]="forms[i].employeeMarriedStatus"
+                name="maritalStatus{{ i }}"
+                required
+              >
+                <option value="">Select</option>
+                <option>Married</option>
+                <option>Unmarried</option>
+              </select>
+            </div>
+
+            <!-- employeeGender -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Employee Gender *</label>
+              <select
+                class="form-select"
+                [(ngModel)]="forms[i].employeeGender"
+                name="employeeGender{{ i }}"
+                id="employeeGender{{ i }}"
+                required
+                #employeeGender="ngModel"
+                [ngClass]="{
+                  'is-invalid':
+                    (showErrors || employeeGender.touched) &&
+                    employeeGender.invalid,
+                }"
+              >
+                <option value="">Select</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+              </select>
+              <div
+                class="text-danger mt-1"
+                *ngIf="
+                  (showErrors || employeeGender.touched) &&
+                  employeeGender.invalid
+                "
+              >
+                Select employeeGender.
+              </div>
+            </div>
+
+            <!-- Employee Email -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Employee Email *</label>
+              <input
+                type="email"
+                class="form-control"
+                [(ngModel)]="forms[i].employeeEmail"
+                name="employeeEmail{{ i }}"
+                id="employeeEmail{{ i }}"
+                required
+              />
+            </div>
+
+            <!-- Employee Contact -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Employee Contact *</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="forms[i].employeeContact"
+                name="employeeContact{{ i }}"
+                id="employeeContact{{ i }}"
+                pattern="^[0-9]{10}$"
+                maxlength="10"
+                required
+              />
+            </div>
+
+            <!-- Employee Address -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Employee Address</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="forms[i].employeeAddress"
+                name="employeeAddress{{ i }}"
+                id="employeeAddress{{ i }}"
+              />
+            </div>
+
+            <!-- Employee City -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Employee City</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="forms[i].employeeCity"
+                name="employeeCity{{ i }}"
+                id="employeeCity{{ i }}"
+              />
+            </div>
+
+            <!-- Employee State -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Employee State</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="forms[i].employeeState"
+                name="employeeState{{ i }}"
+                id="employeeState{{ i }}"
+              />
+            </div>
+
+            <!-- Employee PinCode -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Employee PinCode</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="forms[i].employeePinCode"
+                name="employeePinCode{{ i }}"
+                id="employeePinCode{{ i }}"
+              />
+            </div>
+
+            <!-- Employee Country -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Employee Country</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="forms[i].employeeCountry"
+                name="employeeCountry{{ i }}"
+                id="employeeCountry{{ i }}"
+              />
+            </div>
+
+            <!-- Employee Religion -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Employee Religion</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="forms[i].employeeReligion"
+                name="employeeReligion{{ i }}"
+                id="employeeReligion{{ i }}"
+              />
+            </div>
+
+            <!-- Department -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Department *</label>
+
+             <ng-select
+  [items]="departments"
+  bindLabel="departmentName"
+  bindValue="departmentId"
+  placeholder="Search & Select Department"
+  [(ngModel)]="forms[i].departmentId"
+  name="departmentId{{ i }}"
+  [searchable]="true"
+  [clearable]="true"
+  [loading]="departments.length === 0"
+>
+</ng-select>
+            </div>
+
+            <!-- Designation -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Designation *</label>
+              <ng-select
+  [items]="designations"
+  bindLabel="designationName"
+  bindValue="designationId"
+  placeholder="Search & Select Designation"
+  [(ngModel)]="forms[i].designationId"
+  name="designationId{{ i }}"
+  [searchable]="true"
+  [clearable]="true"
+  [loading]="designations.length === 0"
+>
+</ng-select>
+            </div>
+
+            <div class="col-md-4 col-sm-12">
+              <label for="employeeStatus{{ i }}" class="form-label">
+                Status <span class="text-danger">*</span>
+              </label>
+
+              <select
+                id="employeeStatus{{ i }}"
+                name="employeeStatus{{ i }}"
+                class="form-control"
+                [(ngModel)]="forms[i].employeeStatus"
+                #status="ngModel"
+                [ngClass]="{
+                  'is-invalid':
+                    (showErrors || status.touched) && status.invalid,
+                }"
+              >
+                <option value="Active">Active</option>
+                <option *ngIf="isEditMode" value="InActive">InActive</option>
+              </select>
+
+              <div
+                *ngIf="(showErrors || status.touched) && status.invalid"
+                class="text-orangered mt-1"
+              >
+                <span>please select the status</span>
+              </div>
+            </div>
+
+            <!-- Employee Created Date -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Employee Created Date</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="forms[i].employeeCreatedDate"
+                name="employeeCreatedDate{{ i }}"
+                id="employeeCreatedDate{{ i }}"
+              />
+            </div>
+
+            <!-- LOGIN ID (HIDDEN FIELD) -->
+            <input
+              type="hidden"
+              [(ngModel)]="forms[i].createdBy"
+              name="createdBy{{ i }}"
+              id="createdBy{{ i }}"
+            />
+          </div>
+
+          <!-- SAVE / RESET -->
+          <!-- SAVE + RESET (ONLY LAST FORM) -->
+          <div
+            *ngIf="i === forms.length - 1"
+            class="mt-3 d-flex gap-2 justify-content-end"
+          >
+            <button type="button" class="btn-save" (click)="saveAllRecords()">
+              <i class="bi bi-floppy"></i>
+              {{ isEditMode ? "Update" : "Save" }}
+            </button>
+
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="cancelRecord(recordForm)"
+            >
+              <i class="bi bi-arrow-counterclockwise"></i>
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- BULK IMPORT FORM -->
+    <div
+      *ngIf="activeTab === 'bulkImport'"
+      class="bulk-import-container container-fluid"
+    >
+      <!-- Bulk Import Records Title -->
+      <h3 class="section-title mb-3">
+        <i class="bi bi-file-earmark-arrow-up-fill me-1"></i> Bulk Import
+        Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- Important Notice -->
+      <div class="important-box mb-4">
+        <h4 class="mb-2">
+          <i class="bi bi-exclamation-triangle-fill"></i> Important Notice
+        </h4>
+        <ul class="mb-0">
+          <li>
+            It is Extremely Important to put the System in maintenance mode to
+            perform Bulk Import operations.
+          </li>
+          <li>DO NOT IMPORT BULK DATA WHILE SYSTEM IS UNDER USE.</li>
+          <li>ONLY EXPORT/TRAINED EMPLOYEES SHOULD USE THIS SECTION.</li>
+        </ul>
+      </div>
+      <!-- File Upload Section -->
+      <div class="file-upload-section">
+        <h4 class="mb-2"><i class="bi bi-upload"></i> Upload File to Import</h4>
+        <p>Select file to import(Only doc,excel,csv,txt files):</p>
+        <!-- Responsive Wrapper -->
+        <div class="upload-controls mb-3">
+          <!-- File Input -->
+          <input
+            type="file"
+            class="form-control file-input"
+            (change)="onFileSelected($event)"
+          />
+          <!-- Buttons Wrapper -->
+          <div class="buttons-wrapper">
+            <button type="button" class="btn-upload" (click)="uploadFile()">
+              <i class="bi bi-upload me-2"></i>Upload File
+            </button>
+            <button
+              type="button"
+              class="btn-download"
+              (click)="downloadSampleCSV()"
+            >
+              <i class="bi bi-arrow-down"></i> Download Sample CSV
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BULK EXPORT FORM -->
+    <div *ngIf="activeTab === 'bulkExport'" class="bulk-export-container">
+      <!-- Bulk Export Records Title -->
+      <h3 class="section-title">
+        <i class="bi bi-file-earmark-arrow-down-fill"></i> Bulk Export Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- File Export Options -->
+      <div class="export-options">
+        <h4><i class="bi bi-gear-fill me-1"></i> File Export Options</h4>
+        <!-- Filters in Horizontal Line -->
+        <div class="filter-column">
+          <div class="container">
+            <div class="row g-3">
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="startDate" class="form-label">Start Date:</label>
+                  <input
+                    type="text"
+                    id="startDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="startDate"
+                    (input)="formatDate($event, 'start')"
+                  />
+                </div>
+                <!-- Validation message (optional) -->
+                <p
+                  *ngIf="startDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ startDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="endDate" class="form-label">End Date:</label>
+                  <input
+                    type="text"
+                    id="endDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="endDate"
+                    (input)="formatDate($event, 'end')"
+                  />
+                </div>
+                <p
+                  *ngIf="endDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ endDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="fileType" class="form-label">File Type:</label>
+                  <select
+                    id="fileType"
+                    [(ngModel)]="fileType"
+                    class="form-select"
+                  >
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">Excel (.xlsx)</option>
+                    <option value="pdf">PDF</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="export-buttons justify-content-end">
+          <button type="button" class="btn-reset" (click)="resetFilters()">
+            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Filters
+          </button>
+
+          <button type="button" class="btn-get" (click)="getFile()">
+            <i class="bi bi-download me-1"></i> Get File
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HELP SECTION -->
+    <div *ngIf="activeTab === 'help'" class="help-page-bg container-fluid py-4">
+      <h3 class="section-title mb-2">
+        <i class="bi bi-question-circle-fill"></i> Help & Guidelines
+      </h3>
+      <hr class="mt-0 mb-3" />
+
+      <h4 class="fw-bold text-primary mb-3">
+        Employee Management Module – User Manual
+      </h4>
+
+      <!-- NOTE -->
+      <div class="alert alert-warning mb-4">
+        <strong>NOTE:</strong><br />
+        This module manages complete employee profile including personal
+        details, department mapping, designation mapping, login ID and status.
+      </div>
+
+      <!-- MAIN HELP TABLE -->
+      <div class="table-responsive mb-5">
+        <table class="table table-bordered align-top">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Tab</th>
+              <th>Purpose</th>
+              <th>Instructions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><b>Details</b></td>
+              <td>View and manage employee records</td>
+              <td>
+                • View complete employee profile<br />
+                • Search by Name, City, Department ID etc.<br />
+                • Sort columns like Age, Status<br />
+                • Click <b>Edit</b> to update record<br />
+                • Use checkbox to delete multiple records
+              </td>
+            </tr>
+
+            <tr>
+              <td>2</td>
+              <td><b>New Record</b></td>
+              <td>Add new employee</td>
+              <td>
+                • Enter employee personal details<br />
+                • Fill required fields (Name, DOB, Department ID, Designation
+                ID)<br />
+                • Age auto-calculates from Date of Birth<br />
+                • Click <b>Add More</b> to insert multiple entries<br />
+                • Click <b>Save All</b> to store records
+              </td>
+            </tr>
+
+            <tr>
+              <td>3</td>
+              <td><b>Bulk Import</b></td>
+              <td>Import multiple employee records</td>
+              <td>
+                • Upload CSV / Excel / TXT / DOCX file<br />
+                • File must contain proper column headers:<br />
+                Employee ID, Name, DOB, Age, employeeGender, employeeEmail,
+                Contact, etc.<br />
+                • Invalid rows will be skipped<br />
+                • Age auto-calculated if missing
+              </td>
+            </tr>
+
+            <tr>
+              <td>4</td>
+              <td><b>Bulk Export</b></td>
+              <td>Download employee records</td>
+              <td>
+                • Select Start Date and End Date (DOB filter)<br />
+                • Choose file format (CSV / Excel / PDF)<br />
+                • Click Generate File<br />
+                • Filtered records will be downloaded
+              </td>
+            </tr>
+
+            <tr>
+              <td>5</td>
+              <td><b>Help</b></td>
+              <td>User guidance & troubleshooting</td>
+              <td>
+                • Refer to format examples before uploading file<br />
+                • Follow validation messages<br />
+                • Ensure Date format is DD-MM-YYYY
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SINGLE RECORD EXAMPLE -->
+      <h4 class="fw-semibold text-info">Example: Adding Single Employee</h4>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Step</th>
+              <th>Action</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Go to <b>New Record</b> tab</td>
+              <td>Blank form opens</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Enter Name, DOB, Department ID, Designation ID</td>
+              <td>Age auto-calculates</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Click <b>Save All</b></td>
+              <td>Record appears in Details tab</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MULTIPLE RECORD EXAMPLE -->
+      <h4 class="fw-semibold text-info">Example: Adding Multiple Employees</h4>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Method</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Click <b>Add More</b> → Fill forms → Save All</td>
+              <td>All entries saved together</td>
+            </tr>
+            <tr>
+              <td>Bulk Import</td>
+              <td>Upload properly formatted file</td>
+              <td>Multiple employees imported</td>
+            </tr>
+            <tr>
+              <td>Bulk Export</td>
+              <td>Select date range → Choose format → Generate</td>
+              <td>Filtered file downloaded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- EMPLOYEE VIEW MODAL -->
+<div class="modal" [class.show]="showModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5>Employee Details (ID: {{ selectedRecord?.employeeId }})</h5>
+      <button class="close-btn1" (click)="closeModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <table class="popup-table">
+        <tr>
+          <th>Employee ID</th>
+          <td>{{ selectedRecord?.employeeId }}</td>
+        </tr>
+
+        <tr>
+          <th>Employee Code</th>
+          <td>{{ selectedRecord?.employeeCode }}</td>
+        </tr>
+
+        <tr>
+          <th>Employee Name</th>
+          <td>{{ selectedRecord?.employeeName }}</td>
+        </tr>
+
+        <tr>
+          <th>Date of Birth</th>
+          <td>{{ selectedRecord?.employeeDOB }}</td>
+        </tr>
+
+        <tr>
+          <th>Age</th>
+          <td>{{ selectedRecord?.employeeAge }}</td>
+        </tr>
+
+        <tr>
+          <th>Married Status</th>
+          <td>{{ selectedRecord?.employeeMarriedStatus }}</td>
+        </tr>
+
+        <tr>
+          <th>Gender</th>
+          <td>{{ selectedRecord?.employeeGender }}</td>
+        </tr>
+
+        <tr>
+          <th>Email</th>
+          <td>{{ selectedRecord?.employeeEmail }}</td>
+        </tr>
+
+        <tr>
+          <th>Contact</th>
+          <td>{{ selectedRecord?.employeeContact }}</td>
+        </tr>
+
+        <tr>
+          <th>Address</th>
+          <td>{{ selectedRecord?.employeeAddress }}</td>
+        </tr>
+
+        <tr>
+          <th>City</th>
+          <td>{{ selectedRecord?.employeeCity }}</td>
+        </tr>
+
+        <tr>
+          <th>State</th>
+          <td>{{ selectedRecord?.employeeState }}</td>
+        </tr>
+
+        <tr>
+          <th>Pin Code</th>
+          <td>{{ selectedRecord?.employeePinCode }}</td>
+        </tr>
+
+        <tr>
+          <th>Country</th>
+          <td>{{ selectedRecord?.employeeCountry }}</td>
+        </tr>
+
+        <tr>
+          <th>Religion</th>
+          <td>{{ selectedRecord?.employeeReligion }}</td>
+        </tr>
+
+        <tr>
+          <th>Department ID</th>
+          <td>{{ selectedRecord?.departmentId }}</td>
+        </tr>
+
+        <tr>
+          <th>Designation ID</th>
+          <td>{{ selectedRecord?.designationId }}</td>
+        </tr>
+
+        <tr>
+          <th>Created Date</th>
+          <td>{{ selectedRecord?.employeeCreatedDate }}</td>
+        </tr>
+
+        <tr>
+          <th>createdBy </th>
+          <td>{{ selectedRecord?.createdBy }}</td>
+        </tr>
+
+        <tr>
+          <th>Status</th>
+          <td>
+            <span
+              [ngClass]="{
+                'status-active': selectedRecord?.employeeStatus === 'Active',
+                'status-inactive':
+                  selectedRecord?.employeeStatus === 'Inactive',
+              }"
+            >
+              <span *ngIf="selectedRecord?.employeeStatus === 'Active'">✔</span>
+              <span *ngIf="selectedRecord?.employeeStatus === 'Inactive'"
+                >❌</span
+              >
+              {{ selectedRecord?.employeeStatus }}
+            </span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

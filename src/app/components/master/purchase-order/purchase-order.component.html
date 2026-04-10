@@ -1,0 +1,1552 @@
+<div class="company-container">
+  <!-- HEADER -->
+  <div class="container-fluid py-3">
+    <div class="row align-items-start">
+      <!-- Left Section -->
+      <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
+        <h2 class="company-name">
+          {{ headCompanyName }}
+        </h2>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+          <span class="company-email">{{ userName }}</span>
+          <span class="breadcrumb-date">{{ today | date: "dd MMM yyyy" }}</span>
+        </div>
+      </div>
+
+      <!-- Right Section: Always top-right -->
+      <div
+        class="col-lg-6 col-md-6 col-sm-12 d-flex justify-content-md-end justify-content-start"
+      >
+        <h6 class="breadcrumb">
+          <i class="bi bi-house-fill me-1"></i>
+          Home
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-layers-fill me-1"></i>
+          Master
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-receipt-cutoff me-1"></i>
+          Purchase Order
+        </h6>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS-->
+  <div class="tabs-wrapper">
+    <div class="tabs-container">
+      <div
+        class="tab"
+        *ngFor="let tab of tabs"
+        [class.active]="activeTab === tab.key"
+        (click)="activeTab = tab.key"
+      >
+        <i [class]="tab.icon"></i> {{ tab.label }}
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMS ARE IN CARD -->
+  <div class="form-card">
+    <!-- DETAILS FORM -->
+    <div *ngIf="activeTab === 'details'" class="company-details-container">
+      <h3 class="section-title">
+        <i class="bi bi-receipt-cutoff"></i> Purchase Order Details
+      </h3>
+      <hr class="mt-0 mb-3" />
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <!-- Show entries -->
+        <div class="toolbar-item show-entries">
+          <label for="showEntries">Show</label>
+          <select id="showEntries" (change)="onChangeItemsPerPage($event)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>entries</span>
+        </div>
+
+        <!-- Export buttons -->
+        <div class="toolbar-item export-buttons">
+          <button class="btn-doc" (click)="exportDoc()">
+            <i class="bi bi-file-earmark-word-fill me-1"></i> DOC
+          </button>
+
+          <button class="btn-pdf" (click)="exportPDF()">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF
+          </button>
+
+          <button class="btn-excel" (click)="exportExcel()">
+            <i class="bi bi-file-earmark-excel-fill me-1"></i> Excel
+          </button>
+        </div>
+
+        <!-- Search + Delete -->
+        <div class="search-delete-group">
+          <!-- DELETE BUTTON -->
+          <div class="delete-btn" *ngIf="selectedRows.length > 0">
+            <button (click)="deleteSelectedRows()">
+              <i class="bi bi-trash-fill"></i> Delete
+            </button>
+          </div>
+
+          <!-- SEARCH BOX -->
+          <div class="search-box">
+            <input
+              type="text"
+              placeholder="Search..."
+              (input)="applyFilter($event)"
+            />
+            <i class="bi bi-search"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <table>
+       <thead>
+<tr>
+  <th><input type="checkbox" (change)="toggleAll($event)" /></th>
+
+  <th>
+    PO ID
+    <i (click)="sortTable('purchaseOrderId','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('purchaseOrderId','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    PO No
+    <i (click)="sortTable('purchaseOrderNumber','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('purchaseOrderNumber','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Expected Delivery
+    <i (click)="sortTable('expectedDeliveryDate','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('expectedDeliveryDate','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Vendor Name
+    <i (click)="sortTable('vendorName','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('vendorName','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Vendor Contact
+    <i (click)="sortTable('vendorContact','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('vendorContact','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Vendor GST
+    <i (click)="sortTable('vendorGSTNo','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('vendorGSTNo','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Shipping Address
+    <i (click)="sortTable('shippingAddress','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('shippingAddress','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Asset Type
+    <i (click)="sortTable('assetType','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('assetType','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Asset Make
+    <i (click)="sortTable('assetMake','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('assetMake','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Asset Model
+    <i (click)="sortTable('assetModel','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('assetModel','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Quantity
+    <i (click)="sortTable('quantity','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('quantity','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Unit Price
+    <i (click)="sortTable('unitPrice','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('unitPrice','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Discount %
+    <i (click)="sortTable('discount','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('discount','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    GST %
+    <i (click)="sortTable('gst','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('gst','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Sub Total
+    <i (click)="sortTable('subTotal','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('subTotal','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Total Discount
+    <i (click)="sortTable('totalDiscount','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('totalDiscount','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Total Tax
+    <i (click)="sortTable('totalTax','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('totalTax','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Grand Total
+    <i (click)="sortTable('grandTotal','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('grandTotal','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Advance Paid
+    <i (click)="sortTable('advancePaid','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('advancePaid','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Balance Amount
+    <i (click)="sortTable('balanceAmount','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('balanceAmount','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Payment Status
+    <i (click)="sortTable('paymentStatus','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('paymentStatus','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Payment Mode
+    <i (click)="sortTable('paymentMode','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('paymentMode','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Approved By
+    <i (click)="sortTable('approvedBy','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('approvedBy','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Approved Date
+    <i (click)="sortTable('approvedDate','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('approvedDate','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Remarks
+    <i (click)="sortTable('remarks','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('remarks','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Created Date
+    <i (click)="sortTable('createdDate','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('createdDate','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Updated Date
+    <i (click)="sortTable('updatedDate','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('updatedDate','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Created By
+    <i (click)="sortTable('createdBy','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('createdBy','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>
+    Status
+    <i (click)="sortTable('status','asc')" class="bi bi-arrow-up"></i>
+    <i (click)="sortTable('status','desc')" class="bi bi-arrow-down"></i>
+  </th>
+
+  <th>Action</th>
+</tr>
+</thead>
+
+    <tbody>
+  <tr
+    *ngFor="
+      let row of filteredData
+        | slice
+          : (currentPage - 1) * itemsPerPage
+          : currentPage * itemsPerPage;
+      let i = index
+    "
+  >
+    <!-- Checkbox -->
+    <td>
+      <input
+        type="checkbox"
+        [checked]="selectedRows.includes(row)"
+        (change)="toggleRowSelection(row, $event)"
+      />
+    </td>
+
+    <!-- PO ID -->
+    <td>
+      <span
+        class="leave-link"
+        [ngClass]="{
+          'active-id': selectedRow?.purchaseOrderId === row.purchaseOrderId
+        }"
+        (click)="openDetails(row)"
+      >
+        {{ row.purchaseOrderId }}
+      </span>
+    </td>
+
+    <!-- PO Number -->
+    <td>{{ row.purchaseOrderNumber }}</td>
+
+    <!-- Expected Delivery -->
+    <td>{{ row.expectedDeliveryDate }}</td>
+
+    <!-- Vendor -->
+    <td>{{ row.vendorName }}</td>
+    <td>{{ row.vendorContact }}</td>
+    <td>{{ row.vendorGSTNo }}</td>
+    <td>{{ row.shippingAddress }}</td>
+
+    <!-- Asset -->
+    <td>{{ row.assetType }}</td>
+    <td>{{ row.assetMake }}</td>
+    <td>{{ row.assetModel }}</td>
+
+    <!-- Financial -->
+    <td>{{ row.quantity }}</td>
+    <td>{{ row.unitPrice }}</td>
+    <td>{{ row.discount }}</td>
+    <td>{{ row.gst }}</td>
+    <td>{{ row.totalTax }}</td>
+    <td>{{ row.subTotal }}</td>
+    <td>{{ row.totalDiscount }}</td>
+    <td>{{ row.grandTotal }}</td>
+    <td>{{ row.advancePaid }}</td>
+    <td>{{ row.balanceAmount }}</td>
+
+    <!-- Payment -->
+    <td>{{ row.paymentStatus }}</td>
+    <td>{{ row.paymentMode }}</td>
+
+    <!-- Approval -->
+    <td>{{ row.approvedBy }}</td>
+    <td>{{ row.approvedDate }}</td>
+
+    <!-- Remarks -->
+    <td>{{ row.remarks }}</td>
+
+    <!-- Dates -->
+    <td>{{ row.createdDate }}</td>
+    <td>{{ row.updatedDate }}</td>
+    <td>{{ row.createdBy }}</td>
+
+    <!-- Status -->
+    <td>
+      <span
+        [ngClass]="{
+          'status-active': row.status === 'Active',
+          'status-inactive': row.status !== 'Active'
+        }"
+      >
+        <span *ngIf="row.status === 'Active'">✔</span>
+        <span *ngIf="row.status !== 'Active'">❌</span>
+        {{ row.status }}
+      </span>
+    </td>
+
+    <!-- Action -->
+    <td>
+      <button class="btn-edit" (click)="onEdit(row, i)">
+        <i class="bi bi-pencil-fill"></i> Edit
+      </button>
+    </td>
+  </tr>
+</tbody>
+        </table>
+      </div>
+      <div class="no-data-message" *ngIf="filteredData.length === 0">
+        <i class="bi bi-database-x"></i>
+        No Data Found
+      </div>
+      <!-- Pagination -->
+      <div class="pagination">
+        <button
+          (click)="changePage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+
+        <button
+          *ngFor="let page of [].constructor(totalPages); let p = index"
+          (click)="changePage(p + 1)"
+          [class.active]="currentPage === p + 1"
+        >
+          {{ p + 1 }}
+        </button>
+
+        <button
+          (click)="changePage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+
+    <!-- NEW RECORD FORM -->
+    <div *ngIf="activeTab === 'newRecord'" class="new-record-container">
+      <!-- Title + Add More button -->
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="section-title">
+          <i
+            [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle-fill'"
+          ></i>
+          {{
+            isEditMode
+              ? "Update Purchase Order Details"
+              : "Add New Purchase Order Details"
+          }}
+        </h3>
+        <!-- Add More Button -->
+        <button class="add-more-btn" *ngIf="!isEditMode" (click)="addForm()">
+          <i class="bi bi-plus-lg"></i> Add More
+        </button>
+      </div>
+
+      <hr class="mt-0 mb-3" />
+
+      <!-- Dynamic Forms -->
+      <div
+        *ngFor="let form of forms; let i = index"
+        class="new-record-card mb-4 p-3 border rounded"
+      >
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="section-title">
+            {{
+              isEditMode
+                ? "Update Purchase Order Details (ID: " +
+                  tableData[editIndex!].purchaseOrderId +
+                  ")"
+                : "Add Purchase Order Details " + (i + 1)
+            }}
+          </h5>
+          <!-- REMOVE BUTTON (NOT for first form) -->
+          <button
+            *ngIf="i > 0"
+            class="btn btn-sm btn-light"
+            (click)="removeForm(i)"
+          >
+            <i class="bi bi-x-lg me-2"></i> Remove
+          </button>
+        </div>
+
+        <!-- FORM -->
+        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
+          <div class="row mb-3">
+            <!-- PO Number -->
+          <div class="col-md-4">
+  <label>PO No <span class="text-danger">*</span></label>
+  <input
+    type="text"
+    class="form-control"
+    placeholder="Purchase order number"
+    [(ngModel)]="form.newRecord.purchaseOrderNumber"
+    name="purchaseOrderNumber{{ i }}"
+  />
+</div>
+
+            <!-- purchaseOrdervendorName -->
+            <div class="col-md-4">
+  <label> Vendor Name <span class="text-danger">*</span> </label>
+  <input
+    type="text"
+    class="form-control"
+    placeholder="Enter Vendor Name"
+    required
+    [(ngModel)]="form.newRecord.vendorName"
+    name="vendorName{{ i }}"
+  />
+</div>
+            <!-- Vendor Contact -->
+            <!-- Vendor Contact -->
+          <div class="col-md-4">
+  <label>Vendor Contact</label>
+
+  <input
+    type="tel"
+    class="form-control"
+    placeholder="Enter Vendor Contact Number"
+    [(ngModel)]="form.newRecord.vendorContact"
+    name="vendorContact{{ i }}"
+    #vendorContact="ngModel"
+    required
+    pattern="[0-9]{10}"
+    maxlength="10"
+  />
+
+  <!-- Validation Messages -->
+  <small
+    class="text-danger"
+    *ngIf="vendorContact.invalid && vendorContact.touched"
+  >
+    <span *ngIf="vendorContact.errors?.['required']">
+      Vendor contact number is required
+    </span>
+
+    <span *ngIf="vendorContact.errors?.['pattern']">
+      Enter valid 10 digit contact number
+    </span>
+  </small>
+</div>
+            <!-- Shipping Address -->
+            <!-- Shipping Address -->
+           <div class="col-md-12 mt-2">
+  <label>
+    Shipping Address <span class="text-danger">*</span>
+  </label>
+
+  <textarea
+    class="form-control"
+    placeholder="Enter Shipping Address"
+    rows="3"
+    [(ngModel)]="form.newRecord.shippingAddress"
+    name="shippingAddress{{ i }}"
+    #shippingAddress="ngModel"
+    required
+    minlength="5"
+    maxlength="200"
+  ></textarea>
+
+  <!-- Validation Messages -->
+  <small
+    class="text-danger"
+    *ngIf="shippingAddress.invalid && shippingAddress.touched"
+  >
+    <span *ngIf="shippingAddress.errors?.['required']">
+      Shipping address is required
+    </span>
+
+    <span *ngIf="shippingAddress.errors?.['minlength']">
+      Address must be at least 5 characters
+    </span>
+
+    <span *ngIf="shippingAddress.errors?.['maxlength']">
+      Address cannot exceed 200 characters
+    </span>
+  </small>
+</div>
+            <!-- Asset Type -->
+            <!-- Asset Type -->
+    <div class="col-md-4 mt-2">
+  <label> Asset Type <span class="text-danger">*</span> </label>
+
+  <ng-select
+    [items]="assetTypes"
+    bindLabel="assetTypeName"
+    bindValue="assetTypeName"
+    placeholder="Search & Select Asset Type"
+    [(ngModel)]="form.newRecord.assetType"
+    name="assetType{{ i }}"
+    #assetType="ngModel"
+    [searchable]="true"
+    [clearable]="true"
+    required
+  >
+  </ng-select>
+
+  <small
+    class="text-danger"
+    *ngIf="assetType.invalid && assetType.touched"
+  >
+    Asset Type is required
+  </small>
+</div>
+            <!-- purchaseOrdervendorName GST -->
+            <!-- Vendor GST -->
+          <div class="col-md-4 mt-2">
+  <label>Vendor GST</label>
+
+  <input
+    type="text"
+    class="form-control"
+    placeholder="Enter GST Number (e.g. 27ABCDE1234F1Z5)"
+    [(ngModel)]="form.newRecord.vendorGSTNo"
+    name="vendorGSTNo{{ i }}"
+    #vendorGST="ngModel"
+    pattern="^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$"
+    maxlength="15"
+    style="text-transform: uppercase"
+  />
+
+  <!-- Validation Message -->
+  <small
+    class="text-danger"
+    *ngIf="vendorGST.invalid && vendorGST.touched"
+  >
+    Enter valid GST number
+  </small>
+</div>
+            <!-- Asset Make -->
+            <!-- Asset Make -->
+            <div class="col-md-4 mt-2">
+  <label> Asset Make <span class="text-danger">*</span> </label>
+
+ <ng-select
+  [items]="assetMakes"
+  bindLabel="assetMakeName"
+  bindValue="assetMakeName"
+  placeholder="Search & Select Asset Make"
+  [(ngModel)]="form.newRecord.assetMake"
+  name="assetMake{{ i }}"
+  #assetMake="ngModel"
+  [searchable]="true"
+  [clearable]="true"
+  required
+>
+</ng-select>
+
+<!-- Validation -->
+<small
+  class="text-danger"
+  *ngIf="assetMake.invalid && assetMake.touched"
+>
+  Asset Make is required
+</small>
+</div>
+
+            <!-- Asset Model -->
+            <!-- Asset Model -->
+           <div class="col-md-4 mt-2">
+  <label> Asset Model <span class="text-danger">*</span> </label>
+
+  <input
+    type="text"
+    class="form-control"
+    placeholder="Enter Asset Model"
+    [(ngModel)]="form.newRecord.assetModel"
+    name="assetModel{{ i }}"
+    #assetModel="ngModel"
+    required
+  />
+
+  <!-- Validation -->
+  <small
+    class="text-danger"
+    *ngIf="assetModel.invalid && assetModel.touched"
+  >
+    Asset Model is required
+  </small>
+</div>
+
+            <!-- purchaseOrderquantity -->
+            <!-- Quantity -->
+          <div class="col-md-4 mt-2">
+  <label> Quantity <span class="text-danger">*</span> </label>
+
+  <input
+    type="number"
+    class="form-control"
+    placeholder="Enter Quantity"
+    [(ngModel)]="form.newRecord.quantity"
+    name="quantity{{ i }}"
+    #quantity="ngModel"
+    required
+    min="1"
+    (input)="calculateAmounts(i)"
+  />
+
+  <!-- Validation -->
+  <small
+    class="text-danger"
+    *ngIf="quantity.invalid && quantity.touched"
+  >
+    <span *ngIf="quantity.errors?.['required']">
+      Quantity is required
+    </span>
+
+    <span *ngIf="quantity.errors?.['min']">
+      Quantity must be greater than 0
+    </span>
+  </small>
+</div>
+            <!-- Unit Price -->
+            <!-- Unit Price -->
+        <div class="col-md-4 mt-2">
+  <label> Unit Price <span class="text-danger">*</span> </label>
+
+  <input
+    type="number"
+    class="form-control"
+    placeholder="Enter Unit Price"
+    [(ngModel)]="form.newRecord.unitPrice"
+    name="unitPrice{{ i }}"
+    #unitPrice="ngModel"
+    required
+    min="1"
+    step="0.01"
+    (input)="calculateAmounts(i)"
+  />
+
+  <!-- Validation -->
+  <small
+    class="text-danger"
+    *ngIf="unitPrice.invalid && unitPrice.touched"
+  >
+    <span *ngIf="unitPrice.errors?.['required']">
+      Unit price is required
+    </span>
+
+    <span *ngIf="unitPrice.errors?.['min']">
+      Unit price must be greater than 0
+    </span>
+  </small>
+</div>
+            <!-- Discount -->
+            <!-- Discount -->
+           <div class="col-md-4 mt-2">
+  <label> Discount (%) </label>
+
+  <input
+    type="number"
+    class="form-control"
+    placeholder="Enter Discount Percentage"
+    [(ngModel)]="form.newRecord.discount"
+    name="discount{{ i }}"
+    #discount="ngModel"
+    min="0"
+    max="100"
+    step="0.01"
+    (input)="calculateAmounts(i)"
+  />
+
+  <!-- Validation -->
+  <small
+    class="text-danger"
+    *ngIf="discount.invalid && discount.touched"
+  >
+    <span *ngIf="discount.errors?.['min']">
+      Discount cannot be negative
+    </span>
+
+    <span *ngIf="discount.errors?.['max']">
+      Discount cannot exceed 100%
+    </span>
+  </small>
+</div>
+
+            <!-- GST -->
+            <!-- GST Percentage -->
+          <div class="col-md-4 mt-2">
+  <label> GST (%) <span class="text-danger">*</span> </label>
+
+  <input
+    type="number"
+    class="form-control"
+    placeholder="Enter GST Percentage"
+    [(ngModel)]="form.newRecord.gst"
+    name="gst{{ i }}"
+    #gst="ngModel"
+    required
+    min="0"
+    max="28"
+    step="0.01"
+    (input)="calculateAmounts(i)"
+  />
+
+  <!-- Validation -->
+  <small class="text-danger" *ngIf="gst.invalid && gst.touched">
+    <span *ngIf="gst.errors?.['required']">
+      GST percentage is required
+    </span>
+
+    <span *ngIf="gst.errors?.['min']">
+      GST cannot be negative
+    </span>
+
+    <span *ngIf="gst.errors?.['max']">
+      GST cannot exceed 28%
+    </span>
+  </small>
+</div>
+
+            <!-- Tax Amount -->
+            <!-- Tax Amount -->
+          <div class="col-md-4 mt-2">
+              <label> Tax Amount </label>
+
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Auto Calculated"
+                [(ngModel)]="form.newRecord.purchaseOrdertaxAmount"
+                name="purchaseOrdertaxAmount{{ i }}"
+                #taxAmount="ngModel"
+                min="0"
+              />
+
+              <!-- Validation -->
+              <small
+                class="text-danger"
+                *ngIf="taxAmount.invalid && taxAmount.touched"
+              >
+                Tax amount cannot be negative
+              </small>
+            </div>
+
+            <!-- Sub Total -->
+           <!-- Sub Total -->
+<div class="col-md-4 mt-2">
+  <label>Sub Total</label>
+
+  <input
+    type="number"
+    class="form-control"
+    [(ngModel)]="form.newRecord.subTotal"
+    name="subTotal{{ i }}"
+    readonly
+  />
+</div>
+
+            <!-- Grand Total -->
+            <!-- Grand Total -->
+         <!-- Grand Total -->
+<div class="col-md-4 mt-2">
+  <label> Grand Total </label>
+
+  <input
+    type="number"
+    class="form-control fw-bold text-success"
+    placeholder="Auto Calculated"
+    [(ngModel)]="form.newRecord.grandTotal"
+    name="grandTotal{{ i }}"
+    #grandTotal="ngModel"
+    min="0"
+    readonly
+  />
+
+  <!-- Validation -->
+  <small
+    class="text-danger"
+    *ngIf="grandTotal.invalid && grandTotal.touched"
+  >
+    Grand total cannot be negative
+  </small>
+</div>
+
+            <!-- Payment purchaseOrderstatus -->
+            <!-- Payment Status -->
+          <div class="col-md-4 mt-2">
+  <label> Payment Status <span class="text-danger">*</span> </label>
+
+  <select
+    class="form-select"
+    [(ngModel)]="form.newRecord.paymentStatus"
+    name="paymentStatus{{ i }}"
+    #paymentStatus="ngModel"
+    required
+  >
+    <option value="">Select Payment Status</option>
+    <option value="Pending">Pending</option>
+    <option value="Paid">Paid</option>
+  </select>
+
+  <!-- Validation -->
+  <small
+    class="text-danger"
+    *ngIf="paymentStatus.invalid && paymentStatus.touched"
+  >
+    Payment status is required
+  </small>
+</div>
+
+            <!-- Payment Mode -->
+            <!-- Payment Mode -->
+   <div class="col-md-3 mt-2">
+  <label> Payment Mode <span class="text-danger">*</span> </label>
+
+  <ng-select
+    [items]="paymentModes"
+    bindLabel="name"
+    bindValue="name"
+    placeholder="Search & Select Payment Mode"
+    [(ngModel)]="form.newRecord.paymentMode"
+    name="paymentMode{{ i }}"
+    #paymentMode="ngModel"
+    [searchable]="true"
+    [clearable]="true"
+    required
+  >
+  </ng-select>
+
+  <!-- Validation -->
+  <small
+    class="text-danger"
+    *ngIf="paymentMode.invalid && paymentMode.touched"
+  >
+    Payment mode is required
+  </small>
+</div>
+            <!-- purchaseOrderremarks -->
+            <!-- Remarks -->
+
+            <!-- Approved By -->
+            <!-- Approved By -->
+          <div class="col-md-3 mt-2">
+  <label> Approved By <span class="text-danger">*</span> </label>
+
+  <input
+    type="text"
+    class="form-control"
+    placeholder="Enter Approver Name"
+    [(ngModel)]="form.newRecord.approvedBy"
+    name="approvedBy{{ i }}"
+    #approvedBy="ngModel"
+    required
+    minlength="3"
+    maxlength="50"
+  />
+
+  <!-- Validation -->
+  <small
+    class="text-danger"
+    *ngIf="approvedBy.invalid && approvedBy.touched"
+  >
+    <span *ngIf="approvedBy.errors?.['required']">
+      Approver name is required
+    </span>
+
+    <span *ngIf="approvedBy.errors?.['minlength']">
+      Name must be at least 3 characters
+    </span>
+
+    <span *ngIf="approvedBy.errors?.['maxlength']">
+      Name cannot exceed 50 characters
+    </span>
+  </small>
+</div>
+
+            <!-- Approved Date -->
+            <!-- Approved Date -->
+          <div class="col-md-3 mt-2">
+  <label> Approved Date <span class="text-danger">*</span> </label>
+
+  <input
+    type="date"
+    class="form-control"
+    [(ngModel)]="form.newRecord.approvedDate"
+    name="approvedDate{{ i }}"
+    #approvedDate="ngModel"
+    required
+    [max]="todayDate"
+  />
+
+  <!-- Validation -->
+  <small
+    class="text-danger"
+    *ngIf="approvedDate.invalid && approvedDate.touched"
+  >
+    <span *ngIf="approvedDate.errors?.['required']">
+      Approved date is required
+    </span>
+  </small>
+</div>
+            <!-- Expected Delivery -->
+            <!-- Expected Delivery -->
+          <div class="col-md-3 mt-2">
+  <label>
+    Expected Delivery Date <span class="text-danger">*</span>
+  </label>
+
+  <input
+    type="date"
+    class="form-control"
+    [(ngModel)]="form.newRecord.expectedDeliveryDate"
+    name="expectedDeliveryDate{{ i }}"
+    #deliveryDate="ngModel"
+    required
+    [min]="todayDate"
+  />
+
+  <!-- Validation -->
+  <small
+    class="text-danger"
+    *ngIf="deliveryDate.invalid && deliveryDate.touched"
+  >
+    <span *ngIf="deliveryDate.errors?.['required']">
+      Expected delivery date is required
+    </span>
+  </small>
+</div>
+<!-- Advance Paid -->
+<div class="col-md-4 mt-2">
+  <label>Advance Paid</label>
+  <input
+    type="number"
+    class="form-control"
+    [(ngModel)]="form.newRecord.advancePaid"
+    name="advancePaid{{ i }}"
+    (input)="calculateAmounts(i)"
+  />
+</div>
+
+<!-- Balance Amount -->
+<div class="col-md-4 mt-2">
+  <label>Balance Amount</label>
+  <input
+    type="number"
+    class="form-control"
+    [(ngModel)]="form.newRecord.balanceAmount"
+    name="balanceAmount{{ i }}"
+    readonly
+  />
+</div><div class="col-md-4 mt-2">
+  <label>Transaction Reference</label>
+  <input
+    type="text"
+    class="form-control"
+    [(ngModel)]="form.newRecord.transactionReference"
+    name="transactionReference{{ i }}"
+  />
+</div>
+
+            <div class="col-md-12 mt-2">
+  <label>Remarks</label>
+
+  <textarea
+    class="form-control"
+    placeholder="Enter Remarks (optional)"
+    rows="3"
+    [(ngModel)]="form.newRecord.remarks"
+    name="remarks{{ i }}"
+    #remarks="ngModel"
+    maxlength="250"
+  ></textarea>
+
+  <!-- Validation -->
+  <small
+    class="text-danger"
+    *ngIf="remarks.errors?.['maxlength'] && remarks.touched"
+  >
+    Remarks cannot exceed 250 characters
+  </small>
+</div>
+          </div>
+
+          <!-- SAVE + RESET (ONLY LAST FORM) -->
+          <div
+            *ngIf="i === forms.length - 1"
+            class="mt-3 d-flex gap-2 justify-content-end"
+          >
+            <button type="button" class="btn-save" (click)="saveAllRecords()">
+              <i class="bi bi-floppy"></i>
+              {{ isEditMode ? "Update" : "Save" }}
+            </button>
+
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="cancelRecord(recordForm)"
+            >
+              <i class="bi bi-arrow-counterclockwise"></i>
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- BULK IMPORT FORM -->
+    <div
+      *ngIf="activeTab === 'bulkImport'"
+      class="bulk-import-container container-fluid"
+    >
+      <!-- Bulk Import Records Title -->
+      <h3 class="section-title mb-3">
+        <i class="bi bi-file-earmark-arrow-up-fill me-1"></i> Bulk Import
+        Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- Important Notice -->
+      <div class="important-box mb-4">
+        <h4 class="mb-2">
+          <i class="bi bi-exclamation-triangle-fill"></i> Important Notice
+        </h4>
+        <ul class="mb-0">
+          <li>
+            It is Extremely Important to put the System in maintenance mode to
+            perform Bulk Import operations.
+          </li>
+          <li>DO NOT IMPORT BULK DATA WHILE SYSTEM IS UNDER USE.</li>
+          <li>ONLY EXPORT/TRAINED EMPLOYEES SHOULD USE THIS SECTION.</li>
+        </ul>
+      </div>
+      <!-- File Upload Section -->
+      <div class="file-upload-section">
+        <h4 class="mb-2"><i class="bi bi-upload"></i> Upload File to Import</h4>
+        <p>Select file to import(Only doc,excel,csv,txt files):</p>
+        <!-- Responsive Wrapper -->
+        <div class="upload-controls mb-3">
+          <!-- File Input -->
+          <input
+            type="file"
+            class="form-control file-input"
+            (change)="onFileSelected($event)"
+          />
+          <!-- Buttons Wrapper -->
+          <div class="buttons-wrapper">
+            <button type="button" class="btn-upload" (click)="uploadFile()">
+              <i class="bi bi-upload me-2"></i>Upload File
+            </button>
+            <button
+              type="button"
+              class="btn-download"
+              (click)="downloadSampleCSV()"
+            >
+              <i class="bi bi-arrow-down"></i> Download Sample CSV
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BULK EXPORT FORM -->
+    <div *ngIf="activeTab === 'bulkExport'" class="bulk-export-container">
+      <!-- Bulk Export Records Title -->
+      <h3 class="section-title">
+        <i class="bi bi-file-earmark-arrow-down-fill"></i> Bulk Export Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- File Export Options -->
+      <div class="export-options">
+        <h4><i class="bi bi-gear-fill me-1"></i> File Export Options</h4>
+        <!-- Filters in Horizontal Line -->
+        <div class="filter-column">
+          <div class="container">
+            <div class="row g-3">
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="startDate" class="form-label">Start Date:</label>
+                  <input
+                    type="text"
+                    id="startDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="startDate"
+                    (input)="formatDate($event, 'start')"
+                  />
+                </div>
+                <!-- Validation message (optional) -->
+                <p
+                  *ngIf="startDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ startDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="endDate" class="form-label">End Date:</label>
+                  <input
+                    type="text"
+                    id="endDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="endDate"
+                    (input)="formatDate($event, 'end')"
+                  />
+                </div>
+                <p
+                  *ngIf="endDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ endDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="fileType" class="form-label">File Type:</label>
+                  <select
+                    id="fileType"
+                    [(ngModel)]="fileType"
+                    class="form-select"
+                  >
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">Excel (.xlsx)</option>
+                    <option value="pdf">PDF</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="export-buttons justify-content-end">
+          <button type="button" class="btn-reset" (click)="resetFilters()">
+            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Filters
+          </button>
+
+          <button type="button" class="btn-get" (click)="getFile()">
+            <i class="bi bi-download me-1"></i> Get File
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HELP SECTION -->
+    <div *ngIf="activeTab === 'help'" class="help-page-bg container-fluid py-4">
+      <h3 class="section-title mb-2">
+        <i class="bi bi-question-circle-fill"></i> Help & Guidelines
+      </h3>
+      <hr class="mt-0 mb-3" />
+
+      <h5 class="text-primary mb-3">
+        Purchase Order Management Module – User Manual
+      </h5>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        This section explains how to use the Purchase Order module correctly.
+        Please follow the instructions to avoid incorrect purchase entries.
+      </div>
+
+      <!-- MAIN HELP TABLE -->
+      <div class="table-responsive mb-5">
+        <table class="table table-bordered align-top">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Tab</th>
+              <th>Purpose</th>
+              <th>Instructions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Details</td>
+              <td>View and manage purchase orders</td>
+              <td>
+                • View purchase order list and purchaseOrderstatus<br />
+                • Search, filter, sort records<br />
+                • Click <b>Edit</b> to update an order
+              </td>
+            </tr>
+
+            <tr>
+              <td>2</td>
+              <td>New Record</td>
+              <td>Create new purchase order</td>
+              <td>
+                • Click <b>New Record</b><br />
+                • Fill mandatory fields (marked *)<br />
+                • Use <b>Add More</b> for multiple orders<br />
+                • Click <b>Save</b>
+              </td>
+            </tr>
+
+            <tr>
+              <td>3</td>
+              <td>Bulk Import</td>
+              <td>Import multiple purchase orders</td>
+              <td>
+                • Upload CSV / Excel / DOCX / TXT / PDF<br />
+                • File format must match system structure<br />
+                • Invalid rows will be skipped
+              </td>
+            </tr>
+
+            <tr>
+              <td>4</td>
+              <td>Bulk Export</td>
+              <td>Download purchase order reports</td>
+              <td>
+                • Select date range<br />
+                • Choose export format (CSV / Excel / PDF)<br />
+                • File downloads instantly
+              </td>
+            </tr>
+
+            <tr>
+              <td>5</td>
+              <td>Help</td>
+              <td>Guidelines & examples</td>
+              <td>
+                • Refer examples before data entry<br />
+                • Follow validation messages<br />
+                • Use for troubleshooting
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SINGLE RECORD EXAMPLE -->
+      <h5 class="text-info">Example: Adding Single Purchase Order</h5>
+
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        All required fields must be filled before saving the purchase order.
+      </div>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Purchase Order</td>
+              <td>Fill details and click Save</td>
+              <td>Order visible in Details tab</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MULTIPLE RECORD EXAMPLE -->
+      <h5 class="text-info">Example: Adding Multiple Purchase Orders</h5>
+
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Use bulk options for faster data entry when handling multiple orders.
+      </div>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Multiple</td>
+              <td>Use Add More and Save</td>
+              <td>All orders saved</td>
+            </tr>
+            <tr>
+              <td>Bulk Import</td>
+              <td>Import File</td>
+              <td>Upload valid formatted file</td>
+              <td>Orders imported successfully</td>
+            </tr>
+            <tr>
+              <td>Bulk Export</td>
+              <td>Export</td>
+              <td>Select format and date range</td>
+              <td>Report downloaded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PURCHASE ORDER VIEW MODAL -->
+<div class="modal" [class.show]="showViewModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5>Purchase Order Details (ID: {{ selectedRow?.purchaseOrderId }})</h5>
+      <button class="close-btn1" (click)="closeViewModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+   <table class="popup-table">
+  <tr>
+    <th>PO ID</th>
+    <td>{{ selectedRow?.purchaseOrderId }}</td>
+  </tr>
+
+  <tr>
+    <th>PO No</th>
+    <td>{{ selectedRow?.purchaseOrderNumber }}</td>
+  </tr>
+
+  <tr>
+    <th>Expected Delivery</th>
+    <td>{{ selectedRow?.expectedDeliveryDate }}</td>
+  </tr>
+
+  <tr>
+    <th>Vendor Name</th>
+    <td>{{ selectedRow?.vendorName }}</td>
+  </tr>
+
+  <tr>
+    <th>Vendor Contact</th>
+    <td>{{ selectedRow?.vendorContact }}</td>
+  </tr>
+
+  <tr>
+    <th>Vendor GST</th>
+    <td>{{ selectedRow?.vendorGSTNo }}</td>
+  </tr>
+
+  <tr>
+    <th>Shipping Address</th>
+    <td>{{ selectedRow?.shippingAddress }}</td>
+  </tr>
+
+  <tr>
+    <th>Asset Type</th>
+    <td>{{ selectedRow?.assetType }}</td>
+  </tr>
+
+  <tr>
+    <th>Asset Make</th>
+    <td>{{ selectedRow?.assetMake }}</td>
+  </tr>
+
+  <tr>
+    <th>Asset Model</th>
+    <td>{{ selectedRow?.assetModel }}</td>
+  </tr>
+
+  <tr>
+    <th>Quantity</th>
+    <td>{{ selectedRow?.quantity }}</td>
+  </tr>
+
+  <tr>
+    <th>Unit Price</th>
+    <td>{{ selectedRow?.unitPrice }}</td>
+  </tr>
+
+  <tr>
+    <th>Discount %</th>
+    <td>{{ selectedRow?.discount }}</td>
+  </tr>
+
+  <tr>
+    <th>GST %</th>
+    <td>{{ selectedRow?.gst }}</td>
+  </tr>
+
+  <tr>
+    <th>Total Tax</th>
+    <td>{{ selectedRow?.totalTax }}</td>
+  </tr>
+
+  <tr>
+    <th>Sub Total</th>
+    <td>{{ selectedRow?.subTotal }}</td>
+  </tr>
+
+  <tr>
+    <th>Total Discount</th>
+    <td>{{ selectedRow?.totalDiscount }}</td>
+  </tr>
+
+  <tr>
+    <th>Grand Total</th>
+    <td>{{ selectedRow?.grandTotal }}</td>
+  </tr>
+
+  <tr>
+    <th>Advance Paid</th>
+    <td>{{ selectedRow?.advancePaid }}</td>
+  </tr>
+
+  <tr>
+    <th>Balance Amount</th>
+    <td>{{ selectedRow?.balanceAmount }}</td>
+  </tr>
+
+  <tr>
+    <th>Payment Status</th>
+    <td>{{ selectedRow?.paymentStatus }}</td>
+  </tr>
+
+  <tr>
+    <th>Payment Mode</th>
+    <td>{{ selectedRow?.paymentMode }}</td>
+  </tr>
+
+  <tr>
+    <th>Transaction Reference</th>
+    <td>{{ selectedRow?.transactionReference }}</td>
+  </tr>
+
+  <tr>
+    <th>Approved By</th>
+    <td>{{ selectedRow?.approvedBy }}</td>
+  </tr>
+
+  <tr>
+    <th>Approved Date</th>
+    <td>{{ selectedRow?.approvedDate }}</td>
+  </tr>
+
+  <tr>
+    <th>Remarks</th>
+    <td>{{ selectedRow?.remarks }}</td>
+  </tr>
+
+  <tr>
+    <th>Created Date</th>
+    <td>{{ selectedRow?.createdDate }}</td>
+  </tr>
+
+  <tr>
+    <th>Updated Date</th>
+    <td>{{ selectedRow?.updatedDate }}</td>
+  </tr>
+
+  <tr>
+    <th>Created By</th>
+    <td>{{ selectedRow?.createdBy }}</td>
+  </tr>
+
+  <tr>
+    <th>Status</th>
+    <td>{{ selectedRow?.status }}</td>
+  </tr>
+</table>
+    </div>
+  </div>
+</div>

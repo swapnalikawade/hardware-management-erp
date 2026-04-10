@@ -1,0 +1,1224 @@
+<div class="company-container">
+  <!-- HEADER -->
+  <div class="container-fluid py-3">
+    <div class="row align-items-start">
+      <!-- Left Section -->
+      <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
+        <h2 class="company-name">
+          {{ companyName }}
+        </h2>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+          <span class="company-email">{{ companyEmail }}</span>
+          <span class="breadcrumb-date">{{ today | date: "dd MMM yyyy" }}</span>
+        </div>
+      </div>
+
+      <!-- Right Section: Always top-right -->
+      <div
+        class="col-lg-6 col-md-6 col-sm-12 d-flex justify-content-md-end justify-content-start"
+      >
+        <h6 class="breadcrumb d-flex align-items-center">
+          <i class="bi bi-house-fill me-1"></i>
+          Home
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-layers-fill me-1"></i>
+          Master
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-building-gear me-1"></i>
+          Asset Bought
+        </h6>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS-->
+  <div class="tabs-wrapper">
+    <div class="tabs-container">
+      <div
+        class="tab"
+        *ngFor="let tab of tabs"
+        [class.active]="activeTab === tab.key"
+        (click)="activeTab = tab.key"
+      >
+        <i [class]="tab.icon"></i> {{ tab.label }}
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMS ARE IN CARD -->
+  <div class="form-card">
+    <!-- DETAILS FORM -->
+    <div *ngIf="activeTab === 'details'" class="company-details-container">
+      <h3 class="section-title">
+        <i class="bi bi-calendar-event"></i> Assets Bought Details
+      </h3>
+      <hr class="mt-0 mb-3" />
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <!-- Show entries -->
+        <div class="toolbar-item show-entries">
+          <label for="showEntries">Show</label>
+          <select id="showEntries" (change)="onChangeItemsPerPage($event)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>entries</span>
+        </div>
+
+        <!-- Export buttons -->
+        <div class="toolbar-item export-buttons">
+          <button class="btn-doc" (click)="exportDoc()">
+            <i class="bi bi-file-earmark-word-fill"></i>
+            DOC
+          </button>
+          <button class="btn-pdf" (click)="exportPDF()">
+            <i class="bi bi-file-earmark-pdf-fill"></i>
+            PDF
+          </button>
+          <button class="btn-excel" (click)="exportExcel()">
+            <i class="bi bi-file-earmark-excel-fill"></i>
+            Excel
+          </button>
+        </div>
+
+        <!-- Search + Delete -->
+        <div class="search-delete-group">
+          <!-- DELETE BUTTON -->
+          <div class="delete-btn" *ngIf="selectedRows.length > 0">
+            <button (click)="deleteSelectedRows()">
+              <i class="fa-solid fa-trash"></i> Delete
+            </button>
+          </div>
+
+          <!-- SEARCH BOX -->
+          <div class="search-box">
+            <input
+              type="text"
+              placeholder="Search..."
+              (input)="applyFilter($event)"
+            />
+            <i class="bi bi-search"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox" (change)="toggleAll($event)" /></th>
+
+              <!-- Asset ID -->
+              <th>
+                Asset Bought ID
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtMiscPurchaseId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtMiscPurchaseId', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Asset Code -->
+              <th>
+                Asset Bought Code
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtMiscPurchaseCode', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtMiscPurchaseCode', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Category -->
+              <th>
+                Asset Category
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtAssetCategory', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtAssetCategory', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Asset Type -->
+              <th>
+                Asset Type
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtAssetType', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtAssetType', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Item Name -->
+              <th>
+                Item Name
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtItemName', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtItemName', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Department -->
+              <th>
+                Department
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtDepartment', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtDepartment', 'desc')"
+                ></i>
+              </th>
+              <!-- Asset Bought Vendor -->
+              <th>
+                Asset Bought Vendor
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtVendor', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtVendor', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Asset Bought Serial Nuber -->
+              <th>
+                Asset Bought SR.No
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtSerialNumber', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtSerialNumber', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Asset Status -->
+              <th>
+                Asset Status
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtAssetStatus', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtAssetStatus', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Purchase Date -->
+              <th>
+                Purchase Date
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtPurchaseDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtPurchaseDate', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Purchased By -->
+              <th>
+                Purchased By
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtPurchasedBy', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtPurchasedBy', 'desc')"
+                ></i>
+              </th>
+
+              <!--Remarks-->
+              <th>
+                Remarks
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtRemarks', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtRemarks', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Created Date -->
+              <th>
+                Created Date
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtCreatedDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtCreatedDate', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Updated Date -->
+              <th>
+                Updated Date
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtUpdatedDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtUpdatedDate', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Bill Invoice No -->
+              <th>
+                Bill Invoice No
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtBillInvoiceNo', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtBillInvoiceNo', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Asset Bought Attachment -->
+              <th>
+                Asset Bought Attachment
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtAttachment', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtAttachment', 'desc')"
+                ></i>
+              </th>
+
+              <!-- Status -->
+              <th>
+                Status
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetBoughtStatus', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetBoughtStatus', 'desc')"
+                ></i>
+              </th>
+
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr
+              *ngFor="
+                let row of filteredData
+                  | slice
+                    : (currentPage - 1) * itemsPerPage
+                    : currentPage * itemsPerPage;
+                let i = index
+              "
+            >
+              <!-- Select Row -->
+              <td>
+                <input
+                  type="checkbox"
+                  [checked]="selectedRows.includes(row)"
+                  (change)="toggleRowSelection(row, $event)"
+                />
+              </td>
+
+              <!-- Asset ID -->
+              <td>
+                <span
+                  class="leave-link"
+                  [ngClass]="{
+                    'active-id':
+                      selectedRow?.assetBoughtMiscPurchaseId ===
+                      row.assetBoughtMiscPurchaseId,
+                  }"
+                  (click)="openDetails(row)"
+                >
+                  {{ row.assetBoughtMiscPurchaseId }}
+                </span>
+              </td>
+
+              <!-- Asset Code -->
+              <td>{{ row.assetBoughtMiscPurchaseCode }}</td>
+
+              <!-- Category -->
+              <td>{{ row.assetBoughtAssetCategory }}</td>
+
+              <!-- Asset Type -->
+              <td>{{ row.assetBoughtAssetType }}</td>
+
+              <!-- Item Name -->
+              <td>{{ row.assetBoughtItemName }}</td>
+
+              <!-- Department -->
+              <td>{{ row.assetBoughtDepartment }}</td>
+
+              <td>{{ row.assetBoughtVendor }}</td>
+
+              <td>{{ row.assetBoughtSerialNumber }}</td>
+
+              <!-- Asset Status -->
+              <td>
+                <span
+                  [ngClass]="{
+                    'status-working': row.assetBoughtAssetStatus === 'Working',
+                    'status-not-working':
+                      row.assetBoughtAssetStatus === 'Not Working',
+                    'status-repair':
+                      row.assetBoughtAssetStatus === 'Under Repair',
+                  }"
+                >
+                  {{ row.assetBoughtAssetStatus }}
+                </span>
+              </td>
+
+              <!-- Purchase Date -->
+              <td>{{ row.assetBoughtPurchaseDate }}</td>
+
+              <!-- Purchased By -->
+              <td>{{ row.assetBoughtPurchasedBy }}</td>
+
+              <!-- Remarks -->
+              <td>{{ row.assetBoughtRemarks }}</td>
+
+              <!-- Created Date -->
+              <td>{{ row.assetBoughtCreatedDate }}</td>
+
+              <!-- Updated Date -->
+              <td>{{ row.assetBoughtUpdatedDate }}</td>
+
+              <!-- Bill Invoice No -->
+              <td>{{ row.assetBoughtBillInvoiceNo }}</td>
+
+              <!-- Attachment -->
+              <td>{{ row.assetBoughtAttachment }}</td>
+
+              <!-- Record Status -->
+              <td>
+                <span
+                  [ngClass]="{
+                    'status-active': row.assetBoughtStatus === 'Active',
+                    'status-inactive': row.assetBoughtStatus === 'Inactive',
+                  }"
+                >
+                  <span *ngIf="row.assetBoughtStatus === 'Active'">✔</span>
+                  <span *ngIf="row.assetBoughtStatus === 'Inactive'">❌</span>
+                  {{ row.assetBoughtStatus }}
+                </span>
+              </td>
+
+              <!-- Action -->
+              <td>
+                <button class="btn-edit" (click)="onEdit(row, i)">
+                  <i class="bi bi-pencil-square me-1"></i> Edit
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="no-data-message" *ngIf="filteredData.length === 0">
+        <i class="bi bi-database-x"></i>
+        No Data Found
+      </div>
+      <!-- Pagination -->
+      <div class="pagination">
+        <button
+          (click)="changePage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+
+        <button
+          *ngFor="let page of [].constructor(totalPages); let p = index"
+          (click)="changePage(p + 1)"
+          [class.active]="currentPage === p + 1"
+        >
+          {{ p + 1 }}
+        </button>
+
+        <button
+          (click)="changePage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+
+    <!-- NEW RECORD FORM -->
+    <div *ngIf="activeTab === 'newRecord'" class="new-record-container">
+      <!-- Title + Add More button -->
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="section-title">
+          <i
+            [ngClass]="
+              isEditMode ? 'bi bi-pencil-square' : 'bi bi-plus-circle-fill'
+            "
+          ></i>
+
+          {{
+            isEditMode
+              ? "Update  Assets Bought  Details"
+              : "Add New  Assets Bought  Details"
+          }}
+        </h3>
+        <!-- Add More Button -->
+        <button class="add-more-btn" *ngIf="!isEditMode" (click)="addForm()">
+          <i class="bi bi-plus-lg me-1"></i> Add More
+        </button>
+      </div>
+
+      <hr class="mt-0 mb-3" />
+
+      <!-- Dynamic Forms -->
+      <div
+        *ngFor="let form of forms; let i = index"
+        class="new-record-card mb-4 p-3 border rounded"
+      >
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="section-title">
+            {{
+              isEditMode
+                ? "Update Assets Bought Details (ID: " +
+                  tableData[editIndex!].assetBoughtMiscPurchaseId +
+                  ")"
+                : "Add  Assets Bought  Details " + (i + 1)
+            }}
+          </h5>
+          <!-- REMOVE BUTTON (NOT for first form) -->
+          <button
+            *ngIf="i > 0"
+            class="btn btn-sm btn-light"
+            (click)="removeForm(i)"
+          >
+            <i class="fa-solid fa-xmark me-2"></i>Remove
+          </button>
+        </div>
+
+        <!-- FORM -->
+        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
+          <div class="row mb-3">
+            <!-- Hidden ID -->
+            <input
+              type="hidden"
+              [(ngModel)]="form.newRecord.assetBoughtMiscPurchaseId"
+              name="assetBoughtMiscPurchaseId{{ i }}"
+            />
+
+            <!-- Misc Purchase Code -->
+            <div class="col-md-4">
+              <label class="form-label">Misc Purchase Code</label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetBoughtMiscPurchaseCode"
+                name="assetBoughtMiscPurchaseCode{{ i }}"
+                required
+              />
+            </div>
+
+            <!-- Asset Category -->
+            <div class="col-md-4">
+              <label class="form-label">Asset Category *</label>
+
+              <select
+                class="form-select"
+                [(ngModel)]="form.newRecord.assetBoughtAssetCategory"
+                name="assetBoughtAssetCategory{{ i }}"
+                required
+              >
+                <option value="">Select Category</option>
+                <option value="IT">IT</option>
+                <option value="Non-IT">Non-IT</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Mechanical">Mechanical</option>
+              </select>
+            </div>
+
+            <!-- Asset Type -->
+            <div class="col-md-4">
+              <label class="form-label">Asset Type *</label>
+
+              <select
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetBoughtAssetType"
+                name="assetBoughtAssetType{{ i }}"
+                required
+              >
+                <option value="">Select Asset Type</option>
+
+                <option
+                  *ngFor="let type of assetTypes"
+                  [value]="type.assetTypeName"
+                >
+                  {{ type.assetTypeName }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Item Name -->
+            <div class="col-md-4">
+              <label class="form-label">Item Name *</label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetBoughtItemName"
+                name="assetBoughtItemName{{ i }}"
+                required
+              />
+            </div>
+
+            <!-- Department -->
+            <div class="col-md-4">
+              <label class="form-label">Department *</label>
+
+              <select
+                class="form-select"
+                [(ngModel)]="form.newRecord.assetBoughtDepartment"
+                name="assetBoughtDepartment{{ i }}"
+                required
+              >
+                <option value="">Select Department</option>
+
+                <option
+                  *ngFor="let d of departments"
+                  [value]="d.departmentName"
+                >
+                  {{ d.departmentName }}
+                </option>
+              </select>
+            </div>
+
+            <!--Asset Bought Vendor -->
+            <div class="col-md-4">
+              <label class="form-label">Asset Bought Vendor</label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetBoughtVendor"
+                name="assetBoughtVendor{{ i }}"
+                required
+              />
+            </div>
+
+            <!-- Asset Bought SR.NO By -->
+            <div class="col-md-4">
+              <label class="form-label"> Asset Bought SR.NO *</label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetBoughtSerialNumber"
+                name="assetBoughtSerialNumber{{ i }}"
+                required
+              />
+            </div>
+
+            <!-- Asset Status -->
+            <div class="col-md-4">
+              <label class="form-label">Asset Status *</label>
+
+              <select
+                class="form-select"
+                [(ngModel)]="form.newRecord.assetBoughtAssetStatus"
+                name="assetBoughtAssetStatus{{ i }}"
+                required
+              >
+                <option value="">Select Status</option>
+                <option value="Working">Working</option>
+                <option value="Not Working">Not Working</option>
+                <option value="Under Repair">Under Repair</option>
+              </select>
+            </div>
+
+            <!-- Purchase Date -->
+            <div class="col-md-4">
+              <label class="form-label">Purchase Date *</label>
+
+              <input
+                type="date"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetBoughtPurchaseDate"
+                name="assetBoughtPurchaseDate{{ i }}"
+                required
+              />
+            </div>
+
+            <!-- Purchased By -->
+            <div class="col-md-3">
+              <label class="form-label">Purchased By *</label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetBoughtPurchasedBy"
+                name="assetBoughtPurchasedBy{{ i }}"
+                required
+              />
+            </div>
+
+            <!-- Created Date -->
+            <div class="col-md-3">
+              <label class="form-label">Created Date *</label>
+
+              <input
+                type="text"
+                class="form-control"
+                [value]="form.newRecord.assetBoughtCreatedDate"
+                readonly
+              />
+            </div>
+
+            <!-- Updated Date -->
+            <div class="col-md-3" *ngIf="form.newRecord.assetBoughtUpdatedDate">
+              <label class="form-label">Updated Date *</label>
+
+              <input
+                type="text"
+                class="form-control"
+                [value]="form.newRecord.assetBoughtUpdatedDate"
+                readonly
+              />
+            </div>
+
+            <!-- Invoice Number -->
+            <div class="col-md-3">
+              <label class="form-label">Bill / Invoice No *</label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetBoughtBillInvoiceNo"
+                name="assetBoughtBillInvoiceNo{{ i }}"
+                required
+              />
+            </div>
+
+            <!-- Attachment -->
+            <div class="col-md-3">
+              <label class="form-label">Attachment *</label>
+
+              <input
+                type="file"
+                class="form-control"
+                (change)="onFileSelect($event, i)"
+              />
+            </div>
+
+            <!-- Remarks -->
+            <div class="col-md-12">
+              <label class="form-label">Remarks *</label>
+
+              <textarea
+                class="form-control"
+                rows="2"
+                [(ngModel)]="form.newRecord.assetBoughtRemarks"
+                name="assetBoughtRemarks{{ i }}"
+                required
+              ></textarea>
+            </div>
+
+            <!-- Record Status -->
+            <!-- <div class="col-md-4">
+              <label class="form-label">Status *</label>
+
+              <select
+                class="form-select"
+                [(ngModel)]="form.newRecord.assetBoughtStatus"
+                name="assetBoughtStatus{{ i }}"
+                required
+              >
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div> -->
+          </div>
+
+          <!-- Buttons -->
+          <div
+            *ngIf="i === forms.length - 1"
+            class="mt-3 d-flex gap-2 justify-content-end"
+          >
+            <button type="button" class="btn-save" (click)="saveAllRecords()">
+              <i class="bi bi-floppy"></i>
+              {{ isEditMode ? "Update" : "Save" }}
+            </button>
+
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="cancelRecord(recordForm)"
+            >
+              <i class="bi bi-arrow-counterclockwise"></i>
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- BULK IMPORT FORM -->
+    <div
+      *ngIf="activeTab === 'bulkImport'"
+      class="bulk-import-container container-fluid"
+    >
+      <!-- Bulk Import Records Title -->
+      <h3 class="section-title mb-3">
+        <i class="bi bi-file-earmark-arrow-down-fill me-2"></i>
+        Bulk Import Records
+      </h3>
+
+      <hr class="mt-0 mb-3" />
+      <!-- Important Notice -->
+      <div class="important-box mb-4">
+        <h4 class="mb-2">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          Important Notice
+        </h4>
+
+        <ul class="mb-0">
+          <li>
+            It is Extremely Important to put the System in maintenance mode to
+            perform Bulk Import operations.
+          </li>
+          <li>DO NOT IMPORT BULK DATA WHILE SYSTEM IS UNDER USE.</li>
+          <li>ONLY EXPORT/TRAINED EMPLOYEES SHOULD USE THIS SECTION.</li>
+        </ul>
+      </div>
+      <!-- File Upload Section -->
+      <div class="file-upload-section">
+        <h4 class="mb-2">
+          <i class="bi bi-upload me-2"></i>
+          Upload File to Import
+        </h4>
+
+        <p>Select file to import(Only doc,excel,csv,txt files):</p>
+        <!-- Responsive Wrapper -->
+        <div class="upload-controls mb-3">
+          <!-- File Input -->
+          <input
+            type="file"
+            class="form-control file-input"
+            (change)="onFileSelected($event)"
+          />
+          <!-- Buttons Wrapper -->
+          <!-- Buttons Wrapper -->
+          <div class="buttons-wrapper">
+            <button type="button" class="btn-upload" (click)="uploadFile()">
+              <i class="bi bi-upload me-2"></i> Upload File
+            </button>
+
+            <button
+              type="button"
+              class="btn-download"
+              (click)="downloadSampleCSV()"
+            >
+              <i class="bi bi-file-earmark-arrow-down-fill me-2"></i>
+              Download Sample CSV
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BULK EXPORT FORM -->
+    <div *ngIf="activeTab === 'bulkExport'" class="bulk-export-container">
+      <!-- Bulk Export Records Title -->
+      <h3 class="section-title">
+        <i class="bi bi-file-earmark-arrow-up-fill me-2"></i>
+        Bulk Export Records
+      </h3>
+
+      <hr class="mt-0 mb-3" />
+      <!-- File Export Options -->
+      <div class="export-options">
+        <h4>
+          <i class="bi bi-gear-fill me-2"></i>
+          File Export Options
+        </h4>
+
+        <!-- Filters in Horizontal Line -->
+        <div class="filter-column">
+          <div class="container">
+            <div class="row g-3">
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="startDate" class="form-label">Start Date:</label>
+                  <input
+                    type="text"
+                    id="startDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="startDate"
+                    (input)="formatDate($event, 'start')"
+                  />
+                </div>
+                <!-- Validation message (optional) -->
+                <p
+                  *ngIf="startDateError"
+                  style="color: red; font-size: 14px; margin-top: 5px"
+                >
+                  {{ startDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="endDate" class="form-label">End Date:</label>
+                  <input
+                    type="text"
+                    id="endDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="endDate"
+                    (input)="formatDate($event, 'end')"
+                  />
+                </div>
+                <p
+                  *ngIf="endDateError"
+                  style="color: red; font-size: 14px; margin-top: 5px"
+                >
+                  {{ endDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="fileType" class="form-label">File Type:</label>
+                  <select
+                    id="fileType"
+                    [(ngModel)]="fileType"
+                    class="form-select"
+                  >
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">Excel (.xlsx)</option>
+                    <option value="pdf">PDF</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="export-buttons justify-content-end">
+          <button type="button" class="btn-reset" (click)="resetFilters()">
+            <i class="bi bi-arrow-counterclockwise me-2"></i>
+            Reset Filters
+          </button>
+
+          <button type="button" class="btn-get" (click)="getFile()">
+            <i class="bi bi-download me-2"></i>
+            Get File
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HELP SECTION -->
+    <div *ngIf="activeTab === 'help'" class="help-page-bg container-fluid py-4">
+      <h3 class="section-title mb-2">
+        <i class="bi bi-question-circle-fill me-2"></i>
+        Help & Guidelines
+      </h3>
+
+      <hr class="mt-0 mb-3" />
+
+      <h4 class="fw-bold text-primary mb-3">
+        Assets Bought / AMC Asset Master – User Manual
+      </h4>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        This section explains how to use the
+        <b>Assets Bought / AMC Asset Master</b> module. Follow these guidelines
+        to ensure accurate asset tracking, warranty management, and AMC vendor
+        mapping.
+      </div>
+
+      <!-- MAIN HELP TABLE -->
+      <div class="table-responsive mb-5">
+        <table class="table table-bordered align-top">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Tab</th>
+              <th>Purpose</th>
+              <th>Instructions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Details</td>
+              <td>View and manage purchased assets</td>
+              <td>
+                • View asset master records<br />
+                • Search by <b>Asset Code, Item Name, Brand, Department</b
+                ><br />
+                • Sort columns using arrows<br />
+                • Click <b>Asset ID</b> to view full asset details<br />
+                • Click <b>Edit</b> to update asset information
+              </td>
+            </tr>
+
+            <tr>
+              <td>2</td>
+              <td>New Record</td>
+              <td>Add new purchased asset</td>
+              <td>
+                • Enter <b>Asset Code</b> (or auto-generated)<br />
+                • Select <b>Department</b> & <b>Asset Category</b><br />
+                • Enter Asset Type, Item Name, Brand & Model<br />
+                • Add Warranty / AMC details<br />
+                • Click <b>Save</b> to store asset
+              </td>
+            </tr>
+
+            <tr>
+              <td>3</td>
+              <td>Bulk Import</td>
+              <td>Import multiple purchased assets</td>
+              <td>
+                • Upload CSV / Excel / DOCX / TXT file<br />
+                • File must follow <b>Assets Bought format</b><br />
+                • Invalid rows will be skipped or flagged
+              </td>
+            </tr>
+
+            <tr>
+              <td>4</td>
+              <td>Bulk Export</td>
+              <td>Download asset master reports</td>
+              <td>
+                • Select date range<br />
+                • Choose export format (CSV / Excel / PDF)<br />
+                • Asset master report downloads instantly
+              </td>
+            </tr>
+
+            <tr>
+              <td>5</td>
+              <td>Help</td>
+              <td>User guidance & clarification</td>
+              <td>
+                • Refer examples before data entry<br />
+                • Follow validation messages<br />
+                • Use this section for support & understanding
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SINGLE RECORD EXAMPLE -->
+      <h5 class="fw-semibold text-info">
+        Example: Adding a Single Purchased Asset
+      </h5>
+
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Ensure correct department and category selection for proper asset
+        classification.
+      </div>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Asset</td>
+              <td>
+                Enter Asset Code → Select Category & Type → Fill Item, Brand,
+                Model → Add Warranty & Vendor → Save
+              </td>
+              <td>Asset visible in Details tab</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MULTIPLE RECORD EXAMPLE -->
+      <h5 class="fw-semibold text-info">
+        Example: Adding Multiple Purchased Assets
+      </h5>
+
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Bulk import is recommended when registering large number of purchased
+        assets.
+      </div>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Bulk Import</td>
+              <td>Import Assets</td>
+              <td>Upload valid Assets Bought file</td>
+              <td>Assets added to master list</td>
+            </tr>
+            <tr>
+              <td>Bulk Export</td>
+              <td>Download Report</td>
+              <td>Select date range and format</td>
+              <td>Asset master report downloaded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="simple-toast" *ngIf="toastMessage" [ngClass]="toastType">
+  {{ toastMessage }}
+</div>
+<!-- Department VIEW MODAL -->
+<div class="modal" [class.show]="showViewModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5>Asset Details (ID: {{ selectedRow?.assetBoughtMiscPurchaseId }})</h5>
+      <button class="close-btn1" (click)="closeViewModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <table class="popup-table">
+        <!-- ================= PRIMARY DETAILS ================= -->
+        <tr>
+          <th>Asset ID</th>
+          <td>{{ selectedRow?.assetBoughtMiscPurchaseId }}</td>
+        </tr>
+        <tr>
+          <th>Asset Code</th>
+          <td>{{ selectedRow?.assetBoughtMiscPurchaseCode }}</td>
+        </tr>
+
+        <!-- ================= CLASSIFICATION ================= -->
+        <tr>
+          <th>Asset Category</th>
+          <td>{{ selectedRow?.assetBoughtAssetCategory }}</td>
+        </tr>
+        <tr>
+          <th>Asset Type</th>
+          <td>{{ selectedRow?.assetBoughtAssetType }}</td>
+        </tr>
+        <tr>
+          <th>Item Name</th>
+          <td>{{ selectedRow?.assetBoughtItemName }}</td>
+        </tr>
+
+        <!-- ================= OWNERSHIP / LOCATION ================= -->
+        <tr>
+          <th>Department</th>
+          <td>{{ selectedRow?.assetBoughtDepartment }}</td>
+        </tr>
+
+        <!-- ================= ASSET STATUS ================= -->
+        <tr>
+          <th>Asset Status</th>
+          <td>{{ selectedRow?.assetBoughtAssetStatus }}</td>
+        </tr>
+
+        <tr>
+          <th>Purchase Date</th>
+          <td>{{ selectedRow?.assetBoughtPurchaseDate }}</td>
+        </tr>
+
+        <!-- ================= DOCUMENTS ================= -->
+        <tr>
+          <th>Bill / Invoice No</th>
+          <td>{{ selectedRow?.assetBoughtBillInvoiceNo }}</td>
+        </tr>
+        <tr *ngIf="selectedRow?.attachment">
+          <th>Attachment</th>
+          <td>
+            <a href="javascript:void(0)">
+              {{ selectedRow?.assetBoughtAttachment }}
+            </a>
+          </td>
+        </tr>
+
+        <!-- ================= ADMIN / SYSTEM ================= -->
+        <tr>
+          <th>Purchased By</th>
+          <td>{{ selectedRow?.assetBoughtPurchasedBy }}</td>
+        </tr>
+        <tr *ngIf="selectedRow?.remarks">
+          <th>Remarks</th>
+          <td>{{ selectedRow?.assetBoughtRemarks }}</td>
+        </tr>
+
+        <!-- ================= SYSTEM AUDIT ================= -->
+        <tr>
+          <th>Created Date</th>
+          <td>{{ selectedRow?.assetBoughtCreatedDate }}</td>
+        </tr>
+        <tr *ngIf="selectedRow?.updatedDate">
+          <th>Updated Date</th>
+          <td>{{ selectedRow?.assetBoughtUpdatedDate }}</td>
+        </tr>
+        <tr>
+          <th>Record Status</th>
+          <td>{{ selectedRow?.assetBoughtStatus }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

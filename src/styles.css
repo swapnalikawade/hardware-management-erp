@@ -1,0 +1,53 @@
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+/* ng-select = bootstrap input look */
+.employee-ng-select .ng-select-container {
+  min-height: 44px;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  padding: 0 12px;
+  background-color: #fff;
+  box-shadow: none;
+}
+
+/* placeholder */
+.employee-ng-select .ng-placeholder {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+/* selected value text */
+.employee-ng-select .ng-value-label {
+  font-size: 14px;
+  color: #212529;
+}
+
+/* dropdown panel */
+.employee-ng-select .ng-dropdown-panel {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+/* option hover */
+.employee-ng-select .ng-option:hover {
+  background: #f1f5ff;
+}
+
+/* ❌ invalid state (red border) */
+.employee-ng-select.ng-invalid.ng-touched .ng-select-container {
+  border-color: #dc3545 !important;
+}
+
+/* ❌ invalid focus glow */
+.employee-ng-select.ng-invalid.ng-touched.ng-select-focused
+  .ng-select-container {
+  box-shadow: 0 0 0 0.15rem rgba(220, 53, 69, 0.25);
+}

@@ -1,0 +1,995 @@
+<div class="company-container">
+  <!-- HEADER -->
+  <div class="container-fluid py-3">
+    <div class="row align-items-start">
+      <!-- Left Section -->
+      <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
+        <h2 class="company-name">
+          {{ headCompanyName }}
+        </h2>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+          <span class="company-email">{{ userName }}</span>
+          <span class="breadcrumb-date">{{ today | date: "dd MMM yyyy" }}</span>
+        </div>
+      </div>
+
+      <!-- Right Section: Always top-right -->
+      <div
+        class="col-lg-6 col-md-6 col-sm-12 d-flex justify-content-md-end justify-content-start"
+      >
+        <h6 class="breadcrumb">
+          <i class="bi bi-house-fill me-1"></i>
+          Home
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-layers-fill me-1"></i>
+          Master
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-box-seam-fill me-1"></i>
+          Asset Type
+        </h6>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS-->
+  <div class="tabs-wrapper">
+    <div class="tabs-container">
+      <div
+        class="tab"
+        *ngFor="let tab of tabs"
+        [class.active]="activeTab === tab.key"
+        (click)="activeTab = tab.key"
+      >
+        <i [class]="tab.icon"></i> {{ tab.label }}
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMS ARE IN CARD -->
+  <div class="form-card">
+    <!-- DETAILS FORM -->
+    <div *ngIf="activeTab === 'details'" class="company-details-container">
+      <h3 class="section-title">
+        <i class="bi bi-calendar-event-fill"></i> Asset Type Details
+      </h3>
+      <hr class="mt-0 mb-3" />
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <!-- Show entries -->
+        <div class="toolbar-item show-entries">
+          <label for="showEntries">Show</label>
+          <select id="showEntries" (change)="onChangeItemsPerPage($event)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>entries</span>
+        </div>
+
+        <!-- Export buttons -->
+        <div class="toolbar-item export-buttons">
+          <button class="btn-doc" (click)="exportDoc()">
+            <i class="bi bi-file-earmark-word-fill me-1"></i> DOC
+          </button>
+
+          <button class="btn-pdf" (click)="exportPDF()">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF
+          </button>
+
+          <button class="btn-excel" (click)="exportExcel()">
+            <i class="bi bi-file-earmark-excel-fill me-1"></i> Excel
+          </button>
+        </div>
+
+        <!-- Search + Delete -->
+        <div class="search-delete-group">
+          <!-- DELETE BUTTON -->
+          <div class="delete-btn" *ngIf="selectedRows.length > 0">
+            <button (click)="deleteSelectedRows()">
+              <i class="bi bi-trash-fill"></i> Delete
+            </button>
+          </div>
+
+          <!-- SEARCH BOX -->
+          <div class="search-box">
+            <input
+              type="text"
+              placeholder="Search..."
+              (input)="applyFilter($event)"
+            />
+            <i class="bi bi-search"></i>
+          </div>
+        </div>
+      </div>
+      <!-- Table -->
+      <div class="table-wrapper">
+        <table>
+      <thead>
+  <tr>
+    <th>
+      <input type="checkbox" (change)="toggleAll($event)" />
+    </th>
+
+    <th>
+      Asset Type ID (PK)
+      <i (click)="sortTable('assetTypeId', 'asc')"></i>
+      <i (click)="sortTable('assetTypeId', 'desc')"></i>
+    </th>
+
+    <th>
+      Asset Type Code
+      <i (click)="sortTable('assetTypeCode', 'asc')"></i>
+      <i (click)="sortTable('assetTypeCode', 'desc')"></i>
+    </th>
+
+    <th>
+      Asset Type Name
+      <i (click)="sortTable('assetTypeName', 'asc')"></i>
+      <i (click)="sortTable('assetTypeName', 'desc')"></i>
+    </th>
+
+    <th>
+      Asset Category
+      <i (click)="sortTable('assetCategory', 'asc')"></i>
+      <i (click)="sortTable('assetCategory', 'desc')"></i>
+    </th>
+
+    <!-- ✅ NEW -->
+    <th>
+      Warranty Applicable
+      <i (click)="sortTable('warrantyApplicable', 'asc')"></i>
+      <i (click)="sortTable('warrantyApplicable', 'desc')"></i>
+    </th>
+
+    <th>
+      Warranty Duration
+      <i (click)="sortTable('warrantyDuration', 'asc')"></i>
+      <i (click)="sortTable('warrantyDuration', 'desc')"></i>
+    </th>
+
+    <th>
+      Warranty Unit
+      <i (click)="sortTable('warrantyUnit', 'asc')"></i>
+      <i (click)="sortTable('warrantyUnit', 'desc')"></i>
+    </th>
+
+    <th>
+      Created Date
+      <i (click)="sortTable('createdDate', 'asc')"></i>
+      <i (click)="sortTable('createdDate', 'desc')"></i>
+    </th>
+
+    <th>
+      Updated Date
+      <i (click)="sortTable('updatedDate', 'asc')"></i>
+      <i (click)="sortTable('updatedDate', 'desc')"></i>
+    </th>
+
+    <th>
+      Created By
+      <i (click)="sortTable('createdBy', 'asc')"></i>
+      <i (click)="sortTable('createdBy', 'desc')"></i>
+    </th>
+
+    <th>
+      Status
+      <i (click)="sortTable('status', 'asc')"></i>
+      <i (click)="sortTable('status', 'desc')"></i>
+    </th>
+
+    <th>Action</th>
+  </tr>
+</thead>
+
+         <tbody>
+  <tr
+    *ngFor="
+      let row of filteredData
+        | slice
+          : (currentPage - 1) * itemsPerPage
+          : currentPage * itemsPerPage;
+      let i = index
+    "
+  >
+    <!-- Checkbox -->
+    <td>
+      <input
+        type="checkbox"
+        [checked]="selectedRows.includes(row)"
+        (change)="toggleRowSelection(row, $event)"
+      />
+    </td>
+
+    <!-- Asset Type ID -->
+    <td>
+      <span
+        class="leave-link"
+        [ngClass]="{
+          'active-id': selectedRow?.assetTypeId === row.assetTypeId
+        }"
+        (click)="openDetails(row)"
+      >
+        {{ row.assetTypeId }}
+      </span>
+    </td>
+
+    <!-- Code -->
+    <td>{{ row.assetTypeCode }}</td>
+
+    <!-- Name -->
+    <td>{{ row.assetTypeName }}</td>
+
+    <!-- Category -->
+    <td>{{ row.assetCategory }}</td>
+
+    <!-- ✅ Warranty Applicable -->
+    <td>{{ row.warrantyApplicable }}</td>
+
+    <!-- ✅ Warranty Duration -->
+    <td>{{ row.warrantyDuration }}</td>
+
+    <!-- ✅ Warranty Unit -->
+    <td>{{ row.warrantyUnit }}</td>
+
+    <!-- Created Date -->
+    <td>{{ row.createdDate }}</td>
+
+    <!-- Updated Date -->
+    <td>{{ row.updatedDate }}</td>
+
+    <!-- Created By -->
+    <td>{{ row.createdBy }}</td>
+
+    <!-- ✅ Status -->
+    <td>
+      <span
+        [ngClass]="{
+          'status-active': row.status === 'Active',
+          'status-inactive': row.status !== 'Active'
+        }"
+      >
+        <span *ngIf="row.status === 'Active'">✔</span>
+        <span *ngIf="row.status !== 'Active'">❌</span>
+        {{ row.status }}
+      </span>
+    </td>
+
+    <!-- Action -->
+    <td>
+      <button class="btn-edit" (click)="onEdit(row, i)">
+        <i class="bi bi-pencil-fill"></i> Edit
+      </button>
+    </td>
+  </tr>
+</tbody>
+        </table>
+      </div>
+      <div class="no-data-message" *ngIf="filteredData.length === 0">
+        <i class="bi bi-database-x"></i>
+        No Data Found
+      </div>
+      <!-- Pagination -->
+      <div class="pagination">
+        <button
+          (click)="changePage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+
+        <button
+          *ngFor="let page of [].constructor(totalPages); let p = index"
+          (click)="changePage(p + 1)"
+          [class.active]="currentPage === p + 1"
+        >
+          {{ p + 1 }}
+        </button>
+
+        <button
+          (click)="changePage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+
+    <!-- NEW RECORD FORM -->
+    <div *ngIf="activeTab === 'newRecord'" class="new-record-container">
+      <!-- Title + Add More button -->
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="section-title">
+          <i
+            [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle-fill'"
+          ></i>
+          {{
+            isEditMode ? "Update Asset Type Details" : "Add Asset Type Details"
+          }}
+        </h3>
+        <!-- Add More Button -->
+        <button class="add-more-btn" *ngIf="!isEditMode" (click)="addForm()">
+          <i class="bi bi-plus"></i> Add More
+        </button>
+      </div>
+
+      <hr class="mt-0 mb-3" />
+
+      <!-- Dynamic Forms -->
+      <div
+        *ngFor="let form of forms; let i = index"
+        class="new-record-card mb-4 p-3 border rounded"
+      >
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="section-title">
+            {{
+              isEditMode
+                ? "Update Asset Type Details (ID: " +
+                  tableData[editIndex!].assetTypeId +
+                  ")"
+                : "Add Asset Type Details " + (i + 1)
+            }}
+          </h5>
+          <!-- REMOVE BUTTON (NOT for first form) -->
+          <button
+            *ngIf="i > 0"
+            class="btn btn-sm btn-light"
+            (click)="removeForm(i)"
+          >
+            <i class="bi bi-x-lg me-2"></i>Remove
+          </button>
+        </div>
+
+        <!-- FORM -->
+        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
+          <div class="row mb-3">
+            <!-- Asset Type Code -->
+         <div class="col-md-4">
+  <label class="form-label">
+    Asset Type Code <span class="text-danger">*</span>
+  </label>
+
+  <input
+    type="text"
+    class="form-control"
+    [(ngModel)]="form.newRecord.assetTypeCode"
+    name="assetTypeCode{{ i }}"
+    required
+    placeholder="Enter Asset Type Code"
+    #assetTypeCode="ngModel"
+    [ngClass]="{
+      'is-invalid':
+        (showErrors || assetTypeCode.touched) &&
+        assetTypeCode.invalid
+    }"
+  />
+
+  <div
+    *ngIf="
+      (showErrors || assetTypeCode.touched) &&
+      assetTypeCode.invalid
+    "
+    class="text-danger mt-1"
+  >
+    Asset Type Code is required.
+  </div>
+</div>
+            <!-- Asset Type Name -->
+         <div class="col-md-4">
+  <label class="form-label">
+    Asset Type Name <span class="text-danger">*</span>
+  </label>
+
+  <input
+    type="text"
+    class="form-control"
+    [(ngModel)]="form.newRecord.assetTypeName"
+    name="assetTypeName{{ i }}"
+    required
+    pattern="^[A-Za-z ]+$"
+    placeholder="Enter Asset Type Name"
+    #assetTypeName="ngModel"
+    [ngClass]="{
+      'is-invalid':
+        (showErrors || assetTypeName.touched) &&
+        assetTypeName.invalid
+    }"
+  />
+
+  <div
+    *ngIf="
+      (showErrors || assetTypeName.touched) &&
+      assetTypeName.invalid
+    "
+    class="text-danger mt-1"
+  >
+    <span *ngIf="assetTypeName.errors?.['required']">
+      Asset Type Name is required.
+    </span>
+
+    <span *ngIf="assetTypeName.errors?.['pattern']">
+      Only alphabets and spaces are allowed.
+    </span>
+  </div>
+</div>
+            <!-- Asset Type Category -->
+            <!-- Asset Category -->
+          <div class="col-md-4">
+  <label class="form-label">
+    Asset Category <span class="text-danger">*</span>
+  </label>
+
+  <input
+    type="text"
+    class="form-control"
+    [(ngModel)]="form.newRecord.assetCategory"
+    name="assetCategory{{ i }}"
+    required
+    pattern="^[A-Za-z ]+$"
+    placeholder="Enter Asset Category"
+    #assetCategory="ngModel"
+    [ngClass]="{
+      'is-invalid':
+        (showErrors || assetCategory.touched) &&
+        assetCategory.invalid
+    }"
+  />
+
+  <div
+    *ngIf="
+      (showErrors || assetCategory.touched) &&
+      assetCategory.invalid
+    "
+    class="text-danger mt-1"
+  >
+    <span *ngIf="assetCategory.errors?.['required']">
+      Asset Category is required.
+    </span>
+
+    <span *ngIf="assetCategory.errors?.['pattern']">
+      Only alphabets and spaces are allowed.
+    </span>
+  </div>
+</div>
+            <!-- Warranty -->
+            <!-- Warranty -->
+        <div class="col-md-4 mt-2">
+  <label class="form-label">
+    Warranty Applicable <span class="text-danger">*</span>
+  </label>
+
+  <select
+    class="form-select"
+    [(ngModel)]="form.newRecord.warrantyApplicable"
+    name="warrantyApplicable{{ i }}"
+    required
+    #warrantyApplicable="ngModel"
+    [ngClass]="{
+      'is-invalid':
+        (showErrors || warrantyApplicable.touched) &&
+        warrantyApplicable.invalid
+    }"
+  >
+    <option value="">Select</option>
+    <option value="Yes">Yes</option>
+    <option value="No">No</option>
+  </select>
+
+  <div
+    *ngIf="
+      (showErrors || warrantyApplicable.touched) &&
+      warrantyApplicable.invalid
+    "
+    class="text-danger mt-1"
+  >
+    Warranty selection is required.
+  </div>
+</div>
+            <!-- Warranty Start Date -->
+            <!-- Warranty Start Date -->
+          
+            <!-- Warranty Duration -->
+            <!-- Warranty Duration -->
+           <div
+  class="col-md-4 mt-2"
+  *ngIf="form.newRecord.warrantyApplicable === 'Yes'"
+>
+  <label class="form-label">
+    Warranty Duration <span class="text-danger">*</span>
+  </label>
+
+  <input
+    type="number"
+    class="form-control"
+    [(ngModel)]="form.newRecord.warrantyDuration"
+    name="warrantyDuration{{ i }}"
+    placeholder="Enter duration"
+    min="1"
+    #warrantyDuration="ngModel"
+    required
+    [ngClass]="{
+      'is-invalid':
+        (showErrors || warrantyDuration.touched) &&
+        warrantyDuration.invalid
+    }"
+  />
+
+  <div
+    *ngIf="
+      (showErrors || warrantyDuration.touched) &&
+      warrantyDuration.invalid
+    "
+    class="text-danger mt-1"
+  >
+    Warranty duration is required.
+  </div>
+</div>
+          <div
+  class="col-md-4 mt-2"
+  *ngIf="form.newRecord.warrantyApplicable === 'Yes'"
+>
+  <label class="form-label">
+    Warranty Unit <span class="text-danger">*</span>
+  </label>
+
+  <select
+    class="form-select"
+    [(ngModel)]="form.newRecord.warrantyUnit"
+    name="warrantyUnit{{ i }}"
+    required
+    #warrantyUnit="ngModel"
+    [ngClass]="{
+      'is-invalid':
+        (showErrors || warrantyUnit.touched) &&
+        warrantyUnit.invalid
+    }"
+  >
+    <option value="">Select</option>
+    <option value="Days">Days</option>
+    <option value="Months">Months</option>
+    <option value="Years">Years</option>
+  </select>
+
+  <div
+    *ngIf="
+      (showErrors || warrantyUnit.touched) &&
+      warrantyUnit.invalid
+    "
+    class="text-danger mt-1"
+  >
+    Warranty unit is required.
+  </div>
+</div>
+            <!-- Created Date -->
+          <div class="col-md-4 mt-2">
+  <label class="form-label">Created Date</label>
+
+  <input
+    type="text"
+    class="form-control"
+    [(ngModel)]="form.newRecord.createdDate"
+    name="createdDate{{ i }}"
+    readonly
+  />
+</div>
+          </div>
+
+          <!-- SAVE + RESET (ONLY LAST FORM) -->
+          <div
+            *ngIf="i === forms.length - 1"
+            class="mt-3 d-flex gap-2 justify-content-end"
+          >
+            <button type="button" class="btn-save" (click)="saveAllRecords()">
+              <i class="bi bi-floppy"></i>
+              {{ isEditMode ? "Update" : "Save" }}
+            </button>
+
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="cancelRecord(recordForm)"
+            >
+              <i class="bi bi-arrow-counterclockwise"></i>
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- BULK IMPORT FORM -->
+    <div
+      *ngIf="activeTab === 'bulkImport'"
+      class="bulk-import-container container-fluid"
+    >
+      <!-- Bulk Import Records Title -->
+      <h3 class="section-title mb-3">
+        <i class="bi bi-file-earmark-arrow-up-fill me-1"></i> Bulk Import
+        Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- Important Notice -->
+      <div class="important-box mb-4">
+        <h4 class="mb-2">
+          <i class="bi bi-exclamation-triangle-fill"></i> Important Notice
+        </h4>
+        <ul class="mb-0">
+          <li>
+            It is Extremely Important to put the System in maintenance mode to
+            perform Bulk Import operations.
+          </li>
+          <li>DO NOT IMPORT BULK DATA WHILE SYSTEM IS UNDER USE.</li>
+          <li>ONLY EXPORT/TRAINED EMPLOYEES SHOULD USE THIS SECTION.</li>
+        </ul>
+      </div>
+      <!-- File Upload Section -->
+      <div class="file-upload-section">
+        <h4 class="mb-2"><i class="bi bi-upload"></i> Upload File to Import</h4>
+        <p>Select file to import(Only doc,excel,csv,txt files):</p>
+        <!-- Responsive Wrapper -->
+        <div class="upload-controls mb-3">
+          <!-- File Input -->
+          <input
+            type="file"
+            class="form-control file-input"
+            (change)="onFileSelected($event)"
+          />
+          <!-- Buttons Wrapper -->
+          <div class="buttons-wrapper">
+            <button type="button" class="btn-upload" (click)="uploadFile()">
+              <i class="bi bi-upload me-2"></i>Upload File
+            </button>
+            <button
+              type="button"
+              class="btn-download"
+              (click)="downloadSampleCSV()"
+            >
+              <i class="bi bi-file-earmark-arrow-down-fill"></i>
+              Download Sample CSV
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BULK EXPORT FORM -->
+    <div *ngIf="activeTab === 'bulkExport'" class="bulk-export-container">
+      <!-- Bulk Export Records Title -->
+      <h3 class="section-title">
+        <i class="bi bi-file-earmark-arrow-down-fill"></i> Bulk Export Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- File Export Options -->
+      <div class="export-options">
+        <h4><i class="bi bi-gear-fill me-1"></i> File Export Options</h4>
+        <!-- Filters in Horizontal Line -->
+        <div class="filter-column">
+          <div class="container">
+            <div class="row g-3">
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="startDate" class="form-label">Start Date:</label>
+                  <input
+                    type="text"
+                    id="startDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="startDate"
+                    (input)="formatDate($event, 'start')"
+                  />
+                </div>
+                <!-- Validation message (optional) -->
+                <p
+                  *ngIf="startDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ startDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="endDate" class="form-label">End Date:</label>
+                  <input
+                    type="text"
+                    id="endDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="endDate"
+                    (input)="formatDate($event, 'end')"
+                  />
+                </div>
+                <p
+                  *ngIf="endDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ endDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="fileType" class="form-label">File Type:</label>
+                  <select
+                    id="fileType"
+                    [(ngModel)]="fileType"
+                    class="form-select"
+                  >
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">Excel (.xlsx)</option>
+                    <option value="pdf">PDF</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="export-buttons justify-content-end">
+          <button type="button" class="btn-reset" (click)="resetFilters()">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Reset Filters
+          </button>
+          <button type="button" class="btn-get" (click)="getFile()">
+            <i class="bi bi-download me-1 ms-3"></i> Get File
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HELP SECTION -->
+    <div *ngIf="activeTab === 'help'" class="help-page-bg container-fluid py-4">
+      <h3 class="section-title mb-2">
+        <i class="bi bi-question-circle-fill me-1"></i>
+        Help & Guidelines
+      </h3>
+
+      <hr class="mt-0 mb-3" />
+
+      <h4 class="text-primary mb-3">Asset Type Module – User Manual</h4>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the Asset Type module. Follow the
+        instructions carefully to avoid incorrect data.
+      </div>
+
+      <!-- MAIN HELP TABLE -->
+      <div class="table-responsive mb-5">
+        <table class="table table-bordered align-top">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Tab</th>
+              <th>Purpose</th>
+              <th>Instructions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Details</td>
+              <td>View and manage asset type records</td>
+              <td>
+                • View department data and assetTypestatus<br />
+                • Search, filter, and sort records<br />
+                • Click <b>Edit</b> to update record
+              </td>
+            </tr>
+
+            <tr>
+              <td>2</td>
+              <td>New Record</td>
+              <td>Add new asset type</td>
+              <td>
+                • Click <b>New Record</b><br />
+                • Enter all required fields<br />
+                • Use <b>Add More</b> for multiple entries<br />
+                • Click <b>Save All</b>
+              </td>
+            </tr>
+
+            <tr>
+              <td>3</td>
+              <td>Bulk Import</td>
+              <td>Import multiple asset type details</td>
+              <td>
+                • Upload CSV / Excel / DOCX / PDF / TXT<br />
+                • File must match system format<br />
+                • Errors shown if data is invalid
+              </td>
+            </tr>
+
+            <tr>
+              <td>4</td>
+              <td>Bulk Export</td>
+              <td>Download asset type data</td>
+              <td>
+                • Apply filters if needed<br />
+                • Select export format<br />
+                • File downloads instantly
+              </td>
+            </tr>
+
+            <tr>
+              <td>5</td>
+              <td>Help</td>
+              <td>Usage guidance & examples</td>
+              <td>
+                • Refer examples before entry<br />
+                • Follow validation messages<br />
+                • Use for troubleshooting
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SINGLE RECORD EXAMPLE -->
+      <h4 class="text-info">Example: Adding Single Asset Type</h4>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the Asset Type module. Follow the
+        instructions carefully to avoid incorrect data.
+      </div>
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Asset Type</td>
+              <td>Fill details and click Save</td>
+              <td>Record visible in Details tab</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MULTIPLE RECORD EXAMPLE -->
+      <h4 class="text-info">Example: Adding Multiple Asset Type Details</h4>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the Asset Type module. Follow the
+        instructions carefully to avoid incorrect data.
+      </div>
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Multiple</td>
+              <td>Use Add More and Save All</td>
+              <td>All records saved</td>
+            </tr>
+            <tr>
+              <td>Bulk Import</td>
+              <td>Import File</td>
+              <td>Upload valid file</td>
+              <td>Valid records imported</td>
+            </tr>
+            <tr>
+              <td>Bulk Export</td>
+              <td>Export</td>
+              <td>Select format</td>
+              <td>File downloaded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ASSET TYPE VIEW MODAL -->
+<div class="modal" [class.show]="showViewModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5>Asset Type Details (ID: {{ selectedRow?.assetTypeId }})</h5>
+      <button class="close-btn1" (click)="closeViewModal()">×</button>
+    </div>
+
+   <div class="modal-body">
+  <table class="popup-table">
+
+    <tr>
+      <th>Asset Type ID</th>
+      <td>{{ selectedRow?.assetTypeId }}</td>
+    </tr>
+
+    <tr>
+      <th>Asset Type Code</th>
+      <td>{{ selectedRow?.assetTypeCode }}</td>
+    </tr>
+
+    <tr>
+      <th>Asset Type Name</th>
+      <td>{{ selectedRow?.assetTypeName }}</td>
+    </tr>
+
+    <tr>
+      <th>Asset Category</th>
+      <td>{{ selectedRow?.assetCategory }}</td>
+    </tr>
+
+    <!-- ✅ Warranty Applicable -->
+    <tr>
+      <th>Warranty Applicable</th>
+      <td>{{ selectedRow?.warrantyApplicable }}</td>
+    </tr>
+
+    <!-- ✅ Warranty Duration -->
+    <tr>
+      <th>Warranty Duration</th>
+      <td>{{ selectedRow?.warrantyDuration }}</td>
+    </tr>
+
+    <!-- ✅ Warranty Unit -->
+    <tr>
+      <th>Warranty Unit</th>
+      <td>{{ selectedRow?.warrantyUnit }}</td>
+    </tr>
+
+    <!-- ✅ Created Date -->
+    <tr>
+      <th>Created Date</th>
+      <td>{{ selectedRow?.createdDate }}</td>
+    </tr>
+
+    <!-- ✅ Updated Date -->
+    <tr>
+      <th>Updated Date</th>
+      <td>{{ selectedRow?.updatedDate }}</td>
+    </tr>
+
+    <!-- ✅ Created By -->
+    <tr>
+      <th>Created By</th>
+      <td>{{ selectedRow?.createdBy }}</td>
+    </tr>
+
+    <!-- ✅ Status -->
+    <tr>
+      <th>Status</th>
+      <td>
+        <span
+          [ngClass]="{
+            'status-active': selectedRow?.status === 'Active',
+            'status-inactive': selectedRow?.status !== 'Active'
+          }"
+        >
+          <span *ngIf="selectedRow?.status === 'Active'">✔</span>
+          <span *ngIf="selectedRow?.status !== 'Active'">❌</span>
+          {{ selectedRow?.status }}
+        </span>
+      </td>
+    </tr>
+
+  </table>
+</div>
+  </div>
+</div>

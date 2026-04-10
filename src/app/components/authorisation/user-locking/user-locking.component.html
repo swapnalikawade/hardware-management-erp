@@ -1,0 +1,658 @@
+<div class="company-container">
+  <!-- HEADER -->
+  <div class="container-fluid py-3">
+    <div class="row align-items-start">
+      <!-- Left Section -->
+      <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
+        <h2 class="company-name">
+          {{ headCompanyName }}
+        </h2>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+          <span class="company-email">{{ userName }}</span>
+          <span class="breadcrumb-date">{{ today | date: "dd MMM yyyy" }}</span>
+        </div>
+      </div>
+
+      <!-- Right Section: Always top-right -->
+      <div
+        class="col-lg-6 col-md-6 col-sm-12 d-flex justify-content-md-end justify-content-start"
+      >
+        <h6 class="breadcrumb">
+          <i class="bi bi-house-fill me-1"></i>
+          Home
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-layers-fill me-1"></i>
+          Master
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-person-lock me-1"></i>
+          User Locking
+        </h6>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS-->
+  <div class="tabs-wrapper">
+    <div class="tabs-container">
+      <div
+        class="tab"
+        *ngFor="let tab of tabs"
+        [class.active]="activeTab === tab.key"
+        (click)="activeTab = tab.key"
+      >
+        <i [class]="tab.icon"></i> {{ tab.label }}
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMS ARE IN CARD -->
+  <div class="form-card">
+    <!-- DETAILS FORM -->
+    <div *ngIf="activeTab === 'details'" class="company-details-container">
+      <h3 class="section-title">
+        <i class="bi bi-person-lock"></i> User Locking Details
+      </h3>
+      <hr class="mt-0 mb-3" />
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <!-- Show entries -->
+        <div class="toolbar-item show-entries">
+          <label for="showEntries">Show</label>
+          <select id="showEntries" (change)="onChangeItemsPerPage($event)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>entries</span>
+        </div>
+
+        <!-- Export buttons -->
+        <div class="toolbar-item export-buttons">
+          <button class="btn-doc" (click)="exportDoc()">
+            <i class="bi bi-file-earmark-word-fill me-1"></i> DOC
+          </button>
+
+          <button class="btn-pdf" (click)="exportPDF()">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF
+          </button>
+
+          <button class="btn-excel" (click)="exportExcel()">
+            <i class="bi bi-file-earmark-excel-fill me-1"></i> Excel
+          </button>
+        </div>
+
+        <!-- Search + Delete -->
+        <div class="search-delete-group">
+          <!-- DELETE BUTTON -->
+          <div class="delete-btn" *ngIf="selectedRows.length > 0">
+            <button (click)="deleteSelectedRows()">
+              <i class="bi bi-trash-fill"></i> Delete
+            </button>
+          </div>
+          <div class="status-filter">
+            <select
+              class="form-select form-select-sm"
+              (change)="filterStatus($event)"
+            >
+              <option value="">All</option>
+              <option value="Active">Unlocked</option>
+              <option value="Inactive">Locked</option>
+            </select>
+          </div>
+          <!-- SEARCH BOX -->
+          <div class="search-box">
+            <input
+              type="text"
+              placeholder="Search..."
+              (input)="applyFilter($event)"
+            />
+            <i class="bi bi-search"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox" (change)="toggleAll($event)" /></th>
+
+              <th>
+                User ID
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('userId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('userId', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Employee Code
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('employeeCode', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('employeeCode', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                User Name
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('userName', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('userName', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Role
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('userRole', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('userRole', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Department
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('departmentCode', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('departmentCode', 'desc')"
+                ></i>
+              </th>
+
+              <th>Reason</th>
+
+              <th>
+                Created By
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('userCreatedBy', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('userCreatedBy', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Created Date
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('userCreatedDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('userCreatedDate', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Updated Date
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('updatedDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('updatedDate', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Status
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('userStatus', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('userStatus', 'desc')"
+                ></i>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="
+                let row of filteredData
+                  | slice
+                    : (currentPage - 1) * itemsPerPage
+                    : currentPage * itemsPerPage;
+                let i = index
+              "
+            >
+              <!-- ✅ Checkbox -->
+              <td>
+                <input
+                  type="checkbox"
+                  [checked]="selectedRows.includes(row)"
+                  (change)="toggleRowSelection(row, $event)"
+                />
+              </td>
+
+              <!-- ✅ User ID -->
+              <td>
+                <span
+                  class="leave-link"
+                  [ngClass]="{
+                    'active-id': selectedRow?.userId === row.userId,
+                  }"
+                  (click)="openDetails(row)"
+                >
+                  {{ row.userId }}
+                </span>
+              </td>
+
+              <!-- ✅ Data Columns -->
+              <td>{{ row.employeeCode || "-" }}</td>
+              <td>{{ row.userName || "-" }}</td>
+              <td>{{ row.userRole || "-" }}</td>
+              <td>{{ row.departmentCode || "-" }}</td>
+
+              <!-- ✅ Status -->
+
+              <!-- ✅ Reason -->
+              <td>{{ row.reason || "-" }}</td>
+
+              <!-- ✅ Audit -->
+              <td>{{ row.userCreatedBy || "-" }}</td>
+              <td>{{ row.userCreatedDate || "-" }}</td>
+              <td>{{ row.updatedDate || "-" }}</td>
+
+              <!-- ✅ Action -->
+              <td>
+                <span
+                  class="status-badge"
+                  [ngClass]="{
+                    'status-locked': row.userStatus === 'Inactive',
+                    'status-unlocked': row.userStatus === 'Active',
+                  }"
+                  (click)="openStatusModal(row)"
+                >
+                  <i
+                    class="bi"
+                    [ngClass]="
+                      row.userStatus === 'Inactive'
+                        ? 'bi-lock-fill'
+                        : 'bi-unlock-fill'
+                    "
+                  ></i>
+
+                  {{ row.userStatus === "Active" ? "Unlocked" : "Locked" }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button
+          (click)="changePage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+
+        <button
+          *ngFor="let page of [].constructor(totalPages); let p = index"
+          (click)="changePage(p + 1)"
+          [class.active]="currentPage === p + 1"
+        >
+          {{ p + 1 }}
+        </button>
+
+        <button
+          (click)="changePage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+
+    <!-- HELP SECTION -->
+    <div *ngIf="activeTab === 'help'" class="help-page-bg container-fluid py-4">
+      <h3 class="section-title mb-2">
+        <i class="'bi bi-question-circle-fill"></i>Help & Guidelines
+      </h3>
+      <hr class="mt-0 mb-3" />
+
+      <h4 class="fw-bold text-primary mb-3">
+        UserLocking Management Module – User Manual
+      </h4>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the UserLocking module. Follow
+        the instructions carefully to avoid incorrect data.
+      </div>
+
+      <!-- MAIN HELP TABLE -->
+      <div class="table-responsive mb-5">
+        <table class="table table-bordered align-top">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Tab</th>
+              <th>Purpose</th>
+              <th>Instructions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Details</td>
+              <td>View and manage UserLocking records</td>
+              <td>
+                • View UserLocking data and status<br />
+                • Search, filter, and sort records<br />
+                • Click <b>Edit</b> to update record
+              </td>
+            </tr>
+
+            <tr>
+              <td>2</td>
+              <td>New Record</td>
+              <td>Add new UserLocking</td>
+              <td>
+                • Click <b>New Record</b><br />
+                • Enter all required fields<br />
+                • Use <b>Add More</b> for multiple entries<br />
+                • Click <b>Save All</b>
+              </td>
+            </tr>
+
+            <tr>
+              <td>3</td>
+              <td>Bulk Import</td>
+              <td>Import multiple UserLocking details</td>
+              <td>
+                • Upload CSV / Excel / DOCX / PDF / TXT<br />
+                • File must match system format<br />
+                • Errors shown if data is invalid
+              </td>
+            </tr>
+
+            <tr>
+              <td>4</td>
+              <td>Bulk Export</td>
+              <td>Download UserLocking data</td>
+              <td>
+                • Apply filters if needed<br />
+                • Select export format<br />
+                • File downloads instantly
+              </td>
+            </tr>
+
+            <tr>
+              <td>5</td>
+              <td>Help</td>
+              <td>Usage guidance & examples</td>
+              <td>
+                • Refer examples before entry<br />
+                • Follow validation messages<br />
+                • Use for troubleshooting
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SINGLE RECORD EXAMPLE -->
+      <h4 class="fw-semibold text-info">Example: Adding Single UserLocking</h4>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the UserLocking module. Follow
+        the instructions carefully to avoid incorrect data.
+      </div>
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add UserLocking</td>
+              <td>Fill details and click Save</td>
+              <td>Record visible in Details tab</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MULTIPLE RECORD EXAMPLE -->
+      <h4 class="fw-semibold text-info">
+        Example: Adding Multiple UserLocking Details
+      </h4>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the UserLocking module. Follow
+        the instructions carefully to avoid incorrect data.
+      </div>
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Multiple</td>
+              <td>Use Add More and Save All</td>
+              <td>All records saved</td>
+            </tr>
+            <tr>
+              <td>Bulk Import</td>
+              <td>Import File</td>
+              <td>Upload valid file</td>
+              <td>Valid records imported</td>
+            </tr>
+            <tr>
+              <td>Bulk Export</td>
+              <td>Export</td>
+              <td>Select format</td>
+              <td>File downloaded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- USER VIEW MODAL -->
+<!-- USER VIEW MODAL -->
+<div class="modal" [class.show]="showViewModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5>User Details (ID: {{ selectedRow?.userLockingUsrId }})</h5>
+      <button class="close-btn1" (click)="closeViewModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <table class="popup-table">
+        <tr>
+          <th>User ID</th>
+          <td>{{ selectedRow?.userLockingUsrId }}</td>
+        </tr>
+
+        <tr>
+          <th>User Code</th>
+          <td>{{ selectedRow?.userLockingUsrCode }}</td>
+        </tr>
+
+        <tr>
+          <th>User Name</th>
+          <td>{{ selectedRow?.userLockingUsrName }}</td>
+        </tr>
+
+        <tr>
+          <th>Role</th>
+          <td>{{ selectedRow?.userLockingRole }}</td>
+        </tr>
+
+        <tr>
+          <th>Department</th>
+          <td>{{ selectedRow?.userLockingDeptName }}</td>
+        </tr>
+
+        <tr>
+          <th>Locked Date</th>
+          <td>{{ selectedRow?.userLockingDate }}</td>
+        </tr>
+
+        <tr>
+          <th>Lock Reason</th>
+          <td>{{ selectedRow?.userLockingReason }}</td>
+        </tr>
+
+        <tr>
+          <th>Lock Type</th>
+          <td>{{ selectedRow?.userLockingType }}</td>
+        </tr>
+
+        <tr>
+          <th>Lock Start Date</th>
+          <td>{{ selectedRow?.userLockingStartDate }}</td>
+        </tr>
+
+        <tr>
+          <th>Lock End Date</th>
+          <td>{{ selectedRow?.userLockingEndDate }}</td>
+        </tr>
+
+        <tr>
+          <th>Locked By</th>
+          <td>{{ selectedRow?.userLockingBy }}</td>
+        </tr>
+
+        <tr>
+          <th>Status</th>
+          <td>
+            <span
+              [ngClass]="{
+                'status-locked': selectedRow?.userLockingStatus === 'Locked',
+                'status-unlocked': selectedRow?.userLockingStatus !== 'Locked',
+              }"
+            >
+              {{ selectedRow?.userLockingStatus }}
+            </span>
+          </td>
+        </tr>
+
+        <!-- 🔥 EXTRA (Audit Fields) -->
+        <tr>
+          <th>Unlock Reason</th>
+          <td>{{ selectedRow?.userUnlockingReason || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Created Date</th>
+          <td>{{ selectedRow?.userLockingCreatedDate }}</td>
+        </tr>
+
+        <tr>
+          <th>Updated Date</th>
+          <td>{{ selectedRow?.userLockingUpdatedDate }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- STATUS CHANGE MODAL -->
+<div class="modal" *ngIf="showStatusModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5>Change Status</h5>
+      <button (click)="showStatusModal = false">×</button>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        Current Status:
+        <b>{{ selectedRow?.userLockingStatus }}</b>
+      </p>
+
+      <textarea
+        class="form-control"
+        [(ngModel)]="statusReason"
+        placeholder="Enter Reason"
+      ></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-success" (click)="toggleStatus()">Confirm</button>
+    </div>
+  </div>
+</div>
+<!-- STATUS CHANGE MODAL -->
+<div class="modal" [class.show]="showStatusModal" *ngIf="showStatusModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5>Change Status</h5>
+      <button class="close-btn1" (click)="showStatusModal = false">×</button>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        Current Status:
+        <b>{{ statusRow?.userStatus }}</b>
+      </p>
+
+      <label>Enter Reason <span class="text-danger">*</span></label>
+      <textarea
+        class="form-control"
+        [(ngModel)]="statusReason"
+        placeholder="Enter reason"
+      ></textarea>
+    </div>
+
+    <div class="modal-footer mt-2">
+      <button class="btn btn-success" (click)="toggleStatus()">Confirm</button>
+
+      <button class="btn btn-secondary" (click)="showStatusModal = false">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,824 @@
+<div class="company-container">
+  <!-- HEADER -->
+  <div class="container-fluid py-3">
+    <div class="row align-items-start">
+      <!-- Left Section -->
+      <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
+        <h2 class="company-name">{{ headCompanyName }}</h2>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+          <span class="company-email">{{ userName }}</span>
+          <span class="breadcrumb-date">{{ today | date: "dd MMM yyyy" }}</span>
+        </div>
+      </div>
+
+      <!-- Right Section: Always top-right -->
+      <div
+        class="col-lg-6 col-md-6 col-sm-12 d-flex justify-content-md-end justify-content-start"
+      >
+        <h6 class="breadcrumb">
+          <i class="bi bi-house-fill me-1"></i>
+          Home
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-layers-fill me-1"></i>
+          Master
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-box-seam me-1"></i>
+          Asset Forms
+        </h6>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS-->
+  <div class="tabs-wrapper">
+    <div class="tabs-container">
+      <div
+        class="tab"
+        *ngFor="let tab of tabs"
+        [class.active]="activeTab === tab.key"
+        (click)="activeTab = tab.key"
+      >
+        <i [class]="tab.icon"></i> {{ tab.label }}
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMS ARE IN CARD -->
+  <div class="form-card">
+    <!-- DETAILS FORM -->
+    <div *ngIf="activeTab === 'details'" class="company-details-container">
+      <h3 class="section-title">
+        <i class="bi bi-receipt-cutoff"></i> Asset Details
+      </h3>
+      <hr class="mt-0 mb-3" />
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <!-- Show entries -->
+        <div class="toolbar-item show-entries">
+          <label for="showEntries">Show</label>
+          <select id="showEntries" (change)="onChangeItemsPerPage($event)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>entries</span>
+        </div>
+
+        <!-- Export buttons -->
+        <div class="toolbar-item export-buttons">
+          <button class="btn-doc" (click)="exportDoc()">
+            <i class="bi bi-file-earmark-word-fill me-1"></i> DOC
+          </button>
+
+          <button class="btn-pdf" (click)="exportPDF()">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF
+          </button>
+
+          <button class="btn-excel" (click)="exportExcel()">
+            <i class="bi bi-file-earmark-excel-fill me-1"></i> Excel
+          </button>
+        </div>
+
+        <!-- Search + Delete -->
+        <div class="search-delete-group">
+          <!-- DELETE BUTTON -->
+          <div class="delete-btn" *ngIf="selectedRows.length > 0">
+            <button (click)="deleteSelectedRows()">
+              <i class="bi bi-trash-fill"></i> Delete
+            </button>
+          </div>
+
+          <!-- SEARCH BOX -->
+          <div class="search-box">
+            <input
+              type="text"
+              placeholder="Search..."
+              (input)="applyFilter($event)"
+            />
+            <i class="bi bi-search"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <input type="checkbox" (change)="toggleAll($event)" />
+              </th>
+
+              <!-- 🔹 Asset ID -->
+              <th>
+                Asset ID
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('myassetId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('myassetId', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Asset Code -->
+              <th>
+                Asset Code
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('myassetCode', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('myassetCode', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Asset Name -->
+              <th>
+                Asset Name
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('myassetName', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('myassetName', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Asset Type -->
+              <th>
+                Asset Type
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('myassetType', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('myassetType', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Asset Category -->
+              <th>
+                Asset Category
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('myassetCategory', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('myassetCategory', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Department -->
+              <th>
+                Dept Code
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('departmentCode', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('departmentCode', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Asset Make / Model -->
+              <th>
+                Make
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetMake', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetMake', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Model
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetModel', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetModel', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Location -->
+              <th>
+                Location
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('myassetLocation', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('myassetLocation', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Tag -->
+              <th>
+                Tag / Serial
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('myassetTag', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('myassetTag', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Purchase -->
+              <th>
+                Purchase Date
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('myassetPurchaseDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('myassetPurchaseDate', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Invoice -->
+              <th>
+                Invoice
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('myassetInvoiceNo', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('myassetInvoiceNo', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Vendor -->
+
+              <!-- 🔹 Working -->
+              <th>
+                Working Status
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('myassetWorkingStatus', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('myassetWorkingStatus', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Created -->
+              <th>
+                Created Date
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('myassetCreatedDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('myassetCreatedDate', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Status -->
+              <th>
+                Status
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('myassetStatus', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('myassetStatus', 'desc')"
+                ></i>
+              </th>
+
+              <!-- 🔹 Action -->
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of filteredData; let i = index">
+              <td>
+                <input
+                  type="checkbox"
+                  [checked]="selectedRows.includes(row)"
+                  (change)="toggleRowSelection(row, $event)"
+                />
+              </td>
+
+              <td>
+                <span
+                  class="leave-link"
+                  [ngClass]="{
+                    'active-id': selectedRow?.myassetId === row.myassetId,
+                  }"
+                  (click)="openDetails(row)"
+                >
+                  {{ row.myassetId || "-" }}
+                </span>
+              </td>
+
+              <!-- ✅ BASIC -->
+              <td>{{ row.myassetCode || "-" }}</td>
+              <td>{{ row.myassetName || "-" }}</td>
+              <td>{{ row.myassetType || "-" }}</td>
+              <td>{{ row.myassetCategory || "-" }}</td>
+
+              <!-- ✅ DEPARTMENT -->
+              <td>{{ row.departmentCode || "-" }}</td>
+
+              <!-- ✅ MAKE -->
+              <td>{{ row.assetMake || "-" }}</td>
+              <td>{{ row.assetModel || "-" }}</td>
+
+              <!-- ✅ LOCATION -->
+              <td>{{ row.myassetLocation || "-" }}</td>
+
+              <!-- ✅ TAG -->
+              <td>{{ row.myassetTag || "-" }}</td>
+
+              <!-- ✅ PURCHASE -->
+              <td>{{ formatDate(row.myassetPurchaseDate) }}</td>
+
+              <!-- 🔥 FIX HERE -->
+
+              <!-- Invoice -->
+              <td>{{ row.myassetVendorName || "-" }}</td>
+              <!-- Vendor -->
+
+              <!-- ✅ WORKING -->
+              <td>{{ row.myassetWorkingStatus || "-" }}</td>
+
+              <!-- ✅ CREATED -->
+              <td>{{ formatDate(row.myassetCreatedDate) }}</td>
+
+              <!-- ✅ STATUS -->
+              <td>
+                <span
+                  class="status-link"
+                  [ngClass]="{
+                    'status-active': row.myassetStatus === 'ACTIVE',
+                    'status-pending': row.myassetStatus === 'PENDING',
+                    'status-approval': row.myassetStatus === 'APPROVAL',
+                  }"
+                >
+                  {{ row.myassetStatus || "-" }}
+                </span>
+              </td>
+
+              <!-- ACTION -->
+              <td>
+                <button class="btn-edit" (click)="onEdit(row, i)">
+                  <i class="bi bi-pencil-fill"></i> Edit
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="no-data-message" *ngIf="filteredData.length === 0">
+        <i class="bi bi-database-x"></i>
+        No Data Found
+      </div>
+      <!-- Pagination -->
+      <div class="pagination">
+        <button
+          (click)="changePage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+
+        <button
+          *ngFor="let page of [].constructor(totalPages); let p = index"
+          (click)="changePage(p + 1)"
+          [class.active]="currentPage === p + 1"
+        >
+          {{ p + 1 }}
+        </button>
+
+        <button
+          (click)="changePage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+
+    <!-- HELP SECTION -->
+    <div *ngIf="activeTab === 'help'" class="help-page-bg container-fluid py-4">
+      <h3 class="section-title mb-2">
+        <i class="bi bi-question-circle-fill"></i> Help & Guidelines
+      </h3>
+      <hr class="mt-0 mb-3" />
+
+      <h4 class="fw-bold text-primary mb-3">
+        Asset Management Module – User Manual
+      </h4>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        This section explains how to use the Asset Management module. Follow the
+        steps carefully while entering or importing asset data.
+      </div>
+
+      <!-- MAIN HELP TABLE -->
+      <div class="table-responsive mb-5">
+        <table class="table table-bordered align-top">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Tab</th>
+              <th>Purpose</th>
+              <th>Instructions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><b>Details</b></td>
+              <td>View and manage all asset records</td>
+              <td>
+                • View asset list in table format<br />
+                • Use <b>Search</b> to find assets quickly<br />
+                • Use column <b>sorting arrows</b> to sort data<br />
+                • Click <b>Asset ID</b> to view asset details<br />
+                • Click <b>Edit</b> to modify record<br />
+                • Use checkbox to select records and delete
+              </td>
+            </tr>
+
+            <tr>
+              <td>2</td>
+              <td><b>New Record</b></td>
+              <td>Add new asset information</td>
+              <td>
+                • Open <b>New Record</b> tab<br />
+                • Enter asset information such as asset code, type, department,
+                vendor etc.<br />
+                • Click <b>Add More</b> to create multiple rows<br />
+                • Click <b>Save All</b> to store records
+              </td>
+            </tr>
+
+            <tr>
+              <td>3</td>
+              <td><b>Bulk Import</b></td>
+              <td>Upload multiple asset records at once</td>
+              <td>
+                • Upload supported file formats:<br />
+                CSV / Excel / DOCX / TXT<br />
+                • File must follow system column format<br />
+                • Invalid rows will show error messages
+              </td>
+            </tr>
+
+            <tr>
+              <td>4</td>
+              <td><b>Bulk Export</b></td>
+              <td>Download asset data</td>
+              <td>
+                • Use filters or search if required<br />
+                • Click export buttons in toolbar<br />
+                • Supported formats:<br />
+                DOC / PDF / Excel / CSV
+              </td>
+            </tr>
+
+            <tr>
+              <td>5</td>
+              <td><b>Status Timeline</b></td>
+              <td>View asset lifecycle history</td>
+              <td>
+                • Click asset status in Details table<br />
+                • Timeline shows:<br />
+                Asset creation date<br />
+                Installation date<br />
+                AMC period<br />
+                Last service date<br />
+                Current status
+              </td>
+            </tr>
+
+            <tr>
+              <td>6</td>
+              <td><b>Help</b></td>
+              <td>Guidelines for using this module</td>
+              <td>
+                • Read instructions before using the system<br />
+                • Follow validation messages<br />
+                • Use this page for troubleshooting
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SINGLE RECORD EXAMPLE -->
+      <h4 class="fw-semibold text-info">Example: Adding Single Asset</h4>
+
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Use the New Record tab to create a single asset entry.
+      </div>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Asset</td>
+              <td>Fill asset details → Click Save All</td>
+              <td>New asset appears in Details table</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MULTIPLE RECORD EXAMPLE -->
+      <h4 class="fw-semibold text-info">
+        Example: Adding Multiple Asset Records
+      </h4>
+
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Multiple assets can be added either manually or through file import.
+      </div>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Method</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Multiple Rows</td>
+              <td>
+                Use <b>Add More</b> button → Fill details → Click
+                <b>Save All</b>
+              </td>
+              <td>Multiple assets saved in system</td>
+            </tr>
+
+            <tr>
+              <td>Bulk Import</td>
+              <td>Upload File</td>
+              <td>Upload CSV / Excel / DOCX / TXT file</td>
+              <td>Valid asset records imported automatically</td>
+            </tr>
+
+            <tr>
+              <td>Bulk Export</td>
+              <td>Download Data</td>
+              <td>Select export format (DOC / PDF / Excel / CSV)</td>
+              <td>Asset report downloaded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Asset ORDER VIEW MODAL -->
+<!-- Asset ORDER VIEW MODAL -->
+<div class="modal" [class.show]="showViewModal">
+  <div class="modal-content">
+    <!-- 🔹 Header -->
+    <div class="modal-header">
+      <h5>Asset Details (ID: {{ selectedRow?.myassetId || "-" }})</h5>
+      <button class="close-btn1" (click)="closeViewModal()">×</button>
+    </div>
+
+    <!-- 🔹 Body -->
+    <div class="modal-body" *ngIf="selectedRow as row">
+      <table class="popup-table">
+        <tr>
+          <th>Asset ID</th>
+          <td>{{ row.myassetId || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset Code</th>
+          <td>{{ row.myassetCode || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset Name</th>
+          <td>{{ row.myassetName || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset Type</th>
+          <td>{{ row.myassetType || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset Category</th>
+          <td>{{ row.myassetCategory || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Department Code</th>
+          <td>{{ row.departmentCode || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Department Name</th>
+          <td>{{ row.departmentName || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset Make</th>
+          <td>{{ row.assetMake || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset Model</th>
+          <td>{{ row.assetModel || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Location</th>
+          <td>{{ row.myassetLocation || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset Tag</th>
+          <td>{{ row.myassetTag || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Purchase Date</th>
+          <td>{{ formatDate(row.myassetPurchaseDate) }}</td>
+        </tr>
+
+        <tr>
+          <th>Invoice No</th>
+          <td>{{ row.myassetInvoiceNo || "-" }}</td>
+        </tr>
+        <tr>
+          <th>Vendor</th>
+          <td>{{ row.myassetVendorName || "-" }}</td>
+        </tr>
+
+        <!-- 🔥 STATUS FIX -->
+        <tr>
+          <th>Asset Status</th>
+          <td>
+            <span
+              [ngClass]="{
+                'status-active': row.myassetStatus === 'ACTIVE',
+                'status-pending': row.myassetStatus === 'PENDING',
+                'status-approval': row.myassetStatus === 'APPROVAL',
+              }"
+            >
+              {{ row.myassetStatus || "-" }}
+            </span>
+          </td>
+        </tr>
+        <td>{{ formatDate(row.myassetCreatedDate) }}</td>
+        <tr>
+          <th>Working Status</th>
+          <td>{{ row.myassetWorkingStatus || "-" }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- ASSET STATUS TIMELINE MODAL -->
+<!-- ASSET STATUS TIMELINE MODAL -->
+<!-- ASSET STATUS TIMELINE MODAL -->
+<div class="modal" [class.show]="showTimelineModal">
+  <div class="modal-content timeline-modal">
+    <!-- 🔹 Header -->
+    <div class="modal-header">
+      <h5>Asset Status Timeline (ID: {{ selectedRow?.myassetId || "-" }})</h5>
+      <button class="close-btn1" (click)="closeTimelineModal()">×</button>
+    </div>
+
+    <!-- 🔹 Body -->
+    <div class="modal-body">
+      <div class="timeline">
+        <!-- 🔹 Created -->
+        <div class="timeline-item">
+          <div class="dot created"></div>
+          <div class="timeline-content">
+            <h6>Asset Created</h6>
+            <p>{{ formatDate(selectedRow?.myassetCreatedDate) }}</p>
+          </div>
+        </div>
+
+        <!-- 🔹 Purchase -->
+        <div class="timeline-item">
+          <div class="dot purchase"></div>
+          <div class="timeline-content">
+            <h6>Asset Purchased</h6>
+            <p>{{ formatDate(selectedRow?.myassetPurchaseDate) }}</p>
+
+            <p><b>Vendor :</b> {{ selectedRow?.myassetVendorName || "-" }}</p>
+            <p><b>Invoice :</b> {{ selectedRow?.myassetInvoiceNo || "-" }}</p>
+          </div>
+        </div>
+
+        <!-- 🔹 Department -->
+        <div class="timeline-item">
+          <div class="dot dept"></div>
+          <div class="timeline-content">
+            <h6>Department Assigned</h6>
+
+            <p><b>Code :</b> {{ selectedRow?.departmentCode || "-" }}</p>
+            <p><b>Name :</b> {{ selectedRow?.departmentName || "-" }}</p>
+          </div>
+        </div>
+
+        <!-- 🔹 Asset Info -->
+        <div class="timeline-item">
+          <div class="dot info"></div>
+          <div class="timeline-content">
+            <h6>Asset Info</h6>
+
+            <p><b>Name :</b> {{ selectedRow?.myassetName || "-" }}</p>
+            <p><b>Type :</b> {{ selectedRow?.myassetType || "-" }}</p>
+            <p><b>Category :</b> {{ selectedRow?.myassetCategory || "-" }}</p>
+            <p><b>Make :</b> {{ selectedRow?.assetMake || "-" }}</p>
+            <p><b>Model :</b> {{ selectedRow?.assetModel || "-" }}</p>
+          </div>
+        </div>
+
+        <!-- 🔹 Location -->
+        <div class="timeline-item">
+          <div class="dot location"></div>
+          <div class="timeline-content">
+            <h6>Asset Location</h6>
+
+            <p><b>Location :</b> {{ selectedRow?.myassetLocation || "-" }}</p>
+            <p><b>Tag :</b> {{ selectedRow?.myassetTag || "-" }}</p>
+          </div>
+        </div>
+
+        <!-- 🔥 Status -->
+        <div class="timeline-item">
+          <div class="dot status"></div>
+          <div class="timeline-content">
+            <h6>Status</h6>
+
+            <p>
+              <b>Asset Status :</b>
+              <span
+                [ngClass]="{
+                  'status-active': selectedRow?.myassetStatus === 'ACTIVE',
+                  'status-pending': selectedRow?.myassetStatus === 'PENDING',
+                  'status-approval': selectedRow?.myassetStatus === 'APPROVAL',
+                }"
+              >
+                {{ selectedRow?.myassetStatus || "-" }}
+              </span>
+            </p>
+
+            <p>
+              <b>Working :</b>
+              {{ selectedRow?.myassetWorkingStatus || "-" }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

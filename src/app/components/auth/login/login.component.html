@@ -1,0 +1,63 @@
+<div class="login-bg">
+  <div class="login-card animate-card">
+    <div class="logo-box animate-logo">
+      <div class="logo-wrapper">
+        <img src="/assets/images/logo.jpeg" alt="Goa Shipyard Logo" />
+      </div>
+
+      <p class="company-name">GOA SHIPYARD GOV. LTD</p>
+      <!--<p class="company-tagline">Ship Builders • Ship Repairers • Engineers</p>-->
+    </div>
+
+    <form (ngSubmit)="login()" #loginForm="ngForm" class="animate-form">
+      <div class="form-group animate-field">
+        <label>Email ID</label>
+        <input
+          type="employeeCode"
+          class="form-control"
+          [(ngModel)]="employeeCode"
+          name="employeeCode"
+          required
+          placeholder="Enter Email"
+        />
+      </div>
+
+      <!-- Password with eye icon -->
+      <div class="form-group animate-field password-group">
+        <label>Password</label>
+        <div class="password-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'userPassword'"
+            class="form-control"
+            [(ngModel)]="userPassword"
+            name="userPassword"
+            required
+            placeholder="Enter Password"
+          />
+          <i
+            class="bi"
+            [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+            (click)="togglePassword()"
+            title="Show / Hide Password"
+          ></i>
+        </div>
+      </div>
+
+      <div class="error-msg" *ngIf="errorMsg">
+        {{ errorMsg }}
+      </div>
+
+      <button
+        type="submit"
+        class="btn-login animate-btn"
+        [disabled]="loginForm.invalid || isLoading"
+      >
+        {{ isLoading ? "Logging in..." : "Login" }}
+      </button>
+    </form>
+
+    <div class="footer-text">
+      © 2026 Goa Shipyard Ltd. | AMC Call Logging System
+    </div>
+  </div>
+</div>

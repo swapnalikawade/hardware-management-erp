@@ -1,0 +1,785 @@
+<div class="company-container">
+  <!-- HEADER -->
+  <div class="container-fluid py-3">
+    <div class="row align-items-start">
+      <!-- Left Section -->
+      <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
+        <h2 class="company-name">
+          {{ headCompanyName }}
+        </h2>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+          <span class="company-email">{{ userName }}</span>
+          <span class="breadcrumb-date">{{ today | date: "dd MMM yyyy" }}</span>
+        </div>
+      </div>
+
+      <!-- Right Section: Always top-right -->
+      <div
+        class="col-lg-6 col-md-6 col-sm-12 d-flex justify-content-md-end justify-content-start"
+      >
+        <h6 class="breadcrumb">
+          <i class="bi bi-house-fill me-2"></i>
+          Home
+          <i class="bi bi-chevron-right"></i>
+
+          <i class="bi bi-layers me-2"></i>
+          Master
+          <i class="bi bi-chevron-right"></i>
+
+          <i class="bi bi-person-badge me-2"></i>
+          Designation
+        </h6>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS-->
+  <div class="tabs-wrapper">
+    <div class="tabs-container">
+      <div
+        class="tab"
+        *ngFor="let tab of tabs"
+        [class.active]="activeTab === tab.key"
+        (click)="activeTab = tab.key"
+      >
+        <i [class]="tab.icon"></i> {{ tab.label }}
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMS ARE IN CARD -->
+  <div class="form-card">
+    <!-- DETAILS FORM -->
+    <div *ngIf="activeTab === 'details'" class="company-details-container">
+      <h3 class="section-title">
+        <i class="bi bi-person-fill-add"></i> Designation Details
+      </h3>
+      <hr class="mt-0 mb-3" />
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <!-- Show entries -->
+        <div class="toolbar-item show-entries">
+          <label for="showEntries">Show</label>
+          <select id="showEntries" (change)="onChangeItemsPerPage($event)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>entries</span>
+        </div>
+
+        <!-- Export buttons -->
+        <div class="toolbar-item export-buttons">
+          <button class="btn-doc" (click)="exportDoc()">
+            <i class="bi bi-file-earmark-word"></i> DOC
+          </button>
+          <button class="btn-pdf" (click)="exportPDF()">
+            <i class="bi bi-file-earmark-pdf"></i> PDF
+          </button>
+          <button class="btn-excel" (click)="exportExcel()">
+            <i class="bi bi-file-earmark-excel"></i> Excel
+          </button>
+        </div>
+
+        <!-- Search + Delete -->
+        <div class="search-delete-group">
+          <!-- DELETE BUTTON -->
+          <div class="delete-btn" *ngIf="selectedRows.length > 0">
+            <button (click)="deleteSelectedRows()">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+          </div>
+
+          <!-- SEARCH BOX -->
+          <div class="search-box">
+            <input
+              type="text"
+              placeholder="Search..."
+              (input)="applyFilter($event)"
+            />
+            <i class="bi bi-search"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <input type="checkbox" (change)="toggleAll($event)" />
+              </th>
+
+              <th>
+                Designation ID
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('designationId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('designationId', 'desc')"
+                ></i>
+              </th>
+
+              
+
+              <th>
+                Designation Name
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('designationName', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('designationName', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Created Date
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('createdDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('createdDate', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Created By
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('loginId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('loginId', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Status
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('status', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('status', 'desc')"
+                ></i>
+              </th>
+
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr
+              *ngFor="
+                let row of filteredData
+                  | slice
+                    : (currentPage - 1) * itemsPerPage
+                    : currentPage * itemsPerPage;
+                let i = index
+              "
+            >
+              <!-- Checkbox -->
+              <td>
+                <input
+                  type="checkbox"
+                  [checked]="selectedRows.includes(row)"
+                  (change)="toggleRowSelection(row, $event)"
+                />
+              </td>
+
+              <!-- Designation ID -->
+              <td>
+                <span
+                  class="leave-link"
+                  [ngClass]="{
+                    'active-id':
+                      selectedRecord?.designationId === row.designationId,
+                  }"
+                  (click)="openDetails(row)"
+                >
+                  {{ row.designationId }}
+                </span>
+              </td>
+
+              <!-- Code -->
+            
+              <!-- Name -->
+              <td>{{ row.designationName }}</td>
+
+              <!-- Created Date -->
+              <td>{{ row.createdDate }}</td>
+
+              <!-- Reporting To (NEW COLUMN) -->
+              <td>{{ row.loginId }}</td>
+
+              <!-- designationstatus -->
+              <td>
+                <span
+                  [ngClass]="{
+                    'status-active': row.status === 'Active',
+                    'status-inactive': row.status === 'Inactive',
+                  }"
+                >
+                  <span *ngIf="row.status === 'Active'">✔</span>
+                  <span *ngIf="row.status === 'Inactive'">❌</span>
+                  {{ row.status }}
+                </span>
+              </td>
+
+              <!-- Action -->
+              <td>
+                <button class="btn-edit" (click)="onEdit(row, i)">
+                  <i class="bi bi-pencil"></i> Edit
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="no-data-message" *ngIf="filteredData.length === 0">
+        <i class="bi bi-database-x"></i>
+        No Data Found
+      </div>
+      <!-- Pagination -->
+      <div class="pagination">
+        <button
+          (click)="changePage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+
+        <button
+          *ngFor="let page of [].constructor(totalPages); let p = index"
+          (click)="changePage(p + 1)"
+          [class.active]="currentPage === p + 1"
+        >
+          {{ p + 1 }}
+        </button>
+
+        <button
+          (click)="changePage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+
+    <!-- NEW RECORD FORM -->
+    <div *ngIf="activeTab === 'newRecord'" class="new-record-container">
+      <!-- Title + Add More button -->
+      <div
+        class="d-flex justify-content-between align-items-center text-align-center mb-2"
+      >
+        <h3 class="section-title">
+          <i
+            class="bi"
+            [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle'"
+          ></i>
+          {{
+            isEditMode
+              ? "Update Designation Details"
+              : "Add New Designation Details"
+          }}
+        </h3>
+        <!-- Add More Button -->
+        <button
+          class="add-more-btn"
+          style="
+            background-color: #0b5dd9d3;
+            color: white;
+            font-size: 14px;
+            border: none;
+            border-radius: 3px;
+            padding: 3px 6px;
+          "
+          ;
+          *ngIf="!isEditMode"
+          (click)="addForm()"
+        >
+          <i class="bi bi-plus"></i> Add More
+        </button>
+      </div>
+
+      <hr class="mt-0 mb-3" />
+
+      <!-- Dynamic Forms -->
+      <div
+        *ngFor="let form of forms; let i = index"
+        class="new-record-card mb-4 p-3 border rounded"
+      >
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="section-title">
+            {{
+              isEditMode ? editHeading : "Add Designation Details " + (i + 1)
+            }}
+          </h5>
+          <!-- REMOVE BUTTON (NOT for first form) -->
+          <button
+            *ngIf="i > 0"
+            class="btn btn-sm btn-light"
+            (click)="removeForm(i)"
+          >
+            <i class="fa-solid fa-xmark me-2"></i>Remove
+          </button>
+        </div>
+
+        <!-- FORM -->
+        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
+          <div class="row mb-3">
+           
+
+            <!-- Designation Name -->
+            <div class="col-md-4">
+              <label class="form-label">
+                Designation Name <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="text"
+                class="form-control form-control-md"
+                [(ngModel)]="form.designationName"
+                name="designationName{{ i }}"
+                required
+                pattern="[a-zA-Z ]+"
+                placeholder="Enter Designation Name"
+                #designationName="ngModel"
+                [ngClass]="{
+                  'is-invalid':
+                    (showErrors || designationName.touched) &&
+                    designationName.invalid,
+                }"
+              />
+
+              <div
+                *ngIf="
+                  (showErrors || designationName.touched) &&
+                  designationName.invalid
+                "
+                class="text-danger mt-1"
+              >
+                <span *ngIf="designationName.errors?.['required']">
+                  Designation Name is required.
+                </span>
+                <span *ngIf="designationName.errors?.['pattern']">
+                  Only alphabets are allowed.
+                </span>
+              </div>
+            </div>
+
+            <!-- Created Date -->
+            <div class="col-md-4">
+              <label class="form-label"> Created Date </label>
+
+              <input
+                type="date"
+                class="form-control form-control-md"
+                [(ngModel)]="form.createdDate"
+                name="createdDate{{ i }}"
+                readonly
+              />
+            </div>
+             <div class="col-md-4">
+              <label class="form-label">Login</label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.loginId"
+                name="loginId{{ i }}"
+              />
+            </div>
+          </div>
+
+          
+          <!-- SAVE + RESET -->
+          <!-- SAVE + RESET (ONLY LAST FORM) -->
+          <div
+            *ngIf="i === forms.length - 1"
+            class="mt-3 d-flex gap-2 justify-content-end"
+          >
+            <button type="button" class="btn-save" (click)="saveAllRecords()">
+              <i class="bi bi-floppy"></i>
+              {{ isEditMode ? "Update" : "Save" }}
+            </button>
+
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="cancelRecord(recordForm)"
+            >
+              <i class="bi bi-arrow-counterclockwise"></i>
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- BULK IMPORT FORM -->
+    <div
+      *ngIf="activeTab === 'bulkImport'"
+      class="bulk-import-container container-fluid"
+    >
+      <!-- Bulk Import Records Title -->
+      <h3 class="section-title mb-3">
+        <i class="bi bi-file-earmark-arrow-down"></i> Bulk Import Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- Important Notice -->
+      <div class="important-box mb-4">
+        <h4 class="mb-2">
+          <i class="fa-solid fa-triangle-exclamation"></i> Important Notice
+        </h4>
+        <ul class="mb-0">
+          <li>
+            It is Extremely Important to put the System in maintenance mode to
+            perform Bulk Import operations.
+          </li>
+          <li>DO NOT IMPORT BULK DATA WHILE SYSTEM IS UNDER USE.</li>
+          <li>ONLY EXPORT/TRAINED EMPLOYEES SHOULD USE THIS SECTION.</li>
+        </ul>
+      </div>
+      <!-- File Upload Section -->
+      <div class="file-upload-section">
+        <h4 class="mb-2"><i class="bi bi-upload"></i> Upload File to Import</h4>
+        <p>Select file to import(Only doc,excel,csv,txt files):</p>
+        <!-- Responsive Wrapper -->
+        <div class="upload-controls mb-3">
+          <!-- File Input -->
+          <input
+            type="file"
+            class="form-control file-input"
+            (change)="onFileSelected($event)"
+          />
+          <!-- Buttons Wrapper -->
+          <div class="buttons-wrapper">
+            <button type="button" class="btn-upload" (click)="uploadFile()">
+              <i class="bi bi-upload me-2"></i>Upload File
+            </button>
+            <button
+              type="button"
+              class="btn-download"
+              (click)="downloadSampleCSV()"
+            >
+              <i class="bi bi-file-earmark-arrow-down"></i> Download Sample CSV
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BULK EXPORT FORM -->
+    <div *ngIf="activeTab === 'bulkExport'" class="bulk-export-container">
+      <!-- Bulk Export Records Title -->
+      <h3 class="section-title">
+        <i class="bi bi-file-earmark-arrow-up"></i> Bulk Export Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- File Export Options -->
+      <div class="export-options">
+        <h4><i class="bi bi-gear"></i> File Export Options</h4>
+        <!-- Filters in Horizontal Line -->
+        <div class="filter-column">
+          <div class="container">
+            <div class="row g-3">
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="startDate" class="form-label">Start Date:</label>
+                  <input
+                    type="text"
+                    id="startDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="startDate"
+                    (input)="formatDate($event, 'start')"
+                  />
+                </div>
+                <!-- Validation message (optional) -->
+                <p
+                  *ngIf="startDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ startDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="endDate" class="form-label">End Date:</label>
+                  <input
+                    type="text"
+                    id="endDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="endDate"
+                    (input)="formatDate($event, 'end')"
+                  />
+                </div>
+                <p
+                  *ngIf="endDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ endDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="fileType" class="form-label">File Type:</label>
+                  <select
+                    id="fileType"
+                    [(ngModel)]="fileType"
+                    class="form-select"
+                  >
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">Excel (.xlsx)</option>
+                    <option value="pdf">PDF</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="export-buttons justify-content-end">
+          <button type="button" class="btn-reset" (click)="resetFilters()">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset Filters
+          </button>
+          <button type="button" class="btn-get" (click)="getFile()">
+            <i class="bi bi-download"></i> Get File
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HELP SECTION -->
+    <div *ngIf="activeTab === 'help'" class="help-page-bg container-fluid py-4">
+      <h3 class="section-title mb-2">Help & Guidelines</h3>
+      <hr class="mt-0 mb-3" />
+
+      <h4 class="text-primary mb-3">
+        Designation Management Module – User Manual
+      </h4>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the Designation module. Follow
+        the instructions carefully to avoid incorrect data.
+      </div>
+
+      <!-- MAIN HELP TABLE -->
+      <div class="table-responsive mb-5">
+        <table class="table table-bordered align-top">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Tab</th>
+              <th>Purpose</th>
+              <th>Instructions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Details</td>
+              <td>View and manage designation records</td>
+              <td>
+                • View designation data and designationstatus<br />
+                • Search, filter, and sort records<br />
+                • Click <b>Edit</b> to update record
+              </td>
+            </tr>
+
+            <tr>
+              <td>2</td>
+              <td>New Record</td>
+              <td>Add new designation</td>
+              <td>
+                • Click <b>New Record</b><br />
+                • Enter all required fields<br />
+                • Use <b>Add More</b> for multiple entries<br />
+                • Click <b>Save All</b>
+              </td>
+            </tr>
+
+            <tr>
+              <td>3</td>
+              <td>Bulk Import</td>
+              <td>Import multiple designation details</td>
+              <td>
+                • Upload CSV / Excel / DOCX / PDF / TXT<br />
+                • File must match system format<br />
+                • Errors shown if data is invalid
+              </td>
+            </tr>
+
+            <tr>
+              <td>4</td>
+              <td>Bulk Export</td>
+              <td>Download designation data</td>
+              <td>
+                • Apply filters if needed<br />
+                • Select export format<br />
+                • File downloads instantly
+              </td>
+            </tr>
+
+            <tr>
+              <td>5</td>
+              <td>Help</td>
+              <td>Usage guidance & examples</td>
+              <td>
+                • Refer examples before entry<br />
+                • Follow validation messages<br />
+                • Use for troubleshooting
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SINGLE RECORD EXAMPLE -->
+      <h5 class="text-info">Example: Adding Single Designation</h5>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the Designation module. Follow
+        the instructions carefully to avoid incorrect data.
+      </div>
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Designation</td>
+              <td>Fill details and click Save</td>
+              <td>Record visible in Details tab</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MULTIPLE RECORD EXAMPLE -->
+      <h5 class="text-info">Example: Adding Multiple Designation Details</h5>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the Designation module. Follow
+        the instructions carefully to avoid incorrect data.
+      </div>
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Multiple</td>
+              <td>Use Add More and Save All</td>
+              <td>All records saved</td>
+            </tr>
+            <tr>
+              <td>Bulk Import</td>
+              <td>Import File</td>
+              <td>Upload valid file</td>
+              <td>Valid records imported</td>
+            </tr>
+            <tr>
+              <td>Bulk Export</td>
+              <td>Export</td>
+              <td>Select format</td>
+              <td>File downloaded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Designation VIEW MODAL -->
+<div class="modal" [class.show]="showModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5>Designation Details (ID: {{ selectedRecord?.designationId }})</h5>
+      <button class="close-btn1" (click)="closeModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <table class="popup-table">
+        <tr>
+          <th>Designation ID</th>
+          <td>{{ selectedRecord?.designationId }}</td>
+        </tr>
+
+        <tr>
+          <th>Designation Code</th>
+          <td>{{ selectedRecord?.designationCode }}</td>
+        </tr>
+
+        <tr>
+          <th>Designation Name</th>
+          <td>{{ selectedRecord?.designationName }}</td>
+        </tr>
+
+        <tr>
+          <th>Created Date</th>
+          <td>{{ selectedRecord?.createdDate }}</td>
+        </tr>
+
+        <tr>
+          <th>LoginId</th>
+          <td>{{ selectedRecord?.loginId }}</td>
+        </tr>
+
+        <tr>
+          <th>status</th>
+          <td>
+            <span
+              [ngClass]="{
+                'status-active': selectedRecord?.status === 'Active',
+                'status-inactive': selectedRecord?.status === 'Inactive',
+              }"
+            >
+              <span *ngIf="selectedRecord?.status === 'Active'">✔</span>
+              <span *ngIf="selectedRecord?.status === 'Inactive'">❌</span>
+              {{ selectedRecord?.status }}
+            </span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

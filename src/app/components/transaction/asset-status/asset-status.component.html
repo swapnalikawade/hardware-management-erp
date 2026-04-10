@@ -1,0 +1,1431 @@
+<div class="company-container">
+  <!-- HEADER -->
+  <div class="container-fluid py-3">
+    <div class="row align-items-start">
+      <!-- Left Section -->
+      <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
+        <h2 class="company-name">
+          {{ headCompanyName }}
+        </h2>
+        <div class="d-flex flex-column flex-sm-row gap-2">
+          <span class="company-email">{{ userName }}</span>
+          <span class="breadcrumb-date">{{ today | date: "dd MMM yyyy" }}</span>
+        </div>
+      </div>
+
+      <!-- Right Section: Always top-right -->
+      <div
+        class="col-lg-6 col-md-6 col-sm-12 d-flex justify-content-md-end justify-content-start"
+      >
+        <h6 class="breadcrumb">
+          <i class="bi bi-house-fill me-1"></i>
+          Home
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-layers-fill me-1"></i>
+          Master
+          <i class="bi bi-chevron-right mx-2"></i>
+
+          <i class="bi bi-arrow-repeat me-1"></i>
+          Asset Status Change
+        </h6>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS-->
+  <div class="tabs-wrapper">
+    <div class="tabs-container">
+      <div
+        class="tab"
+        *ngFor="let tab of tabs"
+        [class.active]="activeTab === tab.key"
+        (click)="activeTab = tab.key"
+      >
+        <i [class]="tab.icon"></i> {{ tab.label }}
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMS ARE IN CARD -->
+  <div class="form-card">
+    <!-- DETAILS FORM -->
+    <div *ngIf="activeTab === 'details'" class="company-details-container">
+      <h3 class="section-title">
+        <i class="bi bi-calendar-event-fill"></i> Asset Type Details
+      </h3>
+      <hr class="mt-0 mb-3" />
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <!-- Show entries -->
+        <div class="toolbar-item show-entries">
+          <label for="showEntries">Show</label>
+          <select id="showEntries" (change)="onChangeItemsPerPage($event)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>entries</span>
+        </div>
+
+        <!-- Export buttons -->
+        <div class="toolbar-item export-buttons">
+          <button class="btn-doc" (click)="exportDoc()">
+            <i class="bi bi-file-earmark-word-fill me-1"></i> DOC
+          </button>
+
+          <button class="btn-pdf" (click)="exportPDF()">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF
+          </button>
+
+          <button class="btn-excel" (click)="exportExcel()">
+            <i class="bi bi-file-earmark-excel-fill me-1"></i> Excel
+          </button>
+        </div>
+
+        <!-- Search + Delete -->
+        <div class="search-delete-group">
+          <!-- DELETE BUTTON -->
+          <div class="delete-btn" *ngIf="selectedRows.length > 0">
+            <button (click)="deleteSelectedRows()">
+              <i class="bi bi-trash-fill"></i> Delete
+            </button>
+          </div>
+
+          <!-- SEARCH BOX -->
+          <div class="search-box">
+            <input
+              type="text"
+              placeholder="Search..."
+              (input)="applyFilter($event)"
+            />
+            <i class="bi bi-search"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <!-- SELECT -->
+              <th>
+                <input type="checkbox" (change)="toggleAll($event)" />
+              </th>
+
+              <!-- PRIMARY -->
+              <th>
+                Status Change ID
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetStatusChangeId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetStatusChangeId', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Code
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetStatusChangeCode', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetStatusChangeCode', 'desc')"
+                ></i>
+              </th>
+
+              <!-- DATES -->
+              <th>
+                Created Date
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetStatusCreatedDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetStatusCreatedDate', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Change Date
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetStatusChangeDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetStatusChangeDate', 'desc')"
+                ></i>
+              </th>
+
+              <!-- ASSET DETAILS -->
+              <th>
+                Asset ID
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetId', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Name
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetName', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetName', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Type
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetType', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetType', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Serial No
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetSerialNumber', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetSerialNumber', 'desc')"
+                ></i>
+              </th>
+
+              <!-- STATUS -->
+              <th>
+                Current Status
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetCurrentStatus', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetCurrentStatus', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                New Status
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetNewStatus', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetNewStatus', 'desc')"
+                ></i>
+              </th>
+
+              <!-- REASON -->
+              <th>
+                Reason
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetStatusChangeReason', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetStatusChangeReason', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Remarks<i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetStatusChangeRemarks', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetStatusChangeRemarks', 'desc')"
+                ></i>
+              </th>
+
+              <!-- USER -->
+              <th>
+                Initiated By
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetChangeInitiatedBy', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetChangeInitiatedBy', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Approved By
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetChangeApprovedBy', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetChangeApprovedBy', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Assigned To
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetStatusChangeAssignedTo', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetStatusChangeAssignedTo', 'desc')"
+                ></i>
+              </th>
+
+              <!-- APPROVAL -->
+              <th>
+                Approval Status
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('approvalStatus', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('approvalStatus', 'desc')"
+                ></i>
+              </th>
+
+              <th>
+                Approval Date
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('approvalDate', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('approvalDate', 'desc')"
+                ></i>
+              </th>
+
+              <!-- REPAIR -->
+
+              <!-- REFERENCES -->
+              <th>
+                Call ID
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('callId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('callId', 'desc')"
+                ></i>
+              </th>
+              <th>
+                Allocation ID
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('allocationId', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('allocationId', 'desc')"
+                ></i>
+              </th>
+
+              <!-- SYSTEM -->
+              <th>
+                Status
+                <i
+                  class="bi bi-arrow-up"
+                  (click)="sortTable('assetStatus', 'asc')"
+                ></i>
+                <i
+                  class="bi bi-arrow-down"
+                  (click)="sortTable('assetStatus', 'desc')"
+                ></i>
+              </th>
+
+              <!-- ACTION -->
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="
+                let row of filteredData
+                  | slice
+                    : (currentPage - 1) * itemsPerPage
+                    : currentPage * itemsPerPage;
+                let i = index
+              "
+            >
+              <!-- SELECT -->
+              <td>
+                <input
+                  type="checkbox"
+                  [checked]="selectedRows.includes(row)"
+                  (change)="toggleRowSelection(row, $event)"
+                />
+              </td>
+
+              <!-- ID -->
+              <td>
+                <span
+                  class="leave-link"
+                  [ngClass]="{
+                    'active-id':
+                      selectedRow?.assetStatusChangeId ===
+                      row.assetStatusChangeId,
+                  }"
+                  (click)="openDetails(row)"
+                >
+                  {{ row.assetStatusChangeId }}
+                </span>
+              </td>
+
+              <!-- CODE -->
+              <td>{{ row.assetStatusChangeCode }}</td>
+
+              <!-- DATES -->
+              <td>{{ row.assetStatusCreatedDate }}</td>
+              <td>{{ row.assetStatusChangeDate }}</td>
+
+              <!-- ASSET -->
+              <td>{{ row.assetId }}</td>
+              <td>{{ row.assetName }}</td>
+              <td>{{ row.assetType }}</td>
+              <td>{{ row.assetSerialNumber || "-" }}</td>
+
+              <!-- CURRENT STATUS -->
+              <td>
+                {{ row.assetCurrentStatus }}
+              </td>
+
+              <!-- NEW STATUS -->
+              <td>
+                {{ row.assetNewStatus }}
+              </td>
+
+              <!-- REASON -->
+              <td>{{ row.assetStatusChangeReason }}</td>
+              <td>{{ row.assetStatusChangeRemarks || "-" }}</td>
+
+              <!-- USER -->
+              <td>{{ row.assetChangeInitiatedBy }}</td>
+              <td>{{ row.assetChangeApprovedBy || "-" }}</td>
+              <td>{{ row.assetStatusChangeAssignedTo }}</td>
+
+              <!-- APPROVAL -->
+              <td>
+                {{ row.approvalStatus }}
+              </td>
+              <td>{{ row.approvalDate || "-" }}</td>
+
+              <!-- REFERENCES -->
+              <td>{{ row.callId || "-" }}</td>
+              <td>{{ row.allocationId || "-" }}</td>
+
+              <!-- STATUS -->
+              <td>
+                <span
+                  [ngClass]="{
+                    'status-active': row.assetStatus === 'Active',
+                    'status-inactive': row.assetStatus !== 'Active',
+                  }"
+                >
+                  <span *ngIf="row.assetStatus === 'Active'">✔</span>
+                  <span *ngIf="row.assetStatus !== 'Active'">❌</span>
+                  {{ row.assetStatus }}
+                </span>
+              </td>
+
+              <!-- ACTION -->
+              <td>
+                <button class="btn-edit" (click)="onEdit(row, i)">
+                  <i class="bi bi-pencil-fill"></i> Edit
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="no-data-message" *ngIf="filteredData.length === 0">
+        <i class="bi bi-database-x"></i>
+        No Data Found
+      </div>
+      <!-- Pagination -->
+      <div class="pagination">
+        <button
+          (click)="changePage(currentPage - 1)"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+
+        <button
+          *ngFor="let page of [].constructor(totalPages); let p = index"
+          (click)="changePage(p + 1)"
+          [class.active]="currentPage === p + 1"
+        >
+          {{ p + 1 }}
+        </button>
+
+        <button
+          (click)="changePage(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+
+    <!-- NEW RECORD FORM -->
+    <div *ngIf="activeTab === 'newRecord'" class="new-record-container">
+      <!-- Title + Add More button -->
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="section-title">
+          <i
+            [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle-fill'"
+          ></i>
+          {{
+            isEditMode
+              ? "Update Asset Status Details"
+              : "Add Asset Status Details"
+          }}
+        </h3>
+        <!-- Add More Button -->
+        <button class="add-more-btn" *ngIf="!isEditMode" (click)="addForm()">
+          <i class="bi bi-plus"></i> Add More
+        </button>
+      </div>
+
+      <hr class="mt-0 mb-3" />
+
+      <!-- Dynamic Forms -->
+      <div
+        *ngFor="let form of forms; let i = index"
+        class="new-record-card mb-4 p-3 border rounded"
+      >
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="section-title">
+            {{
+              isEditMode
+                ? "Update Asset Status Details (ID: " +
+                  tableData[editIndex!].assetStatusChangeId +
+                  ")"
+                : "Add Asset Status Details " + (i + 1)
+            }}
+          </h5>
+          <!-- REMOVE BUTTON (NOT for first form) -->
+          <button
+            *ngIf="i > 0"
+            class="btn btn-sm btn-light"
+            (click)="removeForm(i)"
+          >
+            <i class="bi bi-x-lg me-2"></i>Remove
+          </button>
+        </div>
+
+        <!-- FORM -->
+        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
+          <div class="row mb-3">
+            <!-- Status Change Code -->
+            <div class="col-md-4">
+              <label class="form-label">
+                Status Change Code <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetStatusChangeCode"
+                name="assetStatusChangeCode{{ i }}"
+                required
+                placeholder="Enter Status Change Code"
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">
+                Change Date <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="date"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetStatusChangeDate"
+                name="assetStatusChangeDate{{ i }}"
+                required
+                [max]="currentDate"
+              />
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">
+                Asset ID <span class="text-danger">*</span>
+              </label>
+
+              <select
+                class="form-select"
+                [(ngModel)]="form.newRecord.assetId"
+                name="assetId{{ i }}"
+                required
+                (change)="onAssetSelect(form.newRecord.assetId, i)"
+              >
+                <option value="">Select Asset</option>
+                <option *ngFor="let a of assets" [value]="a.assetId">
+                  {{ a.assetId }} - {{ a.assetName }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Asset Type -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">
+                Asset Type <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetType"
+                name="assetType{{ i }}"
+                readonly
+                placeholder="Auto filled"
+              />
+            </div>
+
+            <div class="col-md-4 mt-2">
+              <label class="form-label">
+                Serial Number <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetSerialNumber"
+                name="assetSerialNumber{{ i }}"
+                readonly
+                placeholder="Auto filled"
+              />
+            </div>
+            <div class="col-md-4 mt-2">
+              <label class="form-label">
+                Current Status <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetCurrentStatus"
+                name="assetCurrentStatus{{ i }}"
+                readonly
+                placeholder="Auto filled"
+              />
+            </div>
+
+            <div class="col-md-4 mt-2">
+              <label class="form-label">
+                New Status <span class="text-danger">*</span>
+              </label>
+
+              <select
+                class="form-select"
+                [(ngModel)]="form.newRecord.assetNewStatus"
+                name="assetNewStatus{{ i }}"
+                required
+                (change)="onStatusChange(i)"
+              >
+                <option value="">Select</option>
+
+                <option value="Active">Active</option>
+                <option value="Under Repair">Under Repair</option>
+                <option value="Replaced">Replaced</option>
+                <option value="Scrapped">Scrapped</option>
+              </select>
+            </div>
+            <!-- CALL ID -->
+            <div class="col-md-4 mt-2">
+              <label>Call ID</label>
+              <select
+                class="form-control"
+                [(ngModel)]="form.newRecord.callId"
+                name="callId{{ i }}"
+              >
+                <option value="">Select Call</option>
+                <option *ngFor="let c of filteredCalls" [value]="c.callLogId">
+                  {{ c.callLogId }}
+                </option>
+              </select>
+            </div>
+
+            <!-- ALLOCATION -->
+            <div class="col-md-4 mt-2">
+              <label>Allocation ID</label>
+              <select
+                class="form-control"
+                [(ngModel)]="form.newRecord.allocationId"
+                name="allocationId{{ i }}"
+              >
+                <option value="">Select Allocation</option>
+
+                <option
+                  *ngFor="let a of filteredAllocations"
+                  [value]="a.assetallocationId"
+                >
+                  {{ a.assetallocationId }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-4 mt-2">
+              <label class="form-label">
+                Initiated By <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetChangeInitiatedBy"
+                name="assetChangeInitiatedBy{{ i }}"
+                readonly
+                placeholder="Auto filled (Logged-in user)"
+              />
+            </div>
+
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Approved By</label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetChangeApprovedBy"
+                name="assetChangeApprovedBy{{ i }}"
+                placeholder="Enter Approver"
+                required
+              />
+            </div>
+
+            <div
+              class="col-md-4 mt-2"
+              *ngIf="form.newRecord.assetNewStatus === 'Under Repair'"
+            >
+              <label class="form-label">
+                Repair Vendor <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetRepairVendor"
+                name="assetRepairVendor{{ i }}"
+                placeholder="Enter Vendor Name"
+                required
+              />
+            </div>
+
+            <!-- Expected Return Date -->
+            <div
+              class="col-md-4 mt-2"
+              *ngIf="form.newRecord.assetNewStatus === 'Under Repair'"
+            >
+              <label class="form-label">
+                Expected Return Date <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="date"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetExpectedReturnDate"
+                name="assetExpectedReturnDate{{ i }}"
+                required
+                [min]="todayDate"
+              />
+            </div>
+            <div class="col-md-4 mt-2">
+              <label>Approval Status</label>
+              <select
+                class="form-select"
+                [(ngModel)]="form.newRecord.approvalStatus"
+                name="approvalStatus{{ i }}"
+              >
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+
+            <div class="col-md-4 mt-2">
+              <label>Approval Date</label>
+              <input
+                type="date"
+                class="form-control"
+                [(ngModel)]="form.newRecord.approvalDate"
+                name="assetApprovalDate{{ i }}"
+              />
+            </div>
+            <div
+              class="col-md-4 mt-2"
+              *ngIf="form.newRecord.assetNewStatus === 'Under Repair'"
+            >
+              <label>Repair Cost</label>
+
+              <input
+                type="number"
+                class="form-control"
+                [(ngModel)]="form.newRecord.repairCost"
+                name="repairCost{{ i }}"
+              />
+            </div>
+            <div
+              class="col-md-4 mt-2"
+              *ngIf="form.newRecord.assetNewStatus === 'Replaced'"
+            >
+              <label>Replacement Asset ID</label>
+
+              <input
+                class="form-control"
+                [(ngModel)]="form.newRecord.replacementAssetId"
+                name="replacementAssetId{{ i }}"
+              />
+            </div>
+            <div class="col-md-4 mt-2">
+              <label class="form-label">
+                Assigned To <span class="text-danger">*</span>
+              </label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetStatusChangeAssignedTo"
+                name="assetStatusChangeAssignedTo{{ i }}"
+                required
+              />
+            </div>
+            <div
+              class="col-md-4 mt-2"
+              *ngIf="form.newRecord.assetNewStatus === 'Replaced'"
+            >
+              <label>Replacement Date</label>
+
+              <input
+                type="date"
+                class="form-control"
+                [(ngModel)]="form.newRecord.replacementDate"
+                name="replacementDate{{ i }}"
+              />
+            </div>
+            <!-- Created Date -->
+            <div class="col-md-4 mt-2">
+              <label class="form-label">Created Date</label>
+
+              <input
+                type="date"
+                class="form-control"
+                [(ngModel)]="form.newRecord.assetStatusCreatedDate"
+                name="assetStatusCreatedDate{{ i }}"
+                readonly
+              />
+            </div>
+            <div class="col-md-12 mt-2">
+              <label class="form-label">
+                Change Reason <span class="text-danger">*</span>
+              </label>
+
+              <!-- DROPDOWN -->
+              <select
+                class="form-select"
+                [(ngModel)]="form.newRecord.assetStatusChangeReason"
+                name="assetStatusChangeReason{{ i }}"
+                required
+              >
+                <option value="">Select Reason</option>
+
+                <!-- 🔥 Dynamic reasons -->
+                <option
+                  *ngIf="form.newRecord.assetNewStatus === 'Under Repair'"
+                  value="Hardware Issue"
+                >
+                  Hardware Issue
+                </option>
+                <option
+                  *ngIf="form.newRecord.assetNewStatus === 'Under Repair'"
+                  value="Software Issue"
+                >
+                  Software Issue
+                </option>
+
+                <option
+                  *ngIf="form.newRecord.assetNewStatus === 'Replaced'"
+                  value="Old Asset Replaced"
+                >
+                  Old Asset Replaced
+                </option>
+
+                <option
+                  *ngIf="form.newRecord.assetNewStatus === 'Scrapped'"
+                  value="Damaged Beyond Repair"
+                >
+                  Damaged Beyond Repair
+                </option>
+                <option
+                  *ngIf="form.newRecord.assetNewStatus === 'Scrapped'"
+                  value="Obsolete"
+                >
+                  Obsolete
+                </option>
+
+                <option
+                  *ngIf="form.newRecord.assetNewStatus === 'Active'"
+                  value="Returned From Repair"
+                >
+                  Returned From Repair
+                </option>
+              </select>
+            </div>
+            <!-- Remarks -->
+            <div class="col-md-12 mt-2">
+              <label class="form-label">Remarks</label>
+
+              <textarea
+                class="form-control"
+                rows="2"
+                [(ngModel)]="form.newRecord.assetStatusChangeRemarks"
+                name="assetStatusChangeRemarks{{ i }}"
+                maxlength="250"
+                placeholder="Enter additional remarks (optional)"
+              ></textarea>
+
+              <!-- 🔥 Character counter -->
+              <small class="text-muted">
+                {{ form.newRecord.assetStatusChangeRemarks?.length || 0 }}/250
+                characters
+              </small>
+            </div>
+          </div>
+
+          <div
+            class="mt-3 d-flex gap-2 justify-content-end"
+            *ngIf="activeForm === i"
+          >
+            <button
+              type="button"
+              class="btn-save"
+              (click)="saveAllRecords(recordForm)"
+            >
+              <i class="bi bi-floppy-fill"></i>
+              {{ isEditMode ? "Update" : "Save" }}
+            </button>
+
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="cancelRecord(recordForm)"
+            >
+              <i class="bi bi-arrow-counterclockwise"></i> Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- BULK IMPORT FORM -->
+    <div
+      *ngIf="activeTab === 'bulkImport'"
+      class="bulk-import-container container-fluid"
+    >
+      <!-- Bulk Import Records Title -->
+      <h3 class="section-title mb-3">
+        <i class="bi bi-file-earmark-arrow-up-fill me-1"></i> Bulk Import
+        Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- Important Notice -->
+      <div class="important-box mb-4">
+        <h4 class="mb-2">
+          <i class="bi bi-exclamation-triangle-fill"></i> Important Notice
+        </h4>
+        <ul class="mb-0">
+          <li>
+            It is Extremely Important to put the System in maintenance mode to
+            perform Bulk Import operations.
+          </li>
+          <li>DO NOT IMPORT BULK DATA WHILE SYSTEM IS UNDER USE.</li>
+          <li>ONLY EXPORT/TRAINED EMPLOYEES SHOULD USE THIS SECTION.</li>
+        </ul>
+      </div>
+      <!-- File Upload Section -->
+      <div class="file-upload-section">
+        <h4 class="mb-2"><i class="bi bi-upload"></i> Upload File to Import</h4>
+        <p>Select file to import(Only doc,excel,csv,txt files):</p>
+        <!-- Responsive Wrapper -->
+        <div class="upload-controls mb-3">
+          <!-- File Input -->
+          <input
+            type="file"
+            class="form-control file-input"
+            (change)="onFileSelected($event)"
+          />
+          <!-- Buttons Wrapper -->
+          <div class="buttons-wrapper">
+            <button type="button" class="btn-upload" (click)="uploadFile()">
+              <i class="bi bi-upload me-2"></i>Upload File
+            </button>
+            <button
+              type="button"
+              class="btn-download"
+              (click)="downloadSampleCSV()"
+            >
+              <i class="bi bi-file-earmark-arrow-down-fill"></i>
+              Download Sample CSV
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BULK EXPORT FORM -->
+    <div *ngIf="activeTab === 'bulkExport'" class="bulk-export-container">
+      <!-- Bulk Export Records Title -->
+      <h3 class="section-title">
+        <i class="bi bi-file-earmark-arrow-down-fill"></i> Bulk Export Records
+      </h3>
+      <hr class="mt-0 mb-3" />
+      <!-- File Export Options -->
+      <div class="export-options">
+        <h4><i class="bi bi-gear-fill me-1"></i> File Export Options</h4>
+        <!-- Filters in Horizontal Line -->
+        <div class="filter-column">
+          <div class="container">
+            <div class="row g-3">
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="startDate" class="form-label">Start Date:</label>
+                  <input
+                    type="text"
+                    id="startDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="startDate"
+                    (input)="formatDate($event, 'start')"
+                  />
+                </div>
+                <!-- Validation message (optional) -->
+                <p
+                  *ngIf="startDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ startDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="endDate" class="form-label">End Date:</label>
+                  <input
+                    type="text"
+                    id="endDate"
+                    class="form-control"
+                    placeholder="dd-mm-yyyy"
+                    [(ngModel)]="endDate"
+                    (input)="formatDate($event, 'end')"
+                  />
+                </div>
+                <p
+                  *ngIf="endDateError"
+                  style="color: red; font-size: 13px; margin-top: 5px"
+                >
+                  {{ endDateError }}
+                </p>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-12">
+                <div class="mb-3">
+                  <label for="fileType" class="form-label">File Type:</label>
+                  <select
+                    id="fileType"
+                    [(ngModel)]="fileType"
+                    class="form-select"
+                  >
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">Excel (.xlsx)</option>
+                    <option value="pdf">PDF</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="export-buttons justify-content-end">
+          <button type="button" class="btn-reset" (click)="resetFilters()">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Reset Filters
+          </button>
+          <button type="button" class="btn-get" (click)="getFile()">
+            <i class="bi bi-download me-1 ms-3"></i> Get File
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HELP SECTION -->
+    <div *ngIf="activeTab === 'help'" class="help-page-bg container-fluid py-4">
+      <h3 class="section-title mb-2">
+        <i class="bi bi-question-circle-fill me-1"></i>
+        Help & Guidelines
+      </h3>
+
+      <hr class="mt-0 mb-3" />
+
+      <h4 class="text-primary mb-3">
+        Asset Status Change Module – User Manual
+      </h4>
+
+      <!-- NOTE -->
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Each section below explains how to use the Asset Status Change module.
+        Follow the instructions carefully to avoid incorrect data.
+      </div>
+
+      <!-- MAIN HELP TABLE -->
+      <div class="table-responsive mb-5">
+        <table class="table table-bordered align-top">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Tab</th>
+              <th>Purpose</th>
+              <th>Instructions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Details</td>
+              <td>View and manage asset status change records</td>
+              <td>
+                • View asset status history and current status<br />
+                • Search, filter, and sort records<br />
+                • Click <b>View</b> to see full details<br />
+                • Click <b>Edit</b> to update record
+              </td>
+            </tr>
+
+            <tr>
+              <td>2</td>
+              <td>New Record</td>
+              <td>Add new asset status change entry</td>
+              <td>
+                • Click <b>New Record</b><br />
+                • Select Asset & enter status change details<br />
+                • Fill mandatory fields based on New Status<br />
+                • Use <b>Add More</b> for multiple entries<br />
+                • Click <b>Save All</b>
+              </td>
+            </tr>
+
+            <tr>
+              <td>3</td>
+              <td>Bulk Import</td>
+              <td>Import multiple asset status change records</td>
+              <td>
+                • Upload CSV / Excel / DOCX / TXT<br />
+                • File must match system format<br />
+                • Mandatory fields are validated<br />
+                • Errors shown if data is invalid
+              </td>
+            </tr>
+
+            <tr>
+              <td>4</td>
+              <td>Bulk Export</td>
+              <td>Download asset status change data</td>
+              <td>
+                • Apply filters if needed<br />
+                • Select export format (CSV / Excel / PDF / DOCX)<br />
+                • File downloads instantly
+              </td>
+            </tr>
+
+            <tr>
+              <td>5</td>
+              <td>Help</td>
+              <td>Usage guidance & examples</td>
+              <td>
+                • Refer examples before entry<br />
+                • Follow validation messages<br />
+                • Use for troubleshooting & FAQs
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SINGLE RECORD EXAMPLE -->
+      <h4 class="text-info">Example: Adding Single Asset Status Change</h4>
+
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Status-specific fields are mandatory (e.g., Repair Vendor for Under
+        Repair).
+      </div>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Status Change</td>
+              <td>Select asset, choose New Status, fill details, click Save</td>
+              <td>Record visible in Details tab with updated status</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MULTIPLE RECORD EXAMPLE -->
+      <h4 class="text-info">Example: Adding Multiple Asset Status Changes</h4>
+
+      <div class="alert-note mb-4">
+        <strong>NOTE:</strong><br />
+        Ensure file format matches the provided sample template for bulk import.
+      </div>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Tab</th>
+              <th>Action</th>
+              <th>Steps</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New Record</td>
+              <td>Add Multiple</td>
+              <td>Use Add More and Save All</td>
+              <td>All status change records saved</td>
+            </tr>
+            <tr>
+              <td>Bulk Import</td>
+              <td>Import File</td>
+              <td>Upload valid file (CSV/Excel/DOCX/TXT)</td>
+              <td>Valid records imported; errors shown for invalid rows</td>
+            </tr>
+            <tr>
+              <td>Bulk Export</td>
+              <td>Export</td>
+              <td>Select format & apply filters</td>
+              <td>Filtered report downloaded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="simple-toast" *ngIf="toastMessage" [ngClass]="toastType">
+  {{ toastMessage }}
+</div>
+<!-- ASSET STATUS CHANGE VIEW MODAL -->
+<div class="modal" [class.show]="showViewModal" *ngIf="selectedRow">
+  <div class="modal-content">
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h5>
+        Asset Status Change Details (ID: {{ selectedRow?.assetStatusChangeId }})
+      </h5>
+      <button class="close-btn1" (click)="closeViewModal()">×</button>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body">
+      <table class="popup-table">
+        <!-- PRIMARY -->
+        <tr>
+          <th>Status Change ID</th>
+          <td>{{ selectedRow?.assetStatusChangeId }}</td>
+        </tr>
+
+        <tr>
+          <th>Status Change Code</th>
+          <td>{{ selectedRow?.assetStatusChangeCode }}</td>
+        </tr>
+
+        <!-- DATES -->
+        <tr>
+          <th>Change Date</th>
+          <td>{{ selectedRow?.assetStatusChangeDate }}</td>
+        </tr>
+
+        <tr>
+          <th>Created Date</th>
+          <td>{{ selectedRow?.assetStatusCreatedDate }}</td>
+        </tr>
+
+        <!-- ASSET -->
+        <tr>
+          <th>Asset ID</th>
+          <td>{{ selectedRow?.assetId }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset Name</th>
+          <td>{{ selectedRow?.assetName }}</td>
+        </tr>
+
+        <tr>
+          <th>Asset Type</th>
+          <td>{{ selectedRow?.assetType }}</td>
+        </tr>
+
+        <tr>
+          <th>Serial Number</th>
+          <td>{{ selectedRow?.assetSerialNumber }}</td>
+        </tr>
+
+        <!-- STATUS -->
+        <tr>
+          <th>Current Status</th>
+          <td>{{ selectedRow?.assetCurrentStatus }}</td>
+        </tr>
+
+        <tr>
+          <th>New Status</th>
+          <td>{{ selectedRow?.assetNewStatus }}</td>
+        </tr>
+
+        <!-- REASON -->
+        <tr>
+          <th>Change Reason</th>
+          <td>{{ selectedRow?.assetStatusChangeReason }}</td>
+        </tr>
+
+        <tr>
+          <th>Remarks</th>
+          <td>{{ selectedRow?.assetStatusChangeRemarks || "-" }}</td>
+        </tr>
+
+        <!-- USERS -->
+        <tr>
+          <th>Initiated By</th>
+          <td>{{ selectedRow?.assetChangeInitiatedBy }}</td>
+        </tr>
+
+        <tr>
+          <th>Approved By</th>
+          <td>{{ selectedRow?.assetChangeApprovedBy || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Assigned To</th>
+          <td>{{ selectedRow?.assetStatusChangeAssignedTo }}</td>
+        </tr>
+
+        <!-- APPROVAL 🔥 -->
+        <tr>
+          <th>Approval Status</th>
+          <td>{{ selectedRow?.approvalStatus }}</td>
+        </tr>
+
+        <tr>
+          <th>Approval Date</th>
+          <td>{{ selectedRow?.approvalDate || "-" }}</td>
+        </tr>
+
+        <!-- REPAIR 🔧 -->
+        <tr *ngIf="selectedRow?.assetNewStatus === 'Under Repair'">
+          <th>Repair Vendor</th>
+          <td>{{ selectedRow?.assetRepairVendor }}</td>
+        </tr>
+
+        <tr *ngIf="selectedRow?.assetNewStatus === 'Under Repair'">
+          <th>Expected Return Date</th>
+          <td>{{ selectedRow?.assetExpectedReturnDate }}</td>
+        </tr>
+
+        <tr *ngIf="selectedRow?.assetNewStatus === 'Under Repair'">
+          <th>Repair Cost</th>
+          <td>
+            {{ selectedRow?.repairCost ? "₹ " + selectedRow?.repairCost : "-" }}
+          </td>
+        </tr>
+
+        <!-- REPLACEMENT 🔁 -->
+        <tr *ngIf="selectedRow?.assetNewStatus === 'Replaced'">
+          <th>Replacement Asset ID</th>
+          <td>{{ selectedRow?.replacementAssetId }}</td>
+        </tr>
+
+        <tr *ngIf="selectedRow?.assetNewStatus === 'Replaced'">
+          <th>Replacement Date</th>
+          <td>{{ selectedRow?.replacementDate }}</td>
+        </tr>
+
+        <!-- SCRAP 🗑 -->
+        <tr *ngIf="selectedRow?.assetNewStatus === 'Scrapped'">
+          <th>Scrap Reason</th>
+          <td>{{ selectedRow?.scrapReason }}</td>
+        </tr>
+
+        <tr *ngIf="selectedRow?.assetNewStatus === 'Scrapped'">
+          <th>Scrap Date</th>
+          <td>{{ selectedRow?.scrapDate }}</td>
+        </tr>
+
+        <!-- REFERENCES 🔗 -->
+        <tr>
+          <th>Call ID</th>
+          <td>{{ selectedRow?.callId || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Allocation ID</th>
+          <td>{{ selectedRow?.allocationId || "-" }}</td>
+        </tr>
+
+        <tr>
+          <th>Return ID</th>
+          <td>{{ selectedRow?.returnId || "-" }}</td>
+        </tr>
+
+        <!-- SYSTEM -->
+        <tr>
+          <th>Status</th>
+          <td>{{ selectedRow?.assetStatus }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
