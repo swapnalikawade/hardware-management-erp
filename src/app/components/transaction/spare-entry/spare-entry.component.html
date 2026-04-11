@@ -5,10 +5,11 @@
       <!-- Left Section -->
       <div class="col-lg-6 col-md-6 col-sm-12 mb-2 mb-md-0">
         <h2 class="company-name">
-          {{ companyName }}
+          {{ headCompanyName
+           }}
         </h2>
         <div class="d-flex flex-column flex-sm-row gap-2">
-          <span class="company-email">{{ companyEmail }}</span>
+          <span class="company-email">{{ userName }}</span>
           <span class="breadcrumb-date">{{ today | date: "dd MMM yyyy" }}</span>
         </div>
       </div>
@@ -109,358 +110,180 @@
       <!-- Table -->
       <div class="table-wrapper">
         <table>
-          <thead>
-            <tr>
-              <th><input type="checkbox" (change)="toggleAll($event)" /></th>
+       <thead>
+<tr>
+  <th><input type="checkbox" (change)="toggleAll($event)" /></th>
 
-              <th>
-                Spare Entry ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('spareEntryId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('spareEntryId', 'desc')"
-                ></i>
-              </th>
+  <th>
+    Spare Entry ID
+    <i (click)="sortTable('spareEntryId','asc')"></i>
+    <i (click)="sortTable('spareEntryId','desc')"></i>
+  </th>
 
-              <th>
-                Spare Entry Code
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('spareEntryCode', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('spareEntryCode', 'desc')"
-                ></i>
-              </th>
+  <th>
+    Spare Entry Number
+    <i (click)="sortTable('spareEntryNumber','asc')"></i>
+    <i (click)="sortTable('spareEntryNumber','desc')"></i>
+  </th>
 
-              <th>
-                Entry Date
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('spareEntryDate ', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('spareEntryDate ', 'desc')"
-                ></i>
-              </th>
+  <th>
+    Entry Date
+    <i (click)="sortTable('entryDate','asc')"></i>
+    <i (click)="sortTable('entryDate','desc')"></i>
+  </th>
 
-              <th>
-                Entry Type
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('spareEntryType ', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('spareEntryType ', 'desc')"
-                ></i>
-              </th>
+  <th>
+    Call Logging ID
+    <i (click)="sortTable('callLoggingId','asc')"></i>
+    <i (click)="sortTable('callLoggingId','desc')"></i>
+  </th>
 
-              <th>
-                Call ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('spareEntrycallId ', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('spareEntrycallId ', 'desc')"
-                ></i>
-              </th>
+  <th>
+    Asset ID
+    <i (click)="sortTable('assetId','asc')"></i>
+    <i (click)="sortTable('assetId','desc')"></i>
+  </th>
 
-              <th>
-                Asset ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetId', 'desc')"
-                ></i>
-              </th>
+  <th>
+    Spare Part Name
+    <i (click)="sortTable('sparePartName','asc')"></i>
+    <i (click)="sortTable('sparePartName','desc')"></i>
+  </th>
 
-              <th>
-                Client Name
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('clientName', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('clientName', 'desc')"
-                ></i>
-              </th>
+  <th>
+    Category
+    <i (click)="sortTable('category','asc')"></i>
+    <i (click)="sortTable('category','desc')"></i>
+  </th>
 
-              <th>
-                Engineer Name
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('engineerName', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('engineerName', 'desc')"
-                ></i>
-              </th>
+  <th>
+    Quantity
+    <i (click)="sortTable('quantity','asc')"></i>
+    <i (click)="sortTable('quantity','desc')"></i>
+  </th>
 
-              <th>
-                Department
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('department', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('department', 'desc')"
-                ></i>
-              </th>
+  <th>
+    Unit Price
+    <i (click)="sortTable('unitPrice','asc')"></i>
+    <i (click)="sortTable('unitPrice','desc')"></i>
+  </th>
 
-              <th>
-                Spare Category
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('spareCategory', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('spareCategory', 'desc')"
-                ></i>
-              </th>
+  <th>
+    Total Cost
+    <i (click)="sortTable('totalCost','asc')"></i>
+    <i (click)="sortTable('totalCost','desc')"></i>
+  </th>
 
-              <th>
-                Spare Name
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('spareName', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('spareName', 'desc')"
-                ></i>
-              </th>
+  <th>
+    Vendor Name
+    <i (click)="sortTable('vendorName','asc')"></i>
+    <i (click)="sortTable('vendorName','desc')"></i>
+  </th>
 
-              <th>
-                Compatible Asset Type
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('compatibleAssetType', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('compatibleAssetType', 'desc')"
-                ></i>
-              </th>
+  <th>
+    Engineer Name
+    <i (click)="sortTable('engineerName','asc')"></i>
+    <i (click)="sortTable('engineerName','desc')"></i>
+  </th>
 
-              <th>
-                Qty Used
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('quantityUsed', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('quantityUsed', 'desc')"
-                ></i>
-              </th>
+  <th>
+    Spare Status
+    <i (click)="sortTable('spareStatus','asc')"></i>
+    <i (click)="sortTable('spareStatus','desc')"></i>
+  </th>
 
-              <th>
-                Unit
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('unit', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('unit', 'desc')"
-                ></i>
-              </th>
+  <th>Action</th>
+</tr>
+</thead>
+      <tbody>
+  <tr
+    *ngFor="
+      let row of filteredData
+        | slice:(currentPage - 1) * itemsPerPage
+        : currentPage * itemsPerPage;
+      let i = index
+    "
+  >
+    <!-- Checkbox -->
+    <td>
+      <input
+        type="checkbox"
+        [checked]="selectedRows.includes(row)"
+        (change)="toggleRowSelection(row, $event)"
+      />
+    </td>
 
-              <th>
-                Serial No
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('serialNumber', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('serialNumber', 'desc')"
-                ></i>
-              </th>
+    <!-- Spare Entry ID -->
+    <td>
+      <span
+        class="leave-link"
+        [ngClass]="{
+          'active-id': selectedRow?.spareEntryId === row.spareEntryId
+        }"
+        (click)="openDetails(row)"
+      >
+        {{ row.spareEntryId }}
+      </span>
+    </td>
 
-              <th>
-                Warranty
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('warrantyApplicable', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('warrantyApplicable', 'desc')"
-                ></i>
-              </th>
+    <!-- Number -->
+    <td>{{ row.spareEntryNumber }}</td>
 
-              <th>
-                Unit Cost
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('unitCost', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('unitCost', 'desc')"
-                ></i>
-              </th>
+    <!-- Entry Date -->
+    <td>{{ row.entryDate }}</td>
 
-              <th>
-                Total Cost
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('totalCost', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('totalCost', 'desc')"
-                ></i>
-              </th>
+    <!-- Call Logging -->
+    <td>{{ row.callLoggingId }}</td>
 
-              <th>
-                Stock Available
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('stockAvailable', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('stockAvailable', 'desc')"
-                ></i>
-              </th>
+    <!-- Asset -->
+    <td>{{ row.assetId }}</td>
 
-              <th>
-                Stock After Entry
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('stockAfterEntry', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('stockAfterEntry', 'desc')"
-                ></i>
-              </th>
-              <th>
-                Status
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('spareEntryStatus', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('spareEntryStatus', 'desc')"
-                ></i>
-              </th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              *ngFor="
-                let row of filteredData
-                  | slice
-                    : (currentPage - 1) * itemsPerPage
-                    : currentPage * itemsPerPage;
-                let i = index
-              "
-            >
-              <td>
-                <input
-                  type="checkbox"
-                  [checked]="selectedRows.includes(row)"
-                  (change)="toggleRowSelection(row, $event)"
-                />
-              </td>
+    <!-- Spare Part -->
+    <td>{{ row.sparePartName }}</td>
 
-              <!-- Spare Entry ID -->
-              <td>
-                <span
-                  class="leave-link"
-                  [ngClass]="{
-                    'active-id': selectedRow?.spareEntryId === row.spareEntryId,
-                  }"
-                  (click)="openDetails(row)"
-                >
-                  {{ row.spareEntryId }}
-                </span>
-              </td>
+    <!-- Category -->
+    <td>{{ row.category }}</td>
 
-              <td>{{ row.spareEntryCode }}</td>
-              <td>{{ row.spareEntryDate }}</td>
-              <td>{{ row.spareEntryType }}</td>
+    <!-- Quantity -->
+    <td>{{ row.quantity }}</td>
 
-              <td>{{ row.spareEntrycallId }}</td>
-              <!-- FIX -->
-              <td>{{ row.spareEntryassetId }}</td>
-              <td>{{ row.spareEntryclientName }}</td>
-              <td>{{ row.spareEntryengineerName }}</td>
-              <td>{{ row.department }}</td>
+    <!-- Unit Price -->
+    <td>₹ {{ row.unitPrice }}</td>
 
-              <td>{{ row.spareEntryCategory }}</td>
-              <td>{{ row.spareEntryName }}</td>
-              <td>{{ row.spareEntryCompatibleAssetType }}</td>
+    <!-- Total Cost -->
+    <td>₹ {{ row.totalCost }}</td>
 
-              <td>{{ row.spareEntryquantityUsed }}</td>
-              <td>{{ row.spareEntryunit }}</td>
-              <td>{{ row.spareEntryserialNumber }}</td>
-              <td>{{ row.spareEntrywarrantyApplicable }}</td>
+    <!-- Vendor -->
+    <td>{{ row.vendorName }}</td>
 
-              <td>₹ {{ row.spareEntryunitCost }}</td>
-              <td>₹ {{ row.spareEntrytotalCost }}</td>
+    <!-- Engineer -->
+    <td>{{ row.engineerName }}</td>
 
-              <td>{{ row.spareEntrystockAvailable }}</td>
-              <td>{{ row.spareEntrystockAfterEntry }}</td>
+    <!-- Replacement Date -->
+    <td>{{ row.replacementDate }}</td>
 
-              <!-- Status -->
-              <td>
-                <span
-                  [ngClass]="{
-                    'status-active':
-                      row.spareEntryStatus === 'Active' ||
-                      row.spareEntryStatus === 'Closed',
-                    'status-inactive':
-                      row.spareEntryStatus === 'Inactive' ||
-                      row.spareEntryStatus === 'Pending',
-                  }"
-                >
-                  <span
-                    *ngIf="
-                      row.spareEntryStatus === 'Active' ||
-                      row.spareEntryStatus === 'Closed'
-                    "
-                    >✔</span
-                  >
-                  <span
-                    *ngIf="
-                      row.spareEntryStatus === 'Inactive' ||
-                      row.spareEntryStatus === 'Pending'
-                    "
-                    >❌</span
-                  >
-                  {{ row.spareEntryStatus }}
-                </span>
-              </td>
+    <!-- Status -->
+    <td>
+      <span
+        [ngClass]="{
+          'status-active': row.spareStatus === 'Active',
+          'status-inactive': row.spareStatus === 'Inactive'
+        }"
+      >
+        <span *ngIf="row.spareStatus === 'Active'">✔</span>
+        <span *ngIf="row.spareStatus === 'Inactive'">❌</span>
+        {{ row.spareStatus }}
+      </span>
+    </td>
 
-              <!-- Action -->
-              <td>
-                <button class="btn-edit" (click)="onEdit(row, i)">
-                  <i class="bi bi-pencil-fill"></i> Edit
-                </button>
-              </td>
-            </tr>
-          </tbody>
+    <!-- Action -->
+    <td>
+      <button class="btn-edit" (click)="onEdit(row, i)">
+        <i class="bi bi-pencil-fill"></i> Edit
+      </button>
+    </td>
+  </tr>
+</tbody>
         </table>
       </div>
       <div class="no-data-message" *ngIf="filteredData.length === 0">
@@ -542,481 +365,186 @@
         </div>
 
         <!-- FORM -->
-        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
-          <div class="row mb-3">
-            <!-- Asset Type Code -->
-            <div class="col-md-4">
-              <label class="form-label">
-                Spare Entry Code <span class="text-danger">*</span>
-              </label>
+        <form #recordForm="ngForm" class="container-fluid">
 
-              <input
-                type="text"
-                class="form-control form-control-md"
-                [(ngModel)]="forms[i].spareEntryCode"
-                name="spareEntryCode{{ i }}"
-                required
-                placeholder="Enter Spare Entry Code"
-                #spareEntryCode="ngModel"
-                [ngClass]="{
-                  'is-invalid':
-                    (showErrors || spareEntryCode.touched) &&
-                    spareEntryCode.invalid,
-                }"
-              />
+<div class="row">
 
-              <div
-                *ngIf="
-                  (showErrors || spareEntryCode.touched) &&
-                  spareEntryCode.invalid
-                "
-                class="text-danger mt-1"
-              >
-                Spare Entry Code is required.
-              </div>
-            </div>
+  <!-- Entry Date -->
+  <div class="col-md-4">
+    <label>Entry Date *</label>
+    <input type="date"
+      class="form-control"
+      [(ngModel)]="forms[i].entryDate"
+      name="entryDate{{i}}"
+      required
+      #entryDate="ngModel"
+      [ngClass]="{'is-invalid': (showErrors || entryDate.touched) && entryDate.invalid}" />
 
-            <!-- Entry Created Date -->
-            <div class="col-md-4">
-              <label class="form-label">
-                Entry Date <span class="text-danger">*</span>
-              </label>
+    <div *ngIf="entryDate.invalid && (showErrors || entryDate.touched)" class="text-danger">
+      Entry Date required
+    </div>
+  </div>
 
-              <input
-                type="date"
-                class="form-control form-control-md"
-                [(ngModel)]="forms[i].spareEntryDate"
-                name="entryDate{{ i }}"
-                required
-                #entryDate="ngModel"
-                [ngClass]="{
-                  'is-invalid':
-                    (showErrors || entryDate.touched) && entryDate.invalid,
-                }"
-              />
+  <!-- Call Logging ID -->
+  <div class="col-md-4">
+    <label>Call Logging *</label>
+    <select class="form-select"
+      [(ngModel)]="forms[i].callLoggingId"
+      name="callId{{i}}"
+      required
+      #callId="ngModel"
+      [ngClass]="{'is-invalid': callId.invalid && (showErrors || callId.touched)}">
 
-              <div
-                *ngIf="(showErrors || entryDate.touched) && entryDate.invalid"
-                class="text-danger mt-1"
-              >
-                Entry Date is required.
-              </div>
-            </div>
+      <option value="">Select</option>
+      <option *ngFor="let c of callList" [value]="c.callLogId">
+        {{ c.callLogId }}
+      </option>
+    </select>
 
-            <!-- Entry Type -->
-            <div class="col-md-4">
-              <label class="form-label">
-                Entry Type <span class="text-danger">*</span>
-              </label>
+    <div *ngIf="callId.invalid && (showErrors || callId.touched)" class="text-danger">
+      Call ID required
+    </div>
+  </div>
 
-              <select
-                class="form-select form-control-md"
-                [(ngModel)]="forms[i].spareEntryType"
-                name="entryType{{ i }}"
-                required
-                #entryType="ngModel"
-                [ngClass]="{
-                  'is-invalid':
-                    (showErrors || entryType.touched) && entryType.invalid,
-                }"
-              >
-                <option value="" disabled selected>Select Entry Type</option>
-                <option value="Issue">Issue</option>
-                <option value="Return">Return</option>
-                <option value="Replace">Replace</option>
-                <option value="Service">Service</option>
-              </select>
+  <!-- Asset -->
+  <div class="col-md-4">
+    <label>Asset *</label>
+    <select class="form-select"
+      [(ngModel)]="forms[i].assetId"
+      name="assetId{{i}}"
+      required
+      #assetId="ngModel"
+      [ngClass]="{'is-invalid': assetId.invalid && (showErrors || assetId.touched)}">
 
-              <div
-                *ngIf="(showErrors || entryType.touched) && entryType.invalid"
-                class="text-danger mt-1"
-              >
-                Entry Type is required.
-              </div>
-            </div>
+      <option value="">Select</option>
+      <option *ngFor="let a of assetList" [value]="a.assetId">
+        {{ a.assetId }}
+      </option>
+    </select>
+  </div>
 
-            <div class="col-md-3 mt-2">
-              <label class="form-label">
-                Call ID <span class="text-danger">*</span>
-              </label>
+  <!-- Spare Name -->
+  <div class="col-md-4 mt-2">
+    <label>Spare Part Name *</label>
+    <input type="text"
+      class="form-control"
+      [(ngModel)]="forms[i].sparePartName"
+      name="spareName{{i}}"
+      required
+      #spareName="ngModel"
+      [ngClass]="{'is-invalid': spareName.invalid && (showErrors || spareName.touched)}" />
 
-              <select
-                class="form-select"
-                [(ngModel)]="forms[i].spareEntrycallId"
-                name="spareEntrycallId{{ i }}"
-                required
-                #callId="ngModel"
-                [ngClass]="{
-                  'is-invalid':
-                    (showErrors || callId.touched) && callId.invalid,
-                }"
-              >
-                <option value="" disabled>Select Call ID</option>
+    <div *ngIf="spareName.invalid && (showErrors || spareName.touched)" class="text-danger">
+      Required
+    </div>
+  </div>
 
-                <option *ngFor="let call of callList" [value]="call.callLogId">
-                  {{ call.callLogId }} - {{ call.assetName }}
-                </option>
-              </select>
+  <!-- Category -->
+  <div class="col-md-4 mt-2">
+    <label>Category *</label>
+    <select class="form-select"
+      [(ngModel)]="forms[i].category"
+      name="category{{i}}"
+      required
+      #category="ngModel"
+      [ngClass]="{'is-invalid': category.invalid && (showErrors || category.touched)}">
 
-              <div
-                *ngIf="(showErrors || callId.touched) && callId.invalid"
-                class="text-danger mt-1"
-              >
-                Call ID is required.
-              </div>
-            </div>
+      <option value="">Select</option>
+      <option *ngFor="let c of spareCategoryList" [value]="c">
+        {{ c }}
+      </option>
+    </select>
+  </div>
 
-            <!-- Asset ID -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">
-                Asset ID <span class="text-danger">*</span>
-              </label>
+  <!-- Quantity -->
+  <div class="col-md-4 mt-2">
+    <label>Quantity *</label>
+    <input type="number"
+      min="1"
+      class="form-control"
+      [(ngModel)]="forms[i].quantity"
+      name="qty{{i}}"
+      required
+      #qty="ngModel"
+      [ngClass]="{'is-invalid': qty.invalid && (showErrors || qty.touched)}" />
 
-              <!-- ✅ CORRECT -->
-              <select
-                class="form-select"
-                [(ngModel)]="forms[i].spareEntryassetId"
-                name="assetId{{ i }}"
-                required
-                #assetId="ngModel"
-                [ngClass]="{
-                  'is-invalid':
-                    (showErrors || assetId.touched) && assetId.invalid,
-                }"
-              >
-                <option value="" disabled>Select Asset</option>
+    <div *ngIf="qty.invalid && (showErrors || qty.touched)" class="text-danger">
+      Quantity must be > 0
+    </div>
+  </div>
 
-                <option *ngFor="let asset of assetList" [value]="asset.assetId">
-                  {{ asset.assetId }} - {{ asset.assetName }}
-                </option>
-              </select>
+  <!-- Unit Price -->
+  <div class="col-md-4 mt-2">
+    <label>Unit Price *</label>
+    <input type="number"
+      min="0"
+      class="form-control"
+      [(ngModel)]="forms[i].unitPrice"
+      name="unitPrice{{i}}"
+      required />
+  </div>
 
-              <!-- ✅ ERROR MESSAGE -->
-              <div
-                *ngIf="(showErrors || assetId.touched) && assetId.invalid"
-                class="text-danger mt-1"
-              >
-                Asset ID is required.
-              </div>
-            </div>
+  <!-- Total Cost -->
+  <div class="col-md-4 mt-2">
+    <label>Total Cost</label>
+    <input type="number"
+      class="form-control"
+      [(ngModel)]="forms[i].totalCost"
+      name="totalCost{{i}}" />
+  </div>
 
-            <!-- Client Name -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">
-                Client Name <span class="text-danger">*</span>
-              </label>
+  <!-- Engineer -->
+  <div class="col-md-4 mt-2">
+    <label>Engineer *</label>
+    <input type="text"
+      class="form-control"
+      [(ngModel)]="forms[i].engineerName"
+      name="engineer{{i}}"
+      required />
+  </div>
 
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="forms[i].spareEntryclientName"
-                name="clientName{{ i }}"
-                placeholder="Enter Client Name"
-                required
-                #clientName="ngModel"
-                [ngClass]="{
-                  'is-invalid':
-                    (showErrors || clientName.touched) && clientName.invalid,
-                }"
-              />
+  <!-- Vendor -->
+  <div class="col-md-4 mt-2">
+    <label>Vendor</label>
+    <input type="text"
+      class="form-control"
+      [(ngModel)]="forms[i].vendorName"
+      name="vendor{{i}}" />
+  </div>
 
-              <div
-                *ngIf="(showErrors || clientName.touched) && clientName.invalid"
-                class="text-danger mt-1"
-              >
-                Client Name is required.
-              </div>
-            </div>
+  <!-- Status -->
+  <div class="col-md-4 mt-2">
+    <label>Status *</label>
+    <select class="form-select"
+      [(ngModel)]="forms[i].spareStatus"
+      name="status{{i}}">
+      <option value="Active">Active</option>
+      <option value="Inactive">Inactive</option>
+    </select>
+  </div>
 
-            <!-- Engineer Name -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">
-                Engineer Name <span class="text-danger">*</span>
-              </label>
+  <!-- Remarks -->
+  <div class="col-md-12 mt-2">
+    <label>Remarks</label>
+    <textarea class="form-control"
+      [(ngModel)]="forms[i].remarks"
+      name="remarks{{i}}"></textarea>
+  </div>
 
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="forms[i].spareEntryengineerName"
-                name="engineerName{{ i }}"
-                placeholder="Enter Engineer Name"
-                required
-                #engineerName="ngModel"
-                [ngClass]="{
-                  'is-invalid':
-                    (showErrors || engineerName.touched) &&
-                    engineerName.invalid,
-                }"
-              />
+</div>
 
-              <div
-                *ngIf="
-                  (showErrors || engineerName.touched) && engineerName.invalid
-                "
-                class="text-danger mt-1"
-              >
-                Engineer Name is required.
-              </div>
-            </div>
-            <!-- Department -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">
-                Department <span class="text-danger">*</span>
-              </label>
+<!-- Buttons -->
+<div class="mt-3 text-end">
+  <button class="btn btn-success" (click)="saveAllRecords()">
+    {{ isEditMode ? 'Update' : 'Save' }}
+  </button>
 
-              <select
-                class="form-select"
-                [(ngModel)]="forms[i].department"
-                name="department{{ i }}"
-                required
-                #department="ngModel"
-                [ngClass]="{
-                  'is-invalid':
-                    (showErrors || department.touched) && department.invalid,
-                }"
-              >
-                <option
-                  *ngFor="let dept of departmentList"
-                  [value]="dept.departmentName"
-                >
-                  {{ dept.departmentName }}
-                </option>
-              </select>
+  <button class="btn btn-secondary" (click)="cancelRecord(recordForm)">
+    Reset
+  </button>
+</div>
 
-              <div
-                *ngIf="(showErrors || department.touched) && department.invalid"
-                class="text-danger mt-1"
-              >
-                Department is required.
-              </div>
-            </div>
-            <!-- Spare Category -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">
-                Spare Category <span class="text-danger">*</span>
-              </label>
-
-              <select
-                class="form-select"
-                [(ngModel)]="forms[i].spareEntryCategory"
-                name="spareCategory{{ i }}"
-                required
-                #spareCategory="ngModel"
-                [ngClass]="{
-                  'is-invalid':
-                    (showErrors || spareCategory.touched) &&
-                    spareCategory.invalid,
-                }"
-              >
-                <option value="" disabled>Select Category</option>
-
-                <option *ngFor="let c of spareCategoryList" [value]="c">
-                  {{ c }}
-                </option>
-              </select>
-
-              <div
-                *ngIf="
-                  (showErrors || spareCategory.touched) && spareCategory.invalid
-                "
-                class="text-danger mt-1"
-              >
-                Spare Category is required.
-              </div>
-            </div>
-
-            <!-- Spare Name -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">
-                Spare Name <span class="text-danger">*</span>
-              </label>
-
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="forms[i].spareEntryName"
-                name="spareName{{ i }}"
-                placeholder="Enter Spare Name"
-                required
-                #spareName="ngModel"
-                [ngClass]="{
-                  'is-invalid':
-                    (showErrors || spareName.touched) && spareName.invalid,
-                }"
-                (input)="onSpareChange(forms[i].spareEntryName, i)"
-              />
-
-              <div
-                *ngIf="(showErrors || spareName.touched) && spareName.invalid"
-                class="text-danger mt-1"
-              >
-                Spare Name is required.
-              </div>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">
-                Asset Type <span class="text-danger">*</span>
-              </label>
-
-              <select
-                class="form-control form-control-md"
-                [(ngModel)]="forms[i].assetMakeassetType"
-                name="assetMakeassetType{{ i }}"
-                required
-              >
-                <option value="">Select Asset Type</option>
-
-                <option
-                  *ngFor="let type of assetTypes"
-                  [value]="type.assetTypeName"
-                >
-                  {{ type.assetTypeName }}
-                </option>
-              </select>
-            </div>
-
-            <!-- Quantity Used -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">
-                Quantity Used <span class="text-danger">*</span>
-              </label>
-              <input
-                type="number"
-                min="1"
-                class="form-control"
-                [(ngModel)]="forms[i].spareEntryquantityUsed"
-                name="quantityUsed{{ i }}"
-                required
-                (input)="calculateTotal()"
-              />
-            </div>
-            <!-- Unit -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">Unit</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="forms[i].spareEntryunit"
-                name="unit{{ i }}"
-              />
-            </div>
-            <!-- Serial Number -->
-            <!-- Serial Number (show only if required) -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">
-                Serial Number <span class="text-danger">*</span>
-              </label>
-
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="forms[i].spareEntryserialNumber"
-                name="spareEntryserialNumber{{ i }}"
-                required
-                #serialNumber="ngModel"
-                [ngClass]="{
-                  'is-invalid':
-                    (showErrors || serialNumber.touched) &&
-                    serialNumber.invalid,
-                }"
-              />
-
-              <div
-                *ngIf="
-                  (showErrors || serialNumber.touched) && serialNumber.invalid
-                "
-                class="text-danger mt-1"
-              >
-                Serial Number is required.
-              </div>
-            </div>
-            <!-- Warranty Applicable -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">
-                Warranty Applicable <span class="text-danger">*</span>
-              </label>
-              <select
-                class="form-select"
-                [(ngModel)]="forms[i].spareEntrywarrantyApplicable"
-                name="warrantyApplicable{{ i }}"
-                required
-              >
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-              </select>
-            </div>
-            <!-- Remarks -->
-
-            <!-- Unit Cost -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">Unit Cost</label>
-              <input
-                type="number"
-                class="form-control"
-                [(ngModel)]="forms[i].spareEntryunitCost"
-                name="unitCost{{ i }}"
-              />
-            </div>
-            <!-- Total Cost -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">Total Cost</label>
-              <input
-                type="number"
-                class="form-control"
-                [(ngModel)]="forms[i].spareEntrytotalCost"
-                name="totalCost{{ i }}"
-              />
-            </div>
-            <!-- Stock Available -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">Stock Available</label>
-              <input
-                type="number"
-                class="form-control"
-                [(ngModel)]="forms[i].spareEntrystockAvailable"
-                name="stockAvailable{{ i }}"
-              />
-            </div>
-            <!-- Stock After Entry -->
-            <div class="col-md-3 mt-2">
-              <label class="form-label">Stock After Entry</label>
-              <input
-                type="number"
-                class="form-control"
-                [(ngModel)]="forms[i].spareEntrystockAfterEntry"
-                name="stockAfterEntry{{ i }}"
-              />
-            </div>
-            <div class="col-md-12 mt-2">
-              <label class="form-label">Remarks</label>
-              <textarea
-                class="form-control"
-                rows="2"
-                [(ngModel)]="forms[i].spareEntryremarks"
-                name="remarks{{ i }}"
-                placeholder="Enter remarks (if any)"
-              ></textarea>
-            </div>
-          </div>
-
-          <div
-            class="mt-3 d-flex gap-2 justify-content-end"
-            *ngIf="i === forms.length - 1"
-          >
-            <button type="button" class="btn-save" (click)="saveAllRecords()">
-              <i class="bi bi-floppy-fill"></i>
-              {{ isEditMode ? "Update" : "Save All" }}
-            </button>
-
-            <button
-              type="button"
-              class="btn-cancel"
-              (click)="cancelRecord(recordForm)"
-            >
-              <i class="bi bi-arrow-counterclockwise"></i> Reset
-            </button>
-          </div>
-        </form>
+</form>
       </div>
     </div>
 
@@ -1339,135 +867,138 @@
     </div>
 
     <div class="modal-body">
-      <table class="popup-table">
-        <tr>
-          <th>Spare Entry ID</th>
-          <td>{{ selectedRow?.spareEntryId }}</td>
-        </tr>
+    <table class="popup-table">
 
-        <tr>
-          <th>Spare Entry Code</th>
-          <td>{{ selectedRow?.spareEntryCode }}</td>
-        </tr>
+  <tr>
+    <th>Spare Entry ID</th>
+    <td>{{ selectedRow?.spareEntryId }}</td>
+  </tr>
 
-        <tr>
-          <th>Entry Date</th>
-          <td>{{ selectedRow?.entryDate }}</td>
-        </tr>
+  <tr>
+    <th>Spare Entry Number</th>
+    <td>{{ selectedRow?.spareEntryNumber }}</td>
+  </tr>
 
-        <tr>
-          <th>Entry Type</th>
-          <td>{{ selectedRow?.entryType }}</td>
-        </tr>
+  <tr>
+    <th>Entry Date</th>
+    <td>{{ selectedRow?.entryDate }}</td>
+  </tr>
 
-        <tr>
-          <th>Call ID</th>
-          <td>{{ selectedRow?.callId }}</td>
-        </tr>
+  <tr>
+    <th>Call Logging ID</th>
+    <td>{{ selectedRow?.callLoggingId }}</td>
+  </tr>
 
-        <tr>
-          <th>Asset ID</th>
-          <td>{{ selectedRow?.assetId }}</td>
-        </tr>
+  <tr>
+    <th>Asset ID</th>
+    <td>{{ selectedRow?.assetId }}</td>
+  </tr>
 
-        <tr>
-          <th>Client Name</th>
-          <td>{{ selectedRow?.clientName }}</td>
-        </tr>
+  <tr>
+    <th>Spare Part ID</th>
+    <td>{{ selectedRow?.sparePartId }}</td>
+  </tr>
 
-        <tr>
-          <th>Engineer Name</th>
-          <td>{{ selectedRow?.engineerName }}</td>
-        </tr>
+  <tr>
+    <th>Spare Part Name</th>
+    <td>{{ selectedRow?.sparePartName }}</td>
+  </tr>
 
-        <tr>
-          <th>Department</th>
-          <td>{{ selectedRow?.department }}</td>
-        </tr>
+  <tr>
+    <th>Spare Part Code</th>
+    <td>{{ selectedRow?.sparePartCode }}</td>
+  </tr>
 
-        <tr>
-          <th>Status</th>
-          <td>
-            <span
-              [ngClass]="{
-                'status-active':
-                  selectedRow?.spareEntryStatus === 'Active' ||
-                  selectedRow?.spareEntryStatus === 'Closed',
-                'status-inactive':
-                  selectedRow?.spareEntryStatus === 'Inactive' ||
-                  selectedRow?.spareEntryStatus === 'Pending',
-              }"
-            >
-              {{ selectedRow?.spareEntryStatus }}
-            </span>
-          </td>
-        </tr>
+  <tr>
+    <th>Category</th>
+    <td>{{ selectedRow?.category }}</td>
+  </tr>
 
-        <tr>
-          <th>Spare Category</th>
-          <td>{{ selectedRow?.spareCategory }}</td>
-        </tr>
+  <tr>
+    <th>Quantity</th>
+    <td>{{ selectedRow?.quantity }}</td>
+  </tr>
 
-        <tr>
-          <th>Spare Name</th>
-          <td>{{ selectedRow?.spareName }}</td>
-        </tr>
+  <tr>
+    <th>Unit Price</th>
+    <td>₹ {{ selectedRow?.unitPrice }}</td>
+  </tr>
 
-        <tr>
-          <th>Compatible Asset Type</th>
-          <td>{{ selectedRow?.compatibleAssetType }}</td>
-        </tr>
+  <tr>
+    <th>Total Cost</th>
+    <td>₹ {{ selectedRow?.totalCost }}</td>
+  </tr>
 
-        <tr>
-          <th>Quantity Used</th>
-          <td>{{ selectedRow?.quantityUsed }}</td>
-        </tr>
+  <tr>
+    <th>Vendor Name</th>
+    <td>{{ selectedRow?.vendorName }}</td>
+  </tr>
 
-        <tr>
-          <th>Unit</th>
-          <td>{{ selectedRow?.unit }}</td>
-        </tr>
+  <tr>
+    <th>Purchase Ref No</th>
+    <td>{{ selectedRow?.purchaseReferenceNo }}</td>
+  </tr>
 
-        <tr>
-          <th>Serial Number</th>
-          <td>{{ selectedRow?.serialNumber || "-" }}</td>
-        </tr>
+  <tr>
+    <th>Spare Type</th>
+    <td>{{ selectedRow?.spareType }}</td>
+  </tr>
 
-        <tr>
-          <th>Warranty Applicable</th>
-          <td>{{ selectedRow?.warrantyApplicable }}</td>
-        </tr>
+  <tr>
+    <th>Replacement Type</th>
+    <td>{{ selectedRow?.replacementType }}</td>
+  </tr>
 
-        <tr>
-          <th>Unit Cost</th>
-          <td>₹ {{ selectedRow?.unitCost }}</td>
-        </tr>
+  <tr>
+    <th>Engineer Name</th>
+    <td>{{ selectedRow?.engineerName }}</td>
+  </tr>
 
-        <tr>
-          <th>Total Cost</th>
-          <td>₹ {{ selectedRow?.totalCost }}</td>
-        </tr>
+  <tr>
+    <th>Replacement Date</th>
+    <td>{{ selectedRow?.replacementDate }}</td>
+  </tr>
 
-        <tr>
-          <th>Stock Available</th>
-          <td>{{ selectedRow?.stockAvailable }}</td>
-        </tr>
+  <tr>
+    <th>Status</th>
+    <td>
+      <span
+        [ngClass]="{
+          'status-active': selectedRow?.spareStatus === 'Active',
+          'status-inactive': selectedRow?.spareStatus === 'Inactive'
+        }"
+      >
+        {{ selectedRow?.spareStatus }}
+      </span>
+    </td>
+  </tr>
 
-        <tr>
-          <th>Stock After Entry</th>
-          <td>{{ selectedRow?.stockAfterEntry }}</td>
-        </tr>
+  <tr>
+    <th>Remarks</th>
+    <td>{{ selectedRow?.remarks || '-' }}</td>
+  </tr>
 
-        <tr>
-          <th>Remarks</th>
-          <td>{{ selectedRow?.remarks || "-" }}</td>
-        </tr>
+  <tr>
+    <th>Created By</th>
+    <td>{{ selectedRow?.createdBy }}</td>
+  </tr>
 
-        <tr>
-          <th>Record Status</th>
-          <td>{{ selectedRow?.status }}</td>
-        </tr>
-      </table>
+  <tr>
+    <th>Created Date</th>
+    <td>{{ selectedRow?.createdDate }}</td>
+  </tr>
+
+  <tr>
+    <th>Updated By</th>
+    <td>{{ selectedRow?.updatedBy }}</td>
+  </tr>
+
+  <tr>
+    <th>Updated Date</th>
+    <td>{{ selectedRow?.updatedDate }}</td>
+  </tr>
+
+</table>
     </div>
   </div>
 </div>

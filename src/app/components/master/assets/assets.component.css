@@ -1591,3 +1591,75 @@ form.new-record-form input.form-control.form-control-md::placeholder {
   margin-right: 6px;
   color: red;
 }
+
+/* 🔥 NG-SELECT PROFESSIONAL STYLE */
+
+ng-select {
+  width: 100%;
+}
+
+.ng-select .ng-select-container {
+  min-height: 45px;
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  font-size: 14px;
+  padding: 4px 10px;
+  transition: all 0.3s ease;
+}
+
+/* Focus effect */
+.ng-select.ng-select-focused .ng-select-container {
+  border-color: #0d6efd;
+  box-shadow: 0 0 5px rgba(13, 110, 253, 0.3);
+}
+
+/* Placeholder */
+.ng-select .ng-placeholder {
+  color: #999;
+  font-size: 14px;
+}
+
+/* Selected value */
+.ng-select .ng-value {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Dropdown panel */
+.ng-dropdown-panel {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* Dropdown items */
+.ng-option {
+  padding: 10px;
+  font-size: 14px;
+}
+
+/* Hover */
+.ng-option:hover {
+  background-color: #f1f5ff;
+}
+
+/* Selected option */
+.ng-option-selected {
+  background-color: #0d6efd !important;
+  color: white;
+}
+
+/* Clear button (X) */
+.ng-clear-wrapper {
+  color: red;
+  font-size: 16px;
+}
+
+/* Arrow icon */
+.ng-arrow {
+  border-color: #333 transparent transparent;
+}
+
+/* Disabled */
+.ng-select.ng-select-disabled .ng-select-container {
+  background-color: #f8f9fa;
+}

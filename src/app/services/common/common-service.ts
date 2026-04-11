@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
 import { AuthService } from '../auth/auth-service';
-
+import { TableRow } from '../../components/master/assets/assets.component';
 @Injectable({
   providedIn: 'root',
 })
@@ -664,10 +664,9 @@ fetchAllAssetMakeByLoginId(loginId: string): Observable<any> {
   }
 
   /* ===================== FETCH BY LOGIN ID ===================== */
-
-fetchAssetByLoginId(loginId: string): Observable<any> {
-  return this.http.get(
-    `${this.assetBaseUrl}/getAllAssetByLoginId/${loginId}`
+fetchAssetByLoginId(loginId: string): Observable<any[]> {
+  return this.http.get<any[]>(
+    `http://localhost:8300/asset_service/getAllAssetByLoginId/${loginId}`
   );
 }
   /* ===================== FETCH SINGLE ===================== */

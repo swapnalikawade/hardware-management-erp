@@ -211,7 +211,7 @@ private initializeForm(): void {
       /* ========= META ========= */
       createdBy: this.loginId || '',   // ✅ loginId set केला
       createdDate: this.currentDate || '',
-updatedDate: this.currentDate,
+updatedDate:'',
       /* ========= STATUS ========= */
       status: 'Active',
 
@@ -265,21 +265,22 @@ updatedDate: this.currentDate,
       },
     });
   }
- loadAssets() {
+loadAssets() {
   console.log("LOGIN ID:", this.loginId);
 
+  // ✅ DIRECT SEND (NO CHANGE)
   this.commonService.fetchAssetByLoginId(this.loginId).subscribe({
-    next: (res) => {
+    next: (res: any) => {
       console.log("DATA:", res);
-      this.tableData = res;
-      this.filteredData = [...res];
+
+      this.tableData = res || [];
+      this.filteredData = [...this.tableData];
     },
     error: (err) => {
       console.error("ERROR:", err);
     },
   });
 }
-
   tabs = [
     { key: 'details', label: 'Details', icon: 'bi bi-building' },
     { key: 'newRecord', label: 'New Record', icon: 'bi bi-plus-circle' },
@@ -873,7 +874,7 @@ exportPDF() {
         /* ========= META ========= */
         createdBy: row.createdBy,
         createdDate: row.createdDate,
-        updatedDate: row.updatedDate,
+        updatedDate: this.currentDate,
 
         /* ========= STATUS ========= */
         status: row.status,
@@ -884,13 +885,22 @@ exportPDF() {
     },
   ];
 }
-formatDate(date: string) {
+formatDate(event: Event, type: string) {
+  const input = event.target as HTMLInputElement;
+  const value = input.value;
+
+  if (type === 'start') {
+    this.startDate = value;
+  } else {
+    this.endDate = value;
+  }
+}
+formatDateValue(date: string) {
   if (!date) return null;
 
   const d = new Date(date);
   return d.toISOString().split('T')[0];
 }
-
  saveAllRecords(form?: NgForm) {
   const invalid = this.forms.some(
     (f) =>
@@ -910,9 +920,10 @@ formatDate(date: string) {
   if (this.isEditMode && this.editIndex !== null) {
     const formData = this.forms[0].newRecord;
 
-  const payload = {
+const payload = {
   assetId: formData.assetId,
   assetName: formData.assetName,
+
   assetType: formData.assetType,
   assetMake: formData.assetMake,
   assetModel: formData.assetModel,
@@ -925,17 +936,21 @@ formatDate(date: string) {
   invoiceNumber: formData.invoiceNumber,
 
   warrantyApplicable: formData.warrantyApplicable,
-  warrantyStartDate: this.formatDate(formData.warrantyStartDate),
-  warrantyEndDate: this.formatDate(formData.warrantyEndDate),
+
+  warrantyStartDate: formData.warrantyApplicable === 'Yes'
+    ? this.formatDateValue(formData.warrantyStartDate)
+    : null,
+
+  warrantyEndDate: formData.warrantyApplicable === 'Yes'
+    ? this.formatDateValue(formData.warrantyEndDate)
+    : null,
 
   amcApplicable: formData.amcApplicable,
-  amcStartDate: this.formatDate(formData.amcStartDate),
-  amcEndDate: this.formatDate(formData.amcEndDate),
-
-  status: formData.status,
-  createdBy: formData.createdBy
+  createdDate: formData.createdDate,   // ✅ ADD THIS
+  updatedDate: this.currentDate,
+  createdBy: formData.createdBy,
+  status: formData.status
 };
-
     const assetId = this.tableData[this.editIndex].assetId;
 
     this.commonService.updateAsset(assetId, payload).subscribe({
@@ -953,35 +968,43 @@ formatDate(date: string) {
   }
 
   // ---------------- SAVE ----------------
-const payload = this.forms.map(f => ({
-  assetId: f.newRecord.assetId,
-  assetName: f.newRecord.assetName,
-  assetType: f.newRecord.assetType,
-  assetMake: f.newRecord.assetMake,
-  assetModel: f.newRecord.assetModel,
+const payload = this.forms.map(f => {
 
-  serialNumber: f.newRecord.serialNumber,
-  macAddress: f.newRecord.macAddress,
-  ipAddress: f.newRecord.ipAddress,
+  const isWarrantyYes = f.newRecord.warrantyApplicable === 'Yes';
 
-  purchaseOrderId: f.newRecord.purchaseOrderId,
-  invoiceNumber: f.newRecord.invoiceNumber,
+  return {
+    assetId: f.newRecord.assetId,
+    assetName: f.newRecord.assetName,
 
-  warrantyApplicable: f.newRecord.warrantyApplicable,
-  warrantyStartDate: f.newRecord.warrantyStartDate,
-  warrantyEndDate: f.newRecord.warrantyEndDate,
+    assetType: f.newRecord.assetType,
+    assetMake: f.newRecord.assetMake,
+    assetModel: f.newRecord.assetModel,
 
-  amcApplicable: f.newRecord.amcApplicable,
-  amcStartDate: f.newRecord.amcStartDate,
-  amcEndDate: f.newRecord.amcEndDate,
+    serialNumber: f.newRecord.serialNumber,
+    macAddress: f.newRecord.macAddress,
+    ipAddress: f.newRecord.ipAddress,
 
-  status: 'Active',
+    purchaseOrderId: f.newRecord.purchaseOrderId,
+    invoiceNumber: f.newRecord.invoiceNumber,
 
-  createdBy: this.loginId
+    warrantyApplicable: f.newRecord.warrantyApplicable,
 
-  // ❌ NO createdDate
-  // ❌ NO updatedDate
-}));
+    warrantyStartDate: isWarrantyYes
+      ? this.formatDateValue(f.newRecord.warrantyStartDate)
+      : null,
+
+    warrantyEndDate: isWarrantyYes
+      ? this.formatDateValue(f.newRecord.warrantyEndDate)
+      : null,
+
+    amcApplicable: f.newRecord.amcApplicable,
+
+    status: 'Active',
+    createdBy: this.loginId,
+    createdDate: this.currentDate,
+    updatedDate: null
+  };
+});
 
   this.commonService.submitAsset(payload).subscribe({
     next: () => {

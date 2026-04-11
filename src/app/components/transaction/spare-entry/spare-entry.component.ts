@@ -63,45 +63,45 @@ import { CommonService } from '../../../services/common/common-service';
 import { CommonModule } from '@angular/common';
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc =
   'node_modules/pdfjs-dist/build/pdf.worker.min.js';
-interface TableRow {
+ interface TableRow {
+
   spareEntryId: string;
-  spareEntryCode: string;
+  spareEntryNumber: string;
 
-  spareEntryDate: string;
-  spareEntryType: string;
-  spareEntrycallId: string;
+  entryDate: string;
 
-  spareEntryassetId: string;
-  spareEntryclientName: string;
-  spareEntryengineerName: string;
+  callLoggingId: string;
+  assetId: string;
 
-  department: string;
+  sparePartId: string;
+  sparePartName: string;
+  sparePartCode: string;
 
-  spareEntryCategory: string;
-  spareEntryName: string;
-  spareEntryCompatibleAssetType: string;
-  spareEntryquantityUsed: number;
-  spareEntryunit: string;
+  category: string;
 
-  spareEntryserialNumber: string;
-  spareEntrywarrantyApplicable: string;
+  quantity: number;
+  unitPrice: number;
+  totalCost: number;
 
-  spareEntryremarks: string;
+  vendorName: string;
+  purchaseReferenceNo: string;
 
-  spareEntryunitCost: number;
-  spareEntrytotalCost: number;
+  spareType: string;
+  replacementType: string;
 
-  spareEntrystockAvailable: number;
-  spareEntrystockAfterEntry: number;
+  engineerName: string;
+  replacementDate: string;
 
-  spareEntryStatus: string;
+  spareStatus: 'Active' | 'Inactive';
 
-  loginId: string;
+  remarks: string;
 
+  createdBy: string;
   createdDate?: string;
+
+  updatedBy?: string;
   updatedDate?: string;
 }
-
 @Component({
   selector: 'app-spare-entry',
   standalone: false,
@@ -177,61 +177,89 @@ export class SpareEntryComponent implements OnInit {
     this.filteredData = [...this.tableData];
   }
 
-  private initializeForm(): void {
-    this.forms = [
-      {
-        spareEntryId: '',
-        spareEntryCode: '',
-        spareEntryDate: this.currentDate || '',
-        spareEntryType: '',
-        spareEntrycallId: '',
-        spareEntryassetId: '',
-        spareEntryclientName: '',
-        spareEntryengineerName: '',
-        department: '',
-        spareEntryCategory: '',
-        spareEntryName: '',
-        spareEntryCompatibleAssetType: '',
-        spareEntryquantityUsed: 0,
-        spareEntryunit: '',
-        spareEntryserialNumber: '',
-        spareEntrywarrantyApplicable: 'No',
-        spareEntryremarks: '',
-        spareEntryunitCost: 0,
-        spareEntrytotalCost: 0,
-        spareEntrystockAvailable: 0,
-        spareEntrystockAfterEntry: 0,
-        spareEntryStatus: 'Active',
-        loginId: this.loginId || '',
+private initializeForm(): void {
 
-        newRecord: {
-          spareEntryId: '',
-          spareEntryCode: '',
-          spareEntryDate: this.currentDate,
-          spareEntryType: '',
-          spareEntrycallId: '',
-          spareEntryassetId: '',
-          spareEntryclientName: '',
-          spareEntryengineerName: '',
-          department: '',
-          spareEntryCategory: '',
-          spareEntryName: '',
-          spareEntryCompatibleAssetType: '',
-          spareEntryquantityUsed: 0,
-          spareEntryunit: '',
-          spareEntryserialNumber: '',
-          spareEntrywarrantyApplicable: 'No',
-          spareEntryremarks: '',
-          spareEntryunitCost: 0,
-          spareEntrytotalCost: 0,
-          spareEntrystockAvailable: 0,
-          spareEntrystockAfterEntry: 0,
-          spareEntryStatus: 'Active',
-          loginId: this.loginId || '',
-        },
-      },
-    ];
-  }
+  this.forms = [
+    {
+      spareEntryId: '',
+      spareEntryNumber: '',
+
+      entryDate: this.currentDate || '',
+
+      callLoggingId: '',
+      assetId: '',
+
+      sparePartId: '',
+      sparePartName: '',
+      sparePartCode: '',
+
+      category: '',
+
+      quantity: 0,
+      unitPrice: 0,
+      totalCost: 0,
+
+      vendorName: '',
+      purchaseReferenceNo: '',
+
+      spareType: '',
+      replacementType: '',
+
+      engineerName: '',
+      replacementDate: '',
+
+      spareStatus: 'Active',
+
+      remarks: '',
+
+      createdBy: this.loginId || '',
+      createdDate: this.currentDate || '',
+
+      updatedBy: '',
+      updatedDate: '',
+
+      // 🔥 IMPORTANT (FORM BINDING)
+      newRecord: {
+        spareEntryId: '',
+        spareEntryNumber: '',
+
+        entryDate: this.currentDate || '',
+
+        callLoggingId: '',
+        assetId: '',
+
+        sparePartId: '',
+        sparePartName: '',
+        sparePartCode: '',
+
+        category: '',
+
+        quantity: 0,
+        unitPrice: 0,
+        totalCost: 0,
+
+        vendorName: '',
+        purchaseReferenceNo: '',
+
+        spareType: '',
+        replacementType: '',
+
+        engineerName: '',
+        replacementDate: '',
+
+        spareStatus: 'Active',
+
+        remarks: '',
+
+        createdBy: this.loginId || '',
+        createdDate: this.currentDate || '',
+
+        updatedBy: '',
+        updatedDate: ''
+      }
+    }
+  ];
+}
   spareCategoryList = ['Electrical', 'Mechanical', 'IT', 'Hardware'];
   loadDepartments(): void {
     this.commonService.fetchAllDepartmentByCompany(this.loginId).subscribe({
@@ -487,105 +515,126 @@ export class SpareEntryComponent implements OnInit {
     });
   }
 
-  exportExcel() {
-    const wsData = [];
+exportExcel() {
+  const wsData: any[] = [];
 
-    // ⭐ Row 1 → Company Name
-    wsData.push([this.loginId || 'Company Name']);
+  // ⭐ Row 1 → Company Name
+  wsData.push([this.loginId || 'Company Name']);
 
-    // ⭐ Row 2 → Date
-    const today = new Date();
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
-    wsData.push(['Date:', formattedDate]);
+  // ⭐ Row 2 → Date
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+  wsData.push(['Date:', formattedDate]);
 
-    // Empty Row
-    wsData.push([]);
+  // Empty Row
+  wsData.push([]);
 
-    // ⭐ Header
+  // ⭐ Header (NEW CLEAN)
+  wsData.push([
+    'Spare Entry ID',
+    'Spare Entry Number',
+    'Entry Date',
+    'Call Logging ID',
+    'Asset ID',
+    'Spare Part ID',
+    'Spare Part Name',
+    'Spare Part Code',
+    'Category',
+    'Quantity',
+    'Unit Price',
+    'Total Cost',
+    'Vendor Name',
+    'Purchase Ref No',
+    'Spare Type',
+    'Replacement Type',
+    'Engineer Name',
+    'Replacement Date',
+    'Status',
+    'Remarks',
+    'Created By',
+    'Created Date',
+    'Updated By',
+    'Updated Date'
+  ]);
+
+  // ⭐ Rows
+  this.tableData.forEach((row) => {
     wsData.push([
-      'Spare Entry ID',
-      'Code',
-      'Date',
-      'Type',
-      'Asset ID',
-      'Client Name',
-      'Engineer Name',
-      'Department',
-      'Category',
-      'Spare Name',
-      'Quantity Used',
-      'Unit',
-      'Serial Number',
-      'Warranty',
-      'Unit Cost',
-      'Total Cost',
-      'Stock Available',
-      'Stock After Entry',
-      'Status',
+      row.spareEntryId,
+      row.spareEntryNumber,
+      row.entryDate,
+      row.callLoggingId,
+      row.assetId,
+
+      row.sparePartId,
+      row.sparePartName,
+      row.sparePartCode,
+
+      row.category,
+
+      row.quantity,
+      row.unitPrice,
+      row.totalCost,
+
+      row.vendorName,
+      row.purchaseReferenceNo,
+
+      row.spareType,
+      row.replacementType,
+
+      row.engineerName,
+      row.replacementDate,
+
+      row.spareStatus,
+
+      row.remarks,
+
+      row.createdBy,
+      row.createdDate,
+
+      row.updatedBy,
+      row.updatedDate
     ]);
+  });
 
-    // ⭐ Rows
-    this.tableData.forEach((row) => {
-      wsData.push([
-        row.spareEntryId,
-        row.spareEntryCode,
-        row.spareEntryDate,
-        row.spareEntryType,
-        row.spareEntryassetId,
-        row.spareEntryclientName,
-        row.spareEntryengineerName,
-        row.department,
-        row.spareEntryCategory,
-        row.spareEntryName,
-        row.spareEntryquantityUsed,
-        row.spareEntryunit,
-        row.spareEntryserialNumber,
-        row.spareEntrywarrantyApplicable,
-        row.spareEntryunitCost,
-        row.spareEntrytotalCost,
-        row.spareEntrystockAvailable,
-        row.spareEntrystockAfterEntry,
-        row.spareEntryStatus,
-      ]);
-    });
+  // ⭐ Create worksheet
+  const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
 
-    // Create worksheet
-    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
+  // ⭐ Column width (auto professional)
+  worksheet['!cols'] = new Array(24).fill({ wch: 20 });
 
-    // Create workbook
-    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Spare Entry');
+  // ⭐ Workbook
+  const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Spare Entry');
 
-    // Export
-    const excelBuffer: any = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
-    });
+  // ⭐ Export
+  const excelBuffer: any = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
 
-    const blob = new Blob([excelBuffer], {
-      type: 'application/octet-stream',
-    });
+  const blob = new Blob([excelBuffer], {
+    type: 'application/octet-stream',
+  });
 
-    saveAs(blob, 'Spare_Entry_Report.xlsx');
-  }
+  saveAs(blob, 'Spare_Entry_Report.xlsx');
+}
 
-  exportDoc() {
-    const today = new Date();
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+exportDoc() {
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
 
-    let content = `
+  let content = `
   <html>
     <head>
       <style>
-        body {
-          font-family: Arial, sans-serif;
-        }
+        body { font-family: Arial, sans-serif; }
 
         h2 {
           text-align: center;
-          font-size: 26px;
+          font-size: 24px;
           color: #00468c;
-          margin-bottom: 2px;
+          margin-bottom: 10px;
           font-weight: bold;
           text-decoration: underline;
         }
@@ -593,238 +642,239 @@ export class SpareEntryComponent implements OnInit {
         .header-info {
           display: flex;
           justify-content: space-between;
-          font-size: 16px;
+          font-size: 14px;
           font-weight: bold;
-          margin: 5px 0 10px 0;
-          width: 100%;
+          margin-bottom: 10px;
         }
 
         table {
           width: 100%;
           border-collapse: collapse;
-          margin-top: 5px;
         }
 
         th {
           background: #0066cc;
           color: white;
-          padding: 8px;
-          font-size: 14px;
+          padding: 6px;
+          font-size: 11px;
           border: 1px solid #000;
-          text-align: center;
         }
 
         td {
-          background: #ffffff;
-          padding: 8px;
+          padding: 6px;
+          font-size: 11px;
           border: 1px solid #000;
-          font-size: 14px;
           text-align: center;
         }
 
-        /* ⭐ Status Colors */
-        .status-active {
-          color: green;
-          font-weight: bold;
-        }
-
-        .status-inactive {
-          color: red;
-          font-weight: bold;
-        }
+        .status-active { color: green; font-weight: bold; }
+        .status-inactive { color: red; font-weight: bold; }
       </style>
     </head>
 
     <body>
-      <h2>Spare Entry Records</h2>
+
+      <h2>Spare Entry Report</h2>
 
       <div class="header-info">
-        <div>${this.loginId}</div>
-        <div>${formattedDate}</div>
+        <div><b>User:</b> ${this.loginId}</div>
+        <div><b>Date:</b> ${formattedDate}</div>
       </div>
 
       <table>
         <tr>
           <th>ID</th>
-          <th>Code</th>
+          <th>Number</th>
           <th>Date</th>
-          <th>Type</th>
-          <th>Asset ID</th>
-          <th>Client</th>
-          <th>Engineer</th>
-          <th>Department</th>
-          <th>Category</th>
+          <th>Call ID</th>
+          <th>Asset</th>
           <th>Spare Name</th>
+          <th>Category</th>
           <th>Qty</th>
-          <th>Unit</th>
-          <th>Serial No</th>
-          <th>Warranty</th>
-          <th>Unit Cost</th>
-          <th>Total Cost</th>
-          <th>Stock</th>
-          <th>After Entry</th>
+          <th>Unit Price</th>
+          <th>Total</th>
+          <th>Vendor</th>
+          <th>Type</th>
+          <th>Engineer</th>
           <th>Status</th>
+          <th>Created</th>
+          <th>Updated</th>
         </tr>
   `;
 
-    this.tableData.forEach((row) => {
-      const statusClass =
-        row.spareEntryStatus === 'Active' || row.spareEntryStatus === 'Closed'
-          ? 'status-active'
-          : 'status-inactive';
+  this.tableData.forEach((row) => {
 
-      const statusIcon =
-        row.spareEntryStatus === 'Active' || row.spareEntryStatus === 'Closed'
-          ? '✔️'
-          : '❌';
+    const statusClass =
+      row.spareStatus === 'Active'
+        ? 'status-active'
+        : 'status-inactive';
 
-      content += `
-      <tr>
-        <td>${row.spareEntryId}</td>
-        <td>${row.spareEntryCode}</td>
-        <td>${row.spareEntryDate}</td>
-        <td>${row.spareEntryType}</td>
-        <td>${row.spareEntryassetId}</td>
-        <td>${row.spareEntryclientName}</td>
-        <td>${row.spareEntryengineerName}</td>
-        <td>${row.department}</td>
-        <td>${row.spareEntryCategory}</td>
-        <td>${row.spareEntryName}</td>
-        <td>${row.spareEntryquantityUsed}</td>
-        <td>${row.spareEntryunit}</td>
-        <td>${row.spareEntryserialNumber}</td>
-        <td>${row.spareEntrywarrantyApplicable}</td>
-        <td>${row.spareEntryunitCost}</td>
-        <td>${row.spareEntrytotalCost}</td>
-        <td>${row.spareEntrystockAvailable}</td>
-        <td>${row.spareEntrystockAfterEntry}</td>
-        <td class="${statusClass}">${statusIcon} ${row.spareEntryStatus}</td>
-      </tr>
-    `;
-    });
+    const statusIcon =
+      row.spareStatus === 'Active' ? '✔️' : '❌';
 
     content += `
+      <tr>
+        <td>${row.spareEntryId}</td>
+        <td>${row.spareEntryNumber}</td>
+        <td>${row.entryDate}</td>
+        <td>${row.callLoggingId}</td>
+        <td>${row.assetId}</td>
+
+        <td>${row.sparePartName}</td>
+        <td>${row.category}</td>
+
+        <td>${row.quantity}</td>
+        <td>${row.unitPrice}</td>
+        <td>${row.totalCost}</td>
+
+        <td>${row.vendorName}</td>
+        <td>${row.spareType}</td>
+
+        <td>${row.engineerName}</td>
+
+        <td class="${statusClass}">${statusIcon} ${row.spareStatus}</td>
+
+        <td>${row.createdDate || ''}</td>
+        <td>${row.updatedDate || ''}</td>
+      </tr>
+    `;
+  });
+
+  content += `
       </table>
     </body>
   </html>
   `;
 
-    const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
-    saveAs(blob, 'Spare_Entry_Report.doc');
-  }
+  const blob = new Blob(['\ufeff', content], {
+    type: 'application/msword',
+  });
 
-  exportPDF() {
-    const doc = new jsPDF('p', 'pt', 'a4');
+  saveAs(blob, 'Spare_Entry_Report.doc');
+}
 
-    // ⭐ TITLE (Center + Underline)
-    doc.setFontSize(22);
-    doc.setTextColor(0, 70, 140);
+exportPDF() {
+  const doc = new jsPDF('l', 'pt', 'a4');
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const titleX = pageWidth / 2;
+  // ⭐ TITLE
+  doc.setFontSize(20);
+  doc.setTextColor(0, 70, 140);
 
-    doc.text('Spare Entry Records', titleX, 60, { align: 'center' });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const title = 'Spare Entry Report';
 
-    // Underline
-    const titleWidth = doc.getTextWidth('Spare Entry Records');
-    doc.line(titleX - titleWidth / 2, 65, titleX + titleWidth / 2, 65);
+  doc.text(title, pageWidth / 2, 40, { align: 'center' });
 
-    // ⭐ Company Name + Date
-    doc.setFontSize(14);
-    doc.setTextColor(0, 0, 0);
+  const titleWidth = doc.getTextWidth(title);
+  doc.line(
+    pageWidth / 2 - titleWidth / 2,
+    45,
+    pageWidth / 2 + titleWidth / 2,
+    45
+  );
 
-    const company = this.loginId || 'Company Name';
-    const dateStr = new Date().toLocaleDateString();
+  // ⭐ HEADER
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
 
-    const leftX = 40;
-    const topY = 100;
+  const company = this.loginId || 'Company Name';
+  const dateStr = new Date().toLocaleDateString();
 
-    // Company Name
-    doc.text(company, leftX, topY);
+  doc.text(`User: ${company}`, 40, 70);
+  doc.text(`Date: ${dateStr}`, pageWidth - 40, 70, { align: 'right' });
 
-    // Date Right
-    doc.text(dateStr, pageWidth - 40, topY, { align: 'right' });
+  // ⭐ TABLE
+  autoTable(doc, {
+    startY: 80,
 
-    // ⭐ TABLE
-    autoTable(doc, {
-      startY: 110,
-      head: [
-        [
-          'ID',
-          'Code',
-          'Date',
-          'Type',
-          'Asset ID',
-          'Client',
-          'Engineer',
-          'Dept',
-          'Category',
-          'Spare Name',
-          'Qty',
-          'Unit',
-          'Serial No',
-          'Warranty',
-          'Unit Cost',
-          'Total Cost',
-          'Stock',
-          'After Entry',
-          'Status',
-        ],
-      ],
+    head: [[
+      'ID',
+      'Number',
+      'Date',
+      'Call ID',
+      'Asset',
+      'Spare Name',
+      'Category',
+      'Qty',
+      'Unit Price',
+      'Total',
+      'Vendor',
+      'Type',
+      'Engineer',
+      'Status',
+      'Created',
+      'Updated'
+    ]],
 
-      body: this.tableData.map((row) => [
-        row.spareEntryId,
-        row.spareEntryCode,
-        row.spareEntryDate,
-        row.spareEntryType,
-        row.spareEntryassetId,
-        row.spareEntryclientName,
-        row.spareEntryengineerName,
-        row.department,
-        row.spareEntryCategory,
-        row.spareEntryName,
-        row.spareEntryquantityUsed,
-        row.spareEntryunit,
-        row.spareEntryserialNumber,
-        row.spareEntrywarrantyApplicable,
-        row.spareEntryunitCost,
-        row.spareEntrytotalCost,
-        row.spareEntrystockAvailable,
-        row.spareEntrystockAfterEntry,
-        row.spareEntryStatus,
-      ]),
+    body: this.tableData.map((row) => [
+      row.spareEntryId,
+      row.spareEntryNumber,
+      row.entryDate,
+      row.callLoggingId,
+      row.assetId,
 
-      theme: 'grid',
+      row.sparePartName,
+      row.category,
 
-      headStyles: {
-        fillColor: [0, 92, 179],
-        textColor: [255, 255, 255],
-        halign: 'center',
-        fontSize: 10,
-      },
+      row.quantity,
+      row.unitPrice,
+      row.totalCost,
 
-      bodyStyles: {
-        fontSize: 9,
-        halign: 'center',
-        textColor: [0, 0, 0],
-      },
+      row.vendorName,
+      row.spareType,
 
-      styles: {
-        lineWidth: 0.5,
-        lineColor: [0, 0, 0],
-        valign: 'middle',
-      },
+      row.engineerName,
 
-      // ✅ Auto wrap (important for many columns)
-      columnStyles: {
-        0: { cellWidth: 70 }, // ID
-        1: { cellWidth: 50 }, // Code
-        2: { cellWidth: 60 }, // Date
-      },
-    });
+      row.spareStatus,
 
-    doc.save('Spare_Entry_Report.pdf');
-  }
+      row.createdDate || '',
+      row.updatedDate || ''
+    ]),
+
+    theme: 'grid',
+
+    headStyles: {
+      fillColor: [0, 92, 179],
+      textColor: [255, 255, 255],
+      halign: 'center',
+      fontSize: 9,
+    },
+
+    bodyStyles: {
+      fontSize: 8,
+      halign: 'center',
+    },
+
+    styles: {
+      lineWidth: 0.3,
+      lineColor: [0, 0, 0],
+    },
+
+    // ✅ STATUS COLOR FIX
+    didParseCell: function (data) {
+      if (data.column.index === 13) {
+        if (data.cell.raw === 'Active') {
+          data.cell.styles.textColor = [0, 150, 0];
+        } else {
+          data.cell.styles.textColor = [200, 0, 0];
+        }
+      }
+    },
+
+    // ✅ PAGE NUMBER
+    didDrawPage: function (data) {
+      const pageCount = doc.getNumberOfPages();
+      doc.setFontSize(10);
+      doc.text(
+        `Page ${data.pageNumber} of ${pageCount}`,
+        pageWidth - 100,
+        doc.internal.pageSize.getHeight() - 10
+      );
+    }
+  });
+
+  doc.save('Spare_Entry_Report.pdf');
+}
 
   //pagination
   // Pagination Variables
@@ -871,44 +921,55 @@ export class SpareEntryComponent implements OnInit {
   // --------------------------
   // INITIAL RECORD STRUCTURE
   // --------------------------
-  newRecord: TableRow = {
-    spareEntryId: '0',
-    spareEntryCode: '',
-    spareEntryDate: '',
+newRecord: TableRow = {
 
-    spareEntryType: '',
+  /* ========= PRIMARY ========= */
+  spareEntryId: '0',
+  spareEntryNumber: '',
 
-    spareEntrycallId: '', // ✅ ADD THIS
-    spareEntryassetId: '',
-    spareEntryclientName: '',
-    spareEntryengineerName: '',
+  /* ========= ENTRY ========= */
+  entryDate: this.currentDate || '',
 
-    department: '',
+  callLoggingId: '',
+  assetId: '',
 
-    spareEntryCategory: '',
-    spareEntryName: '',
+  /* ========= SPARE ========= */
+  sparePartId: '',
+  sparePartName: '',
+  sparePartCode: '',
 
-    spareEntryCompatibleAssetType: '', // ✅ ADD THIS
+  category: '',
 
-    spareEntryquantityUsed: 0,
-    spareEntryunit: '',
+  /* ========= COST ========= */
+  quantity: 0,
+  unitPrice: 0,
+  totalCost: 0,
 
-    spareEntryserialNumber: '',
-    spareEntrywarrantyApplicable: '',
+  /* ========= VENDOR ========= */
+  vendorName: '',
+  purchaseReferenceNo: '',
 
-    spareEntryremarks: '',
+  /* ========= TYPE ========= */
+  spareType: '',
+  replacementType: '',
 
-    spareEntryunitCost: 0,
-    spareEntrytotalCost: 0,
+  /* ========= PEOPLE ========= */
+  engineerName: '',
+  replacementDate: '',
 
-    spareEntrystockAvailable: 0,
-    spareEntrystockAfterEntry: 0,
+  /* ========= STATUS ========= */
+  spareStatus: 'Active',
 
-    spareEntryStatus: 'Open',
+  /* ========= EXTRA ========= */
+  remarks: '',
 
-    loginId: this.loginId || '',
-  };
+  /* ========= AUDIT ========= */
+  createdBy: this.loginId || '',
+  createdDate: this.currentDate || '',
 
+  updatedBy: '',
+  updatedDate: ''
+};
   // --------------------------
   // STATE VARIABLES
   // --------------------------
@@ -922,194 +983,293 @@ export class SpareEntryComponent implements OnInit {
   // EDIT EXISTING ROW
   // --------------------------
 
-  onEdit(row: any, index: number) {
-    this.activeTab = 'newRecord';
-    this.isEditMode = true;
-    this.editIndex = index; // 🔥 MUST
+onEdit(row: TableRow, index: number) {
 
-    this.forms = [
-      {
-        spareEntryCode: row.spareEntryCode,
-        spareEntryDate: row.spareEntryDate,
-        spareEntryType: row.spareEntryType,
-        spareEntrycallId: row.spareEntrycallId,
-        spareEntryassetId: row.spareEntryassetId,
-        spareEntryclientName: row.spareEntryclientName,
-        spareEntryengineerName: row.spareEntryengineerName,
-        department: row.department,
-        spareEntryCategory: row.spareEntryCategory,
-        spareEntryName: row.spareEntryName,
-        spareEntryCompatibleAssetType: row.spareEntryCompatibleAssetType,
-        spareEntryquantityUsed: row.spareEntryquantityUsed,
-        spareEntryunit: row.spareEntryunit,
-        spareEntryserialNumber: row.spareEntryserialNumber,
-        spareEntrywarrantyApplicable: row.spareEntrywarrantyApplicable,
-        spareEntryremarks: row.spareEntryremarks,
-        spareEntryunitCost: row.spareEntryunitCost,
-        spareEntrytotalCost: row.spareEntrytotalCost,
-        spareEntrystockAvailable: row.spareEntrystockAvailable,
-        spareEntrystockAfterEntry: row.spareEntrystockAfterEntry,
-        spareEntryStatus: row.spareEntryStatus,
-        loginId: row.loginId,
-      },
-    ];
-  }
+  this.activeTab = 'newRecord';
+  this.isEditMode = true;
+  this.editIndex = index;
+
+  this.forms = [
+    {
+      spareEntryId: row.spareEntryId,
+      spareEntryNumber: row.spareEntryNumber,
+
+      entryDate: row.entryDate,
+
+      callLoggingId: row.callLoggingId,
+      assetId: row.assetId,
+
+      sparePartId: row.sparePartId,
+      sparePartName: row.sparePartName,
+      sparePartCode: row.sparePartCode,
+
+      category: row.category,
+
+      quantity: row.quantity,
+      unitPrice: row.unitPrice,
+      totalCost: row.totalCost,
+
+      vendorName: row.vendorName,
+      purchaseReferenceNo: row.purchaseReferenceNo,
+
+      spareType: row.spareType,
+      replacementType: row.replacementType,
+
+      engineerName: row.engineerName,
+      replacementDate: row.replacementDate,
+
+      spareStatus: row.spareStatus,
+
+      remarks: row.remarks,
+
+      createdBy: row.createdBy,
+      createdDate: row.createdDate,
+
+      updatedBy: this.loginId || '',
+      updatedDate: this.currentDate,
+
+      // 🔥 IMPORTANT (FORM BINDING)
+      newRecord: {
+        ...row,
+        updatedBy: this.loginId || '',
+        updatedDate: this.currentDate
+      }
+    }
+  ];
+}
   // --------------------------
   // SAVE RECORD (SINGLE OR MULTIPLE)
   // --------------------------
-  saveAllRecords() {
-    // ---------------- VALIDATION ----------------
-    const invalid = this.forms.some(
-      (f) =>
-        !f.spareEntryCode?.trim() ||
-        !f.spareEntryDate ||
-        !f.spareEntryType ||
-        !f.spareEntrycallId ||
-        !f.spareEntryassetId ||
-        !f.spareEntryclientName ||
-        !f.spareEntryengineerName ||
-        !f.department ||
-        !f.spareEntryCategory ||
-        !f.spareEntryName ||
-        f.spareEntryquantityUsed == null ||
-        !f.spareEntryserialNumber,
-    );
+saveAllRecords() {
 
-    if (invalid) {
-      this.showErrors = true;
-      this.toast.warning('Please fill all required fields!', 'error', 4000);
-      return;
-    }
+  // ---------------- VALIDATION ----------------
+  const invalid = this.forms.some(
+    (f) =>
+      !f.newRecord.spareEntryNumber?.trim() ||
+      !f.newRecord.entryDate ||
+      !f.newRecord.callLoggingId ||
+      !f.newRecord.assetId ||
+      !f.newRecord.sparePartName ||
+      f.newRecord.quantity == null
+  );
 
-    // ---------------- EDIT MODE (UPDATE) ----------------
-    if (this.isEditMode && this.editIndex !== null) {
-      const form = this.forms[0];
-
-      const payload = {
-        spareEntryCode: form.spareEntryCode,
-        spareEntryDate: form.spareEntryDate,
-        spareEntryType: form.spareEntryType,
-        spareEntrycallId: form.spareEntrycallId,
-        spareEntryassetId: form.spareEntryassetId,
-        spareEntryclientName: form.spareEntryclientName,
-        spareEntryengineerName: form.spareEntryengineerName,
-        department: form.department,
-        spareEntryCategory: form.spareEntryCategory,
-        spareEntryName: form.spareEntryName,
-        spareEntryCompatibleAssetType: form.spareEntryCompatibleAssetType,
-        spareEntryquantityUsed: form.spareEntryquantityUsed,
-        spareEntryunit: form.spareEntryunit,
-        spareEntryserialNumber: form.spareEntryserialNumber,
-        spareEntrywarrantyApplicable: form.spareEntrywarrantyApplicable,
-        spareEntryremarks: form.spareEntryremarks,
-        spareEntryunitCost: form.spareEntryunitCost,
-        spareEntrytotalCost: form.spareEntrytotalCost,
-        spareEntrystockAvailable: form.spareEntrystockAvailable,
-        spareEntrystockAfterEntry: form.spareEntrystockAfterEntry,
-        spareEntryStatus: form.spareEntryStatus,
-        loginId: form.loginId || this.loginId,
-      };
-
-      const spareEntryId = this.tableData[this.editIndex].spareEntryId;
-
-      this.commonService
-        .updateSpareEntry(spareEntryId, this.loginId, payload)
-        .subscribe({
-          next: () => {
-            this.toast.success(
-              'Spare Entry Updated Successfully!',
-              'success',
-              4000,
-            );
-            this.resetAfterSave();
-            this.loadSpareEntry();
-          },
-          error: () => {
-            this.toast.danger('Update failed!', 'error', 4000);
-          },
-        });
-
-      return;
-    }
-
-    // ---------------- ADD MODE (SAVE) ----------------
-    const payload = this.forms.map((f) => ({
-      spareEntryCode: f.spareEntryCode,
-      spareEntryDate: f.spareEntryDate,
-      spareEntryType: f.spareEntryType,
-      spareEntrycallId: f.spareEntrycallId,
-      spareEntryassetId: f.spareEntryassetId,
-      spareEntryclientName: f.spareEntryclientName,
-      spareEntryengineerName: f.spareEntryengineerName,
-      department: f.department,
-      spareEntryCategory: f.spareEntryCategory,
-      spareEntryName: f.spareEntryName,
-      spareEntryCompatibleAssetType: f.spareEntryCompatibleAssetType, // 🔥 IMPORTANT
-      spareEntryquantityUsed: f.spareEntryquantityUsed,
-      spareEntryunit: f.spareEntryunit,
-      spareEntryserialNumber: f.spareEntryserialNumber,
-      spareEntrywarrantyApplicable: f.spareEntrywarrantyApplicable,
-      spareEntryremarks: f.spareEntryremarks,
-      spareEntryunitCost: f.spareEntryunitCost,
-      spareEntrytotalCost: f.spareEntrytotalCost,
-      spareEntrystockAvailable: f.spareEntrystockAvailable,
-      spareEntrystockAfterEntry: f.spareEntrystockAfterEntry,
-      spareEntryStatus: f.spareEntryStatus,
-      loginId: f.loginId || this.loginId,
-    }));
-
-    console.log('SPARE ENTRY PAYLOAD 👉', payload); // 🔥 DEBUG
-
-    this.commonService.submit_multiple_spare_entry(payload).subscribe({
-      next: (res) => {
-        if (res?.dublicateMessages?.length) {
-          res.dublicateMessages.forEach((msg: string) =>
-            this.toast.warning(msg, 'warning', 4000),
-          );
-        }
-
-        this.toast.success('Spare Entry Added Successfully!', 'success', 4000);
-        this.resetAfterSave();
-        this.loadSpareEntry();
-      },
-      error: () => {
-        this.toast.danger('Save failed!', 'error', 4000);
-      },
-    });
+  if (invalid) {
+    this.showErrors = true;
+    this.toast.warning('Please fill all required fields!', 'error', 4000);
+    return;
   }
-  resetAfterSave() {
-    this.forms = [
-      {
-        spareEntryCode: '',
-        spareEntryDate: '',
-        spareEntryType: '',
-        spareEntrycallId: '',
-        spareEntryassetId: '',
-        spareEntryclientName: '',
-        spareEntryengineerName: '',
-        department: '',
-        spareEntryCategory: '',
-        spareEntryName: '',
-        spareEntryCompatibleAssetType: '',
-        spareEntryquantityUsed: null,
-        spareEntryunit: '',
-        spareEntryserialNumber: '',
-        spareEntrywarrantyApplicable: '',
-        spareEntryremarks: '',
-        spareEntryunitCost: null,
-        spareEntrytotalCost: null,
-        spareEntrystockAvailable: null,
-        spareEntrystockAfterEntry: null,
-        spareEntryStatus: 'Active',
-        loginId: '',
-      },
-    ];
 
-    this.isEditMode = false;
-    this.editIndex = null;
-    this.activeTab = 'details';
-    this.showErrors = false;
+  // ---------------- EDIT MODE ----------------
+  if (this.isEditMode && this.editIndex !== null) {
+
+    const form = this.forms[0].newRecord;
+
+    const payload = {
+      spareEntryId: form.spareEntryId,
+      spareEntryNumber: form.spareEntryNumber,
+
+      entryDate: form.entryDate,
+      callLoggingId: form.callLoggingId,
+      assetId: form.assetId,
+
+      sparePartId: form.sparePartId,
+      sparePartName: form.sparePartName,
+      sparePartCode: form.sparePartCode,
+
+      category: form.category,
+
+      quantity: form.quantity,
+      unitPrice: form.unitPrice,
+      totalCost: form.totalCost,
+
+      vendorName: form.vendorName,
+      purchaseReferenceNo: form.purchaseReferenceNo,
+
+      spareType: form.spareType,
+      replacementType: form.replacementType,
+
+      engineerName: form.engineerName,
+      replacementDate: form.replacementDate,
+
+      spareStatus: form.spareStatus,
+
+      remarks: form.remarks,
+
+      createdBy: form.createdBy,
+      createdDate: form.createdDate,
+
+      updatedBy: this.loginId || '',
+      updatedDate: this.currentDate
+    };
+
+    this.commonService
+      .updateSpareEntry(form.spareEntryId, this.loginId, payload)
+      .subscribe({
+        next: () => {
+          this.toast.success('Spare Entry Updated!', 'success', 4000);
+          this.resetAfterSave();
+          this.loadSpareEntry();
+        },
+        error: () => {
+          this.toast.danger('Update failed!', 'error', 4000);
+        },
+      });
+
+    return;
   }
+
+  // ---------------- ADD MODE ----------------
+  const payload = this.forms.map((f) => {
+
+    const form = f.newRecord;
+
+    return {
+      spareEntryNumber: form.spareEntryNumber,
+
+      entryDate: form.entryDate,
+      callLoggingId: form.callLoggingId,
+      assetId: form.assetId,
+
+      sparePartId: form.sparePartId,
+      sparePartName: form.sparePartName,
+      sparePartCode: form.sparePartCode,
+
+      category: form.category,
+
+      quantity: form.quantity,
+      unitPrice: form.unitPrice,
+      totalCost: form.totalCost,
+
+      vendorName: form.vendorName,
+      purchaseReferenceNo: form.purchaseReferenceNo,
+
+      spareType: form.spareType,
+      replacementType: form.replacementType,
+
+      engineerName: form.engineerName,
+      replacementDate: form.replacementDate,
+
+      spareStatus: form.spareStatus,
+
+      remarks: form.remarks,
+
+      createdBy: this.loginId || '',
+      createdDate: this.currentDate,
+
+      updatedBy: null,
+      updatedDate: null
+    };
+  });
+
+  console.log('SPARE ENTRY PAYLOAD 👉', payload);
+
+  this.commonService.submit_multiple_spare_entry(payload).subscribe({
+    next: (res) => {
+
+      if (res?.duplicateMessages?.length) {
+        res.duplicateMessages.forEach((msg: string) =>
+          this.toast.warning(msg, 'warning', 4000)
+        );
+      }
+
+      this.toast.success('Spare Entry Added Successfully!', 'success', 4000);
+      this.resetAfterSave();
+      this.loadSpareEntry();
+    },
+    error: () => {
+      this.toast.danger('Save failed!', 'error', 4000);
+    },
+  });
+}
+resetAfterSave() {
+
+  this.forms = [
+    {
+      spareEntryId: '',
+      spareEntryNumber: '',
+
+      entryDate: this.currentDate || '',
+
+      callLoggingId: '',
+      assetId: '',
+
+      sparePartId: '',
+      sparePartName: '',
+      sparePartCode: '',
+
+      category: '',
+
+      quantity: 0,
+      unitPrice: 0,
+      totalCost: 0,
+
+      vendorName: '',
+      purchaseReferenceNo: '',
+
+      spareType: '',
+      replacementType: '',
+
+      engineerName: '',
+      replacementDate: '',
+
+      spareStatus: 'Active',
+
+      remarks: '',
+
+      createdBy: this.loginId || '',
+      createdDate: this.currentDate || '',
+
+      updatedBy: '',
+      updatedDate: '',
+
+      // 🔥 FORM BINDING
+      newRecord: {
+        spareEntryId: '',
+        spareEntryNumber: '',
+
+        entryDate: this.currentDate || '',
+
+        callLoggingId: '',
+        assetId: '',
+
+        sparePartId: '',
+        sparePartName: '',
+        sparePartCode: '',
+
+        category: '',
+
+        quantity: 0,
+        unitPrice: 0,
+        totalCost: 0,
+
+        vendorName: '',
+        purchaseReferenceNo: '',
+
+        spareType: '',
+        replacementType: '',
+
+        engineerName: '',
+        replacementDate: '',
+
+        spareStatus: 'Active',
+
+        remarks: '',
+
+        createdBy: this.loginId || '',
+        createdDate: this.currentDate || '',
+
+        updatedBy: '',
+        updatedDate: ''
+      }
+    }
+  ];
+
+  // ✅ RESET FLAGS
+  this.isEditMode = false;
+  this.editIndex = null;
+  this.activeTab = 'details';
+  this.showErrors = false;
+}
   // --------------------------
   // OPEN NEW RECORD TAB
   // --------------------------
@@ -1124,109 +1284,195 @@ export class SpareEntryComponent implements OnInit {
   // --------------------------
   // ADD NEW FORM
   // --------------------------
-  addForm() {
-    if (this.isEditMode) return;
+addForm() {
 
-    const today = new Date().toISOString().split('T')[0];
+  if (this.isEditMode) return;
 
-    this.forms.push({
-      spareEntryCode: '',
-      spareEntryDate: today,
-      spareEntryType: '',
-      spareEntrycallId: '',
-      spareEntryassetId: '',
-      spareEntryclientName: '',
-      spareEntryengineerName: '',
-      department: '',
-      spareEntryCategory: '',
-      spareEntryName: '',
-      spareEntryCompatibleAssetType: '',
-      spareEntryquantityUsed: null,
-      spareEntryunit: '',
-      spareEntryserialNumber: '',
-      spareEntrywarrantyApplicable: '',
-      spareEntryremarks: '',
-      spareEntryunitCost: null,
-      spareEntrytotalCost: null,
-      spareEntrystockAvailable: null,
-      spareEntrystockAfterEntry: null,
-      spareEntryStatus: 'Active',
-      loginId: this.loginId,
-    });
-  }
+  const today = new Date().toISOString().split('T')[0];
+
+  this.forms.push({
+
+    spareEntryId: '',
+    spareEntryNumber: '',
+
+    entryDate: today,
+
+    callLoggingId: '',
+    assetId: '',
+
+    sparePartId: '',
+    sparePartName: '',
+    sparePartCode: '',
+
+    category: '',
+
+    quantity: 0,
+    unitPrice: 0,
+    totalCost: 0,
+
+    vendorName: '',
+    purchaseReferenceNo: '',
+
+    spareType: '',
+    replacementType: '',
+
+    engineerName: '',
+    replacementDate: '',
+
+    spareStatus: 'Active',
+
+    remarks: '',
+
+    createdBy: this.loginId || '',
+    createdDate: today,
+
+    updatedBy: '',
+    updatedDate: '',
+
+    // 🔥 FORM BINDING
+    newRecord: {
+      spareEntryId: '',
+      spareEntryNumber: '',
+
+      entryDate: today,
+
+      callLoggingId: '',
+      assetId: '',
+
+      sparePartId: '',
+      sparePartName: '',
+      sparePartCode: '',
+
+      category: '',
+
+      quantity: 0,
+      unitPrice: 0,
+      totalCost: 0,
+
+      vendorName: '',
+      purchaseReferenceNo: '',
+
+      spareType: '',
+      replacementType: '',
+
+      engineerName: '',
+      replacementDate: '',
+
+      spareStatus: 'Active',
+
+      remarks: '',
+
+      createdBy: this.loginId || '',
+      createdDate: today,
+
+      updatedBy: '',
+      updatedDate: ''
+    }
+  });
+}
 
   // --------------------------
   // CANCEL / RESET FORM
   // --------------------------
 
-  cancelRecord(form?: NgForm, index?: number) {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const currentDate = `${yyyy}-${mm}-${dd}`;
+cancelRecord(form?: NgForm, index?: number) {
 
-    if (index !== undefined) {
-      this.forms[index] = {
-        // ✅ UI Binding
-        spareEntryCode: '',
-        spareEntryDate: currentDate,
-        spareEntryType: '',
-        spareEntrycallId: '',
-        spareEntryassetId: '',
-        spareEntryclientName: '',
-        spareEntryengineerName: '',
-        department: '',
-        spareEntryCategory: '',
-        spareEntryName: '',
-        spareEntryCompatibleAssetType: '',
-        spareEntryquantityUsed: null,
-        spareEntryunit: '',
-        spareEntryserialNumber: '',
-        spareEntrywarrantyApplicable: '',
-        spareEntryremarks: '',
-        spareEntryunitCost: null,
-        spareEntrytotalCost: null,
-        spareEntrystockAvailable: null,
-        spareEntrystockAfterEntry: null,
-        spareEntryStatus: 'Active',
-        loginId: '',
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const currentDate = `${yyyy}-${mm}-${dd}`;
 
-        // ✅ Backend Save Logic
-        newRecord: {
-          spareEntryId: '',
-          spareEntryCode: '',
-          spareEntryDate: currentDate,
-          spareEntryType: '',
-          spareEntrycallId: '',
-          spareEntryassetId: '',
-          spareEntryclientName: '',
-          spareEntryengineerName: '',
-          department: '',
-          spareEntryCategory: '',
-          spareEntryName: '',
-          spareEntryCompatibleAssetType: '',
-          spareEntryquantityUsed: null,
-          spareEntryunit: '',
-          spareEntryserialNumber: '',
-          spareEntrywarrantyApplicable: '',
-          spareEntryremarks: '',
-          spareEntryunitCost: null,
-          spareEntrytotalCost: null,
-          spareEntrystockAvailable: null,
-          spareEntrystockAfterEntry: null,
-          spareEntryStatus: 'Active',
-          loginId: '',
-        },
-      };
-    }
+  if (index !== undefined) {
 
-    if (form) form.resetForm();
+    this.forms[index] = {
 
-    this.isEditMode = false;
-    this.editIndex = null;
-    this.showErrors = false;
+      spareEntryId: '',
+      spareEntryNumber: '',
+
+      entryDate: currentDate,
+
+      callLoggingId: '',
+      assetId: '',
+
+      sparePartId: '',
+      sparePartName: '',
+      sparePartCode: '',
+
+      category: '',
+
+      quantity: 0,
+      unitPrice: 0,
+      totalCost: 0,
+
+      vendorName: '',
+      purchaseReferenceNo: '',
+
+      spareType: '',
+      replacementType: '',
+
+      engineerName: '',
+      replacementDate: '',
+
+      spareStatus: 'Active',
+
+      remarks: '',
+
+      // ✅ KEEP LOGIN
+      createdBy: this.loginId || '',
+      createdDate: currentDate,
+
+      updatedBy: '',
+      updatedDate: '',
+
+      // 🔥 FORM BINDING
+      newRecord: {
+        spareEntryId: '',
+        spareEntryNumber: '',
+
+        entryDate: currentDate,
+
+        callLoggingId: '',
+        assetId: '',
+
+        sparePartId: '',
+        sparePartName: '',
+        sparePartCode: '',
+
+        category: '',
+
+        quantity: 0,
+        unitPrice: 0,
+        totalCost: 0,
+
+        vendorName: '',
+        purchaseReferenceNo: '',
+
+        spareType: '',
+        replacementType: '',
+
+        engineerName: '',
+        replacementDate: '',
+
+        spareStatus: 'Active',
+
+        remarks: '',
+
+        createdBy: this.loginId || '',
+        createdDate: currentDate,
+
+        updatedBy: '',
+        updatedDate: ''
+      }
+    };
   }
+
+  if (form) form.resetForm();
+
+  this.isEditMode = false;
+  this.editIndex = null;
+  this.showErrors = false;
+}
 
   // --------------------------
   // REMOVE FORM
@@ -1313,22 +1559,27 @@ export class SpareEntryComponent implements OnInit {
   //bulk export date format
   startDateError: string = '';
   endDateError: string = '';
-  filterByDate() {
-    // जर start किंवा end date नाही दिली तर संपूर्ण data दाखवा
-    if (!this.startDate || !this.endDate) {
-      this.filteredData = [...this.tableData];
-      return;
-    }
+filterByDate() {
 
-    const start = this.convertToDate(this.startDate);
-    const end = this.convertToDate(this.endDate);
-
-    this.filteredData = this.tableData.filter((item: TableRow) => {
-      // 🔹 Spare Entry साठी date field वापरा
-      const itemDate = this.convertToDate(item.spareEntryDate);
-      return itemDate >= start && itemDate <= end;
-    });
+  // ❗ If no dates → show all
+  if (!this.startDate || !this.endDate) {
+    this.filteredData = [...this.tableData];
+    return;
   }
+
+  const start = this.convertToDate(this.startDate);
+  const end = this.convertToDate(this.endDate);
+
+  this.filteredData = this.tableData.filter((item: TableRow) => {
+
+    // 🔥 USE entryDate (NOT createdDate)
+    if (!item.entryDate) return false;
+
+    const itemDate = this.convertToDate(item.entryDate);
+
+    return itemDate >= start && itemDate <= end;
+  });
+}
   convertToDate(dateStr: string): Date {
     if (!dateStr) return new Date(0); // fallback
 
@@ -1450,221 +1701,268 @@ export class SpareEntryComponent implements OnInit {
   }
 
   // ---------------- Excel Parsing ----------------
-  readExcel(file: File) {
-    const reader = new FileReader();
+readExcel(file: File) {
 
-    reader.onload = () => {
-      const workbook = XLSX.read(reader.result, { type: 'binary' });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+  const reader = new FileReader();
 
-      json.forEach((obj: any, i) => {
-        const row: TableRow = {
-          spareEntryId: obj['ID'] || '',
-          spareEntryCode: obj['Spare Entry Code'] || '',
-          spareEntryDate: obj['Date'] || '',
-          spareEntryType: obj['Entry Type'] || '',
-          spareEntrycallId: obj['Call ID'] || '',
-          spareEntryassetId: obj['Asset ID'] || '',
-          spareEntryclientName: obj['Client Name'] || '',
-          spareEntryengineerName: obj['Engineer Name'] || '',
-          department: obj['Department'] || '',
-          spareEntryCategory: obj['Spare Category'] || '',
-          spareEntryName: obj['Spare Name'] || '',
-          spareEntryCompatibleAssetType: obj['Compatible Asset Type'] || '',
-          spareEntryquantityUsed: obj['Quantity Used'] || 0,
-          spareEntryunit: obj['Unit'] || '',
-          spareEntryserialNumber: obj['Serial Number'] || '',
-          spareEntrywarrantyApplicable: obj['Warranty Applicable'] || 'No',
-          spareEntryremarks: obj['Remarks'] || '',
-          spareEntryunitCost: obj['Unit Cost'] || 0,
-          spareEntrytotalCost: obj['Total Cost'] || 0,
-          spareEntrystockAvailable: obj['Stock Available'] || 0,
-          spareEntrystockAfterEntry: obj['Stock After Entry'] || 0,
-          spareEntryStatus: obj['Status'] || 'Active',
-          loginId: this.loginId || '',
-        };
+  reader.onload = () => {
 
-        this.tableData.push(row);
-      });
+    const workbook = XLSX.read(reader.result, { type: 'binary' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
-      this.filteredData = [...this.tableData];
-      this.toast.success(
-        'Spare Entry Excel imported successfully!',
-        'success',
-        4000,
-      );
-    };
+    json.forEach((obj: any) => {
 
-    reader.readAsBinaryString(file);
-  }
+      const row: TableRow = {
 
-  // ---------------- TXT Parsing ----------------
-  readTXT(file: File) {
-    const reader = new FileReader();
+        spareEntryId: obj['Spare Entry ID'] || '',
+        spareEntryNumber: obj['Spare Entry Number'] || '',
 
-    reader.onload = () => {
-      let text = reader.result as string;
+        entryDate: obj['Entry Date'] || '',
 
-      // Remove header line (update column names for Spare Entry)
-      text = text
-        .replace(
-          /ID\s+Spare Entry Code\s+Entry Type\s+Call ID\s+Asset ID\s+Client Name\s+Engineer Name\s+Department\s+Spare Category\s+Spare Name\s+Compatible Asset Type\s+Quantity Used\s+Unit\s+Serial Number\s+Warranty Applicable\s+Remarks\s+Unit Cost\s+Total Cost\s+Stock Available\s+Stock After Entry\s+Status/i,
-          '',
-        )
-        .trim();
+        callLoggingId: obj['Call Logging ID'] || '',
+        assetId: obj['Asset ID'] || '',
 
-      // Split rows based on Status (Active / Inactive)
-      const rawRows = text
-        .split(/(Active|Inactive)/)
-        .reduce((acc: string[], curr, index, arr) => {
-          if (curr === 'Active' || curr === 'Inactive') {
-            acc[acc.length - 1] += ' ' + curr;
-          } else if (curr.trim() !== '') {
-            acc.push(curr.trim());
-          }
-          return acc;
-        }, []);
+        sparePartId: obj['Spare Part ID'] || '',
+        sparePartName: obj['Spare Part Name'] || '',
+        sparePartCode: obj['Spare Part Code'] || '',
 
-      rawRows.forEach((r) => {
-        const parts = r.split(/\s+/);
+        category: obj['Category'] || '',
 
-        if (parts.length < 21) {
-          // check number of fields
-          console.warn('Invalid row:', r);
-          return;
-        }
+        quantity: Number(obj['Quantity']) || 0,
+        unitPrice: Number(obj['Unit Price']) || 0,
+        totalCost: Number(obj['Total Cost']) || 0,
 
-        const [
-          spareEntryId,
-          spareEntryCode,
-          spareEntryType,
-          spareEntryDate,
-          spareEntrycallId,
-          spareEntryassetId,
-          spareEntryclientName,
-          spareEntryengineerName,
-          department,
-          spareEntryCategory,
-          spareEntryName,
-          spareEntryCompatibleAssetType,
-          spareEntryquantityUsed,
-          spareEntryunit,
-          spareEntryserialNumber,
-          spareEntrywarrantyApplicable,
-          spareEntryremarks,
-          spareEntryunitCost,
-          spareEntrytotalCost,
-          spareEntrystockAvailable,
-          spareEntrystockAfterEntry,
-          spareEntryStatus,
-        ] = parts;
+        vendorName: obj['Vendor Name'] || '',
+        purchaseReferenceNo: obj['Purchase Reference No'] || '',
 
-        const row: TableRow = {
-          spareEntryId,
-          spareEntryCode,
-          spareEntryType,
-          spareEntrycallId,
-          spareEntryassetId,
-          spareEntryclientName,
-          spareEntryengineerName,
-          department,
-          spareEntryCategory,
-          spareEntryName,
-          spareEntryCompatibleAssetType,
-          spareEntryquantityUsed: Number(spareEntryquantityUsed),
-          spareEntryunit,
-          spareEntryserialNumber,
-          spareEntrywarrantyApplicable,
-          spareEntryremarks,
-          spareEntryunitCost: Number(spareEntryunitCost),
-          spareEntrytotalCost: Number(spareEntrytotalCost),
-          spareEntrystockAvailable: Number(spareEntrystockAvailable),
-          spareEntrystockAfterEntry: Number(spareEntrystockAfterEntry),
-          spareEntryStatus: spareEntryStatus as 'Active' | 'Inactive',
+        spareType: obj['Spare Type'] || '',
+        replacementType: obj['Replacement Type'] || '',
 
-          // 🔥 ADD THIS LINE
-          spareEntryDate: spareEntryDate || '', // <-- assign from TXT / default ''
+        engineerName: obj['Engineer Name'] || '',
+        replacementDate: obj['Replacement Date'] || '',
 
-          loginId: this.loginId || '',
-        };
+        spareStatus: obj['Spare Status'] || 'Active',
 
-        this.tableData.push(row);
-      });
+        remarks: obj['Remarks'] || '',
 
-      this.filteredData = [...this.tableData];
-      this.toast.success(
-        'Spare Entry TXT imported successfully!',
-        'success',
-        4000,
-      );
-    };
+        createdBy: this.loginId || '',
+        createdDate: obj['Created Date'] || '',
 
-    reader.readAsText(file);
-  }
-
-  // ---------------- DOCX Parsing (mammoth.js) ----------------
-  async readDOCX(file: File) {
-    const arrayBuffer = await file.arrayBuffer();
-    const result = await mammoth.convertToHtml({ arrayBuffer });
-
-    const doc = new DOMParser().parseFromString(result.value, 'text/html');
-    const table = doc.querySelector('table');
-
-    if (!table) {
-      this.toast.danger('No table found in DOCX!', 'error', 4000);
-      return;
-    }
-
-    const rows = table.querySelectorAll('tr');
-
-    rows.forEach((row, i) => {
-      if (i === 0) return; // Skip header
-
-      const cells = Array.from(row.querySelectorAll('td')).map(
-        (c) => c.textContent?.trim() || '',
-      );
-
-      // Ensure minimum required columns
-      while (cells.length < 23) cells.push(''); // 23 fields in TableRow
-
-      const newRecord: TableRow = {
-        spareEntryId: cells[0],
-        spareEntryCode: cells[1],
-        spareEntryDate: cells[2],
-        spareEntryType: cells[3],
-        spareEntrycallId: cells[4],
-        spareEntryassetId: cells[5],
-        spareEntryclientName: cells[6],
-        spareEntryengineerName: cells[7],
-        department: cells[8],
-        spareEntryStatus: cells[9],
-        spareEntryCategory: cells[10],
-        spareEntryName: cells[11],
-        spareEntryCompatibleAssetType: cells[12],
-        spareEntryquantityUsed: Number(cells[13]) || 0,
-        spareEntryunit: cells[14],
-        spareEntryserialNumber: cells[15],
-        spareEntrywarrantyApplicable: cells[16],
-        spareEntryremarks: cells[17],
-        spareEntryunitCost: Number(cells[18]) || 0,
-        spareEntrytotalCost: Number(cells[19]) || 0,
-        spareEntrystockAvailable: Number(cells[20]) || 0,
-        spareEntrystockAfterEntry: Number(cells[21]) || 0,
-        loginId: cells[22],
+        updatedBy: obj['Updated By'] || '',
+        updatedDate: obj['Updated Date'] || ''
       };
 
-      this.tableData.push(newRecord);
+      this.tableData.push(row);
     });
 
     this.filteredData = [...this.tableData];
 
     this.toast.success(
-      'DOCX Spare Entries imported successfully!',
+      'Spare Entry Excel imported successfully!',
       'success',
-      4000,
+      4000
     );
+  };
+
+  reader.readAsBinaryString(file);
+}
+
+  // ---------------- TXT Parsing ----------------
+readTXT(file: File) {
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+
+    let text = reader.result as string;
+
+    // ⭐ Remove header (NEW FORMAT)
+    text = text
+      .replace(
+        /Spare Entry ID\s+Spare Entry Number\s+Entry Date\s+Call Logging ID\s+Asset ID\s+Spare Part ID\s+Spare Part Name\s+Spare Part Code\s+Category\s+Quantity\s+Unit Price\s+Total Cost\s+Vendor Name\s+Purchase Reference No\s+Spare Type\s+Replacement Type\s+Engineer Name\s+Replacement Date\s+Spare Status\s+Remarks/i,
+        ''
+      )
+      .trim();
+
+    // ⭐ Split rows based on Status
+    const rawRows = text
+      .split(/(Active|Inactive)/)
+      .reduce((acc: string[], curr, index, arr) => {
+        if (curr === 'Active' || curr === 'Inactive') {
+          acc[acc.length - 1] += ' ' + curr;
+        } else if (curr.trim() !== '') {
+          acc.push(curr.trim());
+        }
+        return acc;
+      }, []);
+
+    rawRows.forEach((r) => {
+
+      const parts = r.split(/\s+/);
+
+      if (parts.length < 19) {
+        console.warn('Invalid row:', r);
+        return;
+      }
+
+      const [
+        spareEntryId,
+        spareEntryNumber,
+        entryDate,
+        callLoggingId,
+        assetId,
+        sparePartId,
+        sparePartName,
+        sparePartCode,
+        category,
+        quantity,
+        unitPrice,
+        totalCost,
+        vendorName,
+        purchaseReferenceNo,
+        spareType,
+        replacementType,
+        engineerName,
+        replacementDate,
+        spareStatus,
+        ...rest
+      ] = parts;
+
+      const remarks = rest.join(' '); // ⭐ remaining text
+
+      const row: TableRow = {
+
+        spareEntryId,
+        spareEntryNumber,
+
+        entryDate,
+
+        callLoggingId,
+        assetId,
+
+        sparePartId,
+        sparePartName,
+        sparePartCode,
+
+        category,
+
+        quantity: Number(quantity) || 0,
+        unitPrice: Number(unitPrice) || 0,
+        totalCost: Number(totalCost) || 0,
+
+        vendorName,
+        purchaseReferenceNo,
+
+        spareType,
+        replacementType,
+
+        engineerName,
+        replacementDate,
+
+        spareStatus: spareStatus as 'Active' | 'Inactive',
+
+        remarks,
+
+        createdBy: this.loginId || '',
+        createdDate: '',
+
+        updatedBy: '',
+        updatedDate: ''
+      };
+
+      this.tableData.push(row);
+    });
+
+    this.filteredData = [...this.tableData];
+
+    this.toast.success(
+      'Spare Entry TXT imported successfully!',
+      'success',
+      4000
+    );
+  };
+
+  reader.readAsText(file);
+}
+
+  // ---------------- DOCX Parsing (mammoth.js) ----------------
+async readDOCX(file: File) {
+
+  const arrayBuffer = await file.arrayBuffer();
+  const result = await mammoth.convertToHtml({ arrayBuffer });
+
+  const doc = new DOMParser().parseFromString(result.value, 'text/html');
+  const table = doc.querySelector('table');
+
+  if (!table) {
+    this.toast.danger('No table found in DOCX!', 'error', 4000);
+    return;
   }
+
+  const rows = table.querySelectorAll('tr');
+
+  rows.forEach((row, i) => {
+
+    if (i === 0) return; // skip header
+
+    const cells = Array.from(row.querySelectorAll('td')).map(
+      (c) => c.textContent?.trim() || ''
+    );
+
+    while (cells.length < 24) cells.push('');
+
+    const newRecord: TableRow = {
+
+      spareEntryId: cells[0],
+      spareEntryNumber: cells[1],
+
+      entryDate: cells[2],
+
+      callLoggingId: cells[3],
+      assetId: cells[4],
+
+      sparePartId: cells[5],
+      sparePartName: cells[6],
+      sparePartCode: cells[7],
+
+      category: cells[8],
+
+      quantity: Number(cells[9]) || 0,
+      unitPrice: Number(cells[10]) || 0,
+      totalCost: Number(cells[11]) || 0,
+
+      vendorName: cells[12],
+      purchaseReferenceNo: cells[13],
+
+      spareType: cells[14],
+      replacementType: cells[15],
+
+      engineerName: cells[16],
+      replacementDate: cells[17],
+
+      spareStatus: (cells[18] as 'Active' | 'Inactive') || 'Active',
+
+      remarks: cells[19],
+
+      createdBy: this.loginId || '',
+      createdDate: cells[20] || '',
+
+      updatedBy: cells[21] || '',
+      updatedDate: cells[22] || ''
+    };
+
+    this.tableData.push(newRecord);
+  });
+
+  this.filteredData = [...this.tableData];
+
+  this.toast.success(
+    'DOCX Spare Entries imported successfully!',
+    'success',
+    4000
+  );
+}
   // ---------------- PDF Parsing ----------------
   extract(text: string, regex: RegExp) {
     const m = text.match(regex);
@@ -1672,455 +1970,524 @@ export class SpareEntryComponent implements OnInit {
   }
 
   async readPDF(file: File) {
-    const arrayBuffer = await file.arrayBuffer();
 
-    const pdf = await pdfjsLib.getDocument({
-      data: new Uint8Array(arrayBuffer),
-    }).promise;
+  const arrayBuffer = await file.arrayBuffer();
 
-    let fullText = '';
+  const pdf = await pdfjsLib.getDocument({
+    data: new Uint8Array(arrayBuffer),
+  }).promise;
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      fullText += content.items.map((item: any) => item.str).join(' ') + ' ';
-    }
+  let fullText = '';
 
-    console.log('RAW PDF TEXT:', fullText);
-
-    // Normalize some corrupted text if needed
-    fullText = fullText.replace(/\s+/g, ' ').trim();
-
-    // ⚡ Expected Row Format in PDF (23 columns for SpareEntry):
-    // spareEntryId spareEntryCode spareEntryDate spareEntryType spareEntrycallId
-    // spareEntryassetId spareEntryclientName spareEntryengineerName spareEntrydepartment
-    // spareEntryStatus spareEntryCategory spareEntryName spareEntryCompatibleAssetType
-    // spareEntryquantityUsed spareEntryunit spareEntryserialNumber spareEntrywarrantyApplicable
-    // spareEntryremarks spareEntryunitCost spareEntrytotalCost spareEntrystockAvailable
-    // spareEntrystockAfterEntry loginId
-
-    const rowRegex =
-      /(\S+)\s+(\S+)\s+(\d{2}-\d{2}-\d{4})\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+([\d.]+)\s+([\d.]+)\s+(\d+)\s+(\d+)\s+(\S+)/g;
-
-    let match;
-    while ((match = rowRegex.exec(fullText)) !== null) {
-      const row: TableRow = {
-        spareEntryId: match[1],
-        spareEntryCode: match[2],
-        spareEntryDate: match[3],
-        spareEntryType: match[4],
-        spareEntrycallId: match[5],
-        spareEntryassetId: match[6],
-        spareEntryclientName: match[7],
-        spareEntryengineerName: match[8],
-        department: match[9],
-        spareEntryStatus: match[10],
-        spareEntryCategory: match[11],
-        spareEntryName: match[12],
-        spareEntryCompatibleAssetType: match[13],
-        spareEntryquantityUsed: Number(match[14]) || 0,
-        spareEntryunit: match[15],
-        spareEntryserialNumber: match[16],
-        spareEntrywarrantyApplicable: match[17],
-        spareEntryremarks: match[18],
-        spareEntryunitCost: Number(match[19]) || 0,
-        spareEntrytotalCost: Number(match[20]) || 0,
-        spareEntrystockAvailable: Number(match[21]) || 0,
-        spareEntrystockAfterEntry: Number(match[22]) || 0,
-        loginId: match[23],
-      };
-
-      this.tableData.push(row);
-    }
-
-    this.filteredData = [...this.tableData];
-
-    this.toast.success(
-      'PDF Spare Entries imported successfully!',
-      'success',
-      4000,
-    );
-
-    console.log('FINAL SPARE ENTRY ROWS:', this.tableData);
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    fullText += content.items.map((item: any) => item.str).join(' ') + ' ';
   }
+
+  console.log('RAW PDF TEXT:', fullText);
+
+  fullText = fullText.replace(/\s+/g, ' ').trim();
+
+  // ⭐ NEW FORMAT (backend structure)
+  const rowRegex =
+    /(\S+)\s+(\S+)\s+(\d{4}-\d{2}-\d{2})\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(Active|Inactive)\s+(.*?)(?=\s+\S+\s+\S+\s+\d{4}-\d{2}-\d{2}|$)/g;
+
+  let match;
+
+  while ((match = rowRegex.exec(fullText)) !== null) {
+
+    const row: TableRow = {
+
+      spareEntryId: match[1],
+      spareEntryNumber: match[2],
+
+      entryDate: match[3],
+
+      callLoggingId: match[4],
+      assetId: match[5],
+
+      sparePartId: match[6],
+      sparePartName: match[7],
+      sparePartCode: match[8],
+
+      category: match[9],
+
+      quantity: Number(match[10]) || 0,
+      unitPrice: Number(match[11]) || 0,
+      totalCost: Number(match[12]) || 0,
+
+      vendorName: match[13],
+      purchaseReferenceNo: match[14],
+
+      spareType: match[15],
+      replacementType: match[16],
+
+      engineerName: match[17],
+      replacementDate: match[18],
+
+      spareStatus: match[19] as 'Active' | 'Inactive',
+
+      remarks: match[20]?.trim() || '',
+
+      createdBy: this.loginId || '',
+      createdDate: '',
+
+      updatedBy: '',
+      updatedDate: ''
+    };
+
+    this.tableData.push(row);
+  }
+
+  this.filteredData = [...this.tableData];
+
+  this.toast.success(
+    'PDF Spare Entries imported successfully!',
+    'success',
+    4000
+  );
+
+  console.log('FINAL SPARE ENTRY ROWS:', this.tableData);
+}
   // ---------------- Download Sample CSV ----------------
 
-  downloadSampleCSV() {
-    if (!this.tableData.length) {
-      this.toast.danger('No data to download!', 'error', 4000);
-      return;
-    }
+ downloadSampleCSV() {
 
-    // CSV Headers as per SpareEntry TableRow
-    const headers = [
-      'Spare Entry ID',
-      'Spare Entry Code',
-      'Entry Date',
-      'Entry Type',
-      'Call ID',
-      'Asset ID',
-      'Client Name',
-      'Engineer Name',
-      'Department',
-      'Spare Entry Status',
-      'Spare Category',
-      'Spare Name',
-      'Compatible Asset Type',
-      'Quantity Used',
-      'Unit',
-      'Serial Number',
-      'Warranty Applicable',
-      'Remarks',
-      'Unit Cost',
-      'Total Cost',
-      'Stock Available',
-      'Stock After Entry',
-      'Login ID',
+  if (!this.tableData.length) {
+    this.toast.danger('No data to download!', 'error', 4000);
+    return;
+  }
+
+  // ⭐ HEADERS (FINAL STRUCTURE)
+  const headers = [
+    'Spare Entry ID',
+    'Spare Entry Number',
+    'Entry Date',
+    'Call Logging ID',
+    'Asset ID',
+    'Spare Part ID',
+    'Spare Part Name',
+    'Spare Part Code',
+    'Category',
+    'Quantity',
+    'Unit Price',
+    'Total Cost',
+    'Vendor Name',
+    'Purchase Reference No',
+    'Spare Type',
+    'Replacement Type',
+    'Engineer Name',
+    'Replacement Date',
+    'Spare Status',
+    'Remarks',
+    'Created By',
+    'Created Date',
+    'Updated By',
+    'Updated Date'
+  ];
+
+  const csvRows = [headers.join(',')];
+
+  this.tableData.forEach((row: TableRow) => {
+
+    const rowData = [
+      row.spareEntryId,
+      row.spareEntryNumber,
+      row.entryDate,
+      row.callLoggingId,
+      row.assetId,
+
+      row.sparePartId,
+      row.sparePartName,
+      row.sparePartCode,
+
+      row.category,
+
+      row.quantity,
+      row.unitPrice,
+      row.totalCost,
+
+      row.vendorName,
+      row.purchaseReferenceNo,
+
+      row.spareType,
+      row.replacementType,
+
+      row.engineerName,
+      row.replacementDate,
+
+      row.spareStatus,
+
+      row.remarks,
+
+      row.createdBy,
+      row.createdDate,
+
+      row.updatedBy,
+      row.updatedDate
     ];
 
-    const csvRows = [headers.join(',')];
+    csvRows.push(rowData.join(','));
+  });
 
-    this.tableData.forEach((row: TableRow) => {
-      const rowData = [
-        row.spareEntryId,
-        row.spareEntryCode,
-        row.spareEntryDate,
-        row.spareEntryType,
-        row.spareEntrycallId,
-        row.spareEntryassetId,
-        row.spareEntryclientName,
-        row.spareEntryengineerName,
-        row.department,
-        row.spareEntryStatus,
-        row.spareEntryCategory,
-        row.spareEntryName,
-        row.spareEntryCompatibleAssetType,
-        row.spareEntryquantityUsed,
-        row.spareEntryunit,
-        row.spareEntryserialNumber,
-        row.spareEntrywarrantyApplicable,
-        row.spareEntryremarks,
-        row.spareEntryunitCost,
-        row.spareEntrytotalCost,
-        row.spareEntrystockAvailable,
-        row.spareEntrystockAfterEntry,
-        row.loginId,
-      ];
+  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
 
-      csvRows.push(rowData.join(','));
-    });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Spare_Entries.csv';
+  a.click();
 
-    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'Spare_Entries.csv';
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
+  URL.revokeObjectURL(a.href);
+}
 
   // ---------------- CSV Export ----------------
-  exportFilteredCSV(data: TableRow[]) {
-    const today = new Date();
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+ exportFilteredCSV(data: TableRow[]) {
 
-    const csvRows: string[] = [];
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
 
-    // ⭐ Row 1 → Company / Login ID
-    csvRows.push(this.loginId || 'Company Name');
+  const csvRows: string[] = [];
 
-    // ⭐ Row 2 → Date
-    csvRows.push(`Date:,${formattedDate}`);
+  // ⭐ Row 1 → Company
+  csvRows.push(this.loginId || 'Company Name');
 
-    // Empty row for spacing
-    csvRows.push('');
+  // ⭐ Row 2 → Date
+  csvRows.push(`Date:,${formattedDate}`);
 
-    // ⭐ Header (as per SpareEntry TableRow)
-    const headers = [
-      'Spare Entry ID',
-      'Spare Entry Code',
-      'Entry Date',
-      'Entry Type',
-      'Call ID',
-      'Asset ID',
-      'Client Name',
-      'Engineer Name',
-      'Department',
-      'Spare Entry Status',
-      'Spare Category',
-      'Spare Name',
-      'Compatible Asset Type',
-      'Quantity Used',
-      'Unit',
-      'Serial Number',
-      'Warranty Applicable',
-      'Remarks',
-      'Unit Cost',
-      'Total Cost',
-      'Stock Available',
-      'Stock After Entry',
-      'Login ID',
+  // Empty row
+  csvRows.push('');
+
+  // ⭐ HEADERS (FINAL STRUCTURE)
+  const headers = [
+    'Spare Entry ID',
+    'Spare Entry Number',
+    'Entry Date',
+    'Call Logging ID',
+    'Asset ID',
+    'Spare Part ID',
+    'Spare Part Name',
+    'Spare Part Code',
+    'Category',
+    'Quantity',
+    'Unit Price',
+    'Total Cost',
+    'Vendor Name',
+    'Purchase Reference No',
+    'Spare Type',
+    'Replacement Type',
+    'Engineer Name',
+    'Replacement Date',
+    'Spare Status',
+    'Remarks',
+    'Created By',
+    'Created Date',
+    'Updated By',
+    'Updated Date'
+  ];
+
+  csvRows.push(headers.join(','));
+
+  // ⭐ DATA
+  data.forEach((row: TableRow) => {
+
+    const rowData = [
+      row.spareEntryId,
+      row.spareEntryNumber,
+      row.entryDate,
+      row.callLoggingId,
+      row.assetId,
+
+      row.sparePartId,
+      row.sparePartName,
+      row.sparePartCode,
+
+      row.category,
+
+      row.quantity,
+      row.unitPrice,
+      row.totalCost,
+
+      row.vendorName,
+      row.purchaseReferenceNo,
+
+      row.spareType,
+      row.replacementType,
+
+      row.engineerName,
+      row.replacementDate,
+
+      row.spareStatus,
+
+      row.remarks,
+
+      row.createdBy,
+      row.createdDate,
+
+      row.updatedBy,
+      row.updatedDate
     ];
-    csvRows.push(headers.join(','));
 
-    // ⭐ Data rows
-    data.forEach((row: TableRow) => {
-      const rowData = [
-        row.spareEntryId,
-        row.spareEntryCode,
-        row.spareEntryDate,
-        row.spareEntryType,
-        row.spareEntrycallId,
-        row.spareEntryassetId,
-        row.spareEntryclientName,
-        row.spareEntryengineerName,
-        row.department,
-        row.spareEntryStatus,
-        row.spareEntryCategory,
-        row.spareEntryName,
-        row.spareEntryCompatibleAssetType,
-        row.spareEntryquantityUsed,
-        row.spareEntryunit,
-        row.spareEntryserialNumber,
-        row.spareEntrywarrantyApplicable,
-        row.spareEntryremarks,
-        row.spareEntryunitCost,
-        row.spareEntrytotalCost,
-        row.spareEntrystockAvailable,
-        row.spareEntrystockAfterEntry,
-        row.loginId,
-      ];
+    csvRows.push(rowData.join(','));
+  });
 
-      csvRows.push(rowData.join(','));
-    });
+  // ⭐ EXPORT
+  const csvData = csvRows.join('\n');
 
-    // Create CSV and trigger download
-    const csvData = csvRows.join('\n');
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-    saveAs(blob, 'Filtered_Spare_Entries_Report.csv');
-  }
+  const blob = new Blob([csvData], {
+    type: 'text/csv;charset=utf-8;'
+  });
+
+  saveAs(blob, 'Filtered_Spare_Entries_Report.csv');
+}
 
   // ---------------- Excel Export ----------------
-  exportFilteredExcel(data: TableRow[]) {
-    const wsData: any[][] = [];
+exportFilteredExcel(data: TableRow[]) {
 
-    // ⭐ Row 1 → Company Name
-    wsData.push([this.loginId || 'Company Name']);
+  const wsData: any[][] = [];
 
-    // ⭐ Row 2 → Date
-    const today = new Date();
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
-    wsData.push(['Date:', formattedDate]);
+  // ⭐ Row 1 → Company
+  wsData.push([this.loginId || 'Company Name']);
 
-    // ⭐ Empty Row
-    wsData.push([]);
+  // ⭐ Row 2 → Date
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+  wsData.push(['Date:', formattedDate]);
 
-    // ⭐ Header (as per Spare Entry TableRow)
+  // ⭐ Empty row
+  wsData.push([]);
+
+  // ⭐ HEADERS (FINAL STRUCTURE)
+  wsData.push([
+    'Spare Entry ID',
+    'Spare Entry Number',
+    'Entry Date',
+    'Call Logging ID',
+    'Asset ID',
+    'Spare Part ID',
+    'Spare Part Name',
+    'Spare Part Code',
+    'Category',
+    'Quantity',
+    'Unit Price',
+    'Total Cost',
+    'Vendor Name',
+    'Purchase Reference No',
+    'Spare Type',
+    'Replacement Type',
+    'Engineer Name',
+    'Replacement Date',
+    'Spare Status',
+    'Remarks',
+    'Created By',
+    'Created Date',
+    'Updated By',
+    'Updated Date'
+  ]);
+
+  // ⭐ DATA
+  data.forEach((row: TableRow) => {
+
     wsData.push([
-      'Spare Entry ID',
-      'Spare Entry Code',
+      row.spareEntryId,
+      row.spareEntryNumber,
+      row.entryDate,
+      row.callLoggingId,
+      row.assetId,
+
+      row.sparePartId,
+      row.sparePartName,
+      row.sparePartCode,
+
+      row.category,
+
+      row.quantity,
+      row.unitPrice,
+      row.totalCost,
+
+      row.vendorName,
+      row.purchaseReferenceNo,
+
+      row.spareType,
+      row.replacementType,
+
+      row.engineerName,
+      row.replacementDate,
+
+      row.spareStatus,
+
+      row.remarks,
+
+      row.createdBy,
+      row.createdDate,
+
+      row.updatedBy,
+      row.updatedDate
+    ]);
+  });
+
+  // ⭐ Create worksheet
+  const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
+
+  // ⭐ Column width (professional)
+  worksheet['!cols'] = new Array(24).fill({ wch: 18 });
+
+  // ⭐ Workbook
+  const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Filtered Spare Entries');
+
+  // ⭐ Export
+  const excelBuffer: any = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
+
+  const blob = new Blob([excelBuffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+
+  saveAs(blob, 'Filtered_Spare_Entries_Report.xlsx');
+}
+  // ---------------- PDF Export ----------------
+exportFilteredPDF(data: TableRow[]) {
+
+  const doc = new jsPDF('l', 'pt', 'a4'); // 🔥 landscape (more columns)
+
+  // ⭐ Title
+  doc.setFontSize(20);
+  doc.setTextColor(0, 70, 140);
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const title = 'Filtered Spare Entry Report';
+
+  doc.text(title, pageWidth / 2, 40, { align: 'center' });
+
+  const titleWidth = doc.getTextWidth(title);
+  doc.line(
+    pageWidth / 2 - titleWidth / 2,
+    45,
+    pageWidth / 2 + titleWidth / 2,
+    45
+  );
+
+  // ⭐ Company + Date
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+
+  const today = new Date();
+  const dateStr = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+
+  doc.text(`User: ${this.loginId || 'Company Name'}`, 40, 70);
+  doc.text(`Date: ${dateStr}`, pageWidth - 40, 70, { align: 'right' });
+
+  // ⭐ TABLE
+  autoTable(doc, {
+    startY: 80,
+
+    head: [[
+      'ID',
+      'Number',
       'Entry Date',
-      'Entry Type',
       'Call ID',
       'Asset ID',
-      'Client Name',
-      'Engineer Name',
-      'Department',
-      'Spare Entry Status',
-      'Spare Category',
-      'Spare Name',
-      'Compatible Asset Type',
-      'Quantity Used',
-      'Unit',
-      'Serial Number',
-      'Warranty Applicable',
-      'Remarks',
-      'Unit Cost',
+      'Spare Part ID',
+      'Spare Part Name',
+      'Code',
+      'Category',
+      'Qty',
+      'Unit Price',
       'Total Cost',
-      'Stock Available',
-      'Stock After Entry',
-      'Login ID',
-    ]);
+      'Vendor',
+      'PO Ref',
+      'Spare Type',
+      'Replacement',
+      'Engineer',
+      'Replace Date',
+      'Status',
+      'Remarks',
+      'Created',
+      'Updated'
+    ]],
 
-    // ⭐ Data Rows
-    data.forEach((row: TableRow) => {
-      wsData.push([
-        row.spareEntryId,
-        row.spareEntryCode,
-        row.spareEntryDate,
-        row.spareEntryType,
-        row.spareEntrycallId,
-        row.spareEntryassetId,
-        row.spareEntryclientName,
-        row.spareEntryengineerName,
-        row.department,
-        row.spareEntryStatus,
-        row.spareEntryCategory,
-        row.spareEntryName,
-        row.spareEntryCompatibleAssetType,
-        row.spareEntryquantityUsed,
-        row.spareEntryunit,
-        row.spareEntryserialNumber,
-        row.spareEntrywarrantyApplicable,
-        row.spareEntryremarks,
-        row.spareEntryunitCost,
-        row.spareEntrytotalCost,
-        row.spareEntrystockAvailable,
-        row.spareEntrystockAfterEntry,
-        row.loginId,
-      ]);
-    });
+    body: data.map((row: TableRow) => [
+      row.spareEntryId,
+      row.spareEntryNumber,
+      row.entryDate,
+      row.callLoggingId,
+      row.assetId,
 
-    // Create worksheet
-    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
+      row.sparePartId,
+      row.sparePartName,
+      row.sparePartCode,
 
-    // ⭐ Adjust column widths (example)
-    worksheet['!cols'] = [
-      { wch: 15 }, // Spare Entry ID
-      { wch: 20 }, // Spare Entry Code
-      { wch: 15 }, // Entry Date
-      { wch: 15 }, // Entry Type
-      { wch: 12 }, // Call ID
-      { wch: 12 }, // Asset ID
-      { wch: 20 }, // Client Name
-      { wch: 20 }, // Engineer Name
-      { wch: 18 }, // Department
-      { wch: 18 }, // Spare Entry Status
-      { wch: 15 }, // Spare Category
-      { wch: 20 }, // Spare Name
-      { wch: 20 }, // Compatible Asset Type
-      { wch: 12 }, // Quantity Used
-      { wch: 10 }, // Unit
-      { wch: 18 }, // Serial Number
-      { wch: 18 }, // Warranty Applicable
-      { wch: 25 }, // Remarks
-      { wch: 12 }, // Unit Cost
-      { wch: 12 }, // Total Cost
-      { wch: 12 }, // Stock Available
-      { wch: 12 }, // Stock After Entry
-      { wch: 15 }, // Login ID
-    ];
+      row.category,
 
-    // Create workbook
-    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Filtered Spare Entries');
+      row.quantity,
+      row.unitPrice,
+      row.totalCost,
 
-    // Export
-    const excelBuffer: any = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
-    });
+      row.vendorName,
+      row.purchaseReferenceNo,
 
-    const blob = new Blob([excelBuffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    });
+      row.spareType,
+      row.replacementType,
 
-    saveAs(blob, 'Filtered_Spare_Entries_Report.xlsx');
-  }
+      row.engineerName,
+      row.replacementDate,
 
-  // ---------------- PDF Export ----------------
-  exportFilteredPDF(data: TableRow[]) {
-    const doc = new jsPDF('p', 'pt', 'a4');
+      row.spareStatus,
 
-    // ⭐ Title
-    doc.setFontSize(22);
-    doc.setTextColor(0, 70, 140);
+      row.remarks,
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const titleX = pageWidth / 2;
+      row.createdDate || '',
+      row.updatedDate || ''
+    ]),
 
-    doc.text('Spare Entry Records', titleX, 60, { align: 'center' });
+    theme: 'grid',
 
-    const titleWidth = doc.getTextWidth('Spare Entry Records');
-    doc.line(titleX - titleWidth / 2, 65, titleX + titleWidth / 2, 65);
+    headStyles: {
+      fillColor: [0, 92, 179],
+      textColor: [255, 255, 255],
+      halign: 'center',
+      fontSize: 9,
+    },
 
-    // ⭐ Company + Date
-    doc.setFontSize(14);
-    doc.setTextColor(0, 0, 0);
+    bodyStyles: {
+      halign: 'center',
+      textColor: [0, 0, 0],
+      fontSize: 8,
+    },
 
-    const today = new Date();
-    const dateStr = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+    styles: {
+      lineWidth: 0.3,
+      lineColor: [0, 0, 0],
+      cellPadding: 2,
+      valign: 'middle',
+    },
 
-    doc.text(this.loginId || 'Company Name', 40, 100);
-    doc.text(dateStr, pageWidth - 40, 100, { align: 'right' });
+    // ⭐ Status color highlight
+    didParseCell: function (data) {
+      if (data.column.index === 18) {
+        if (data.cell.raw === 'Active') {
+          data.cell.styles.textColor = [0, 150, 0];
+        } else {
+          data.cell.styles.textColor = [200, 0, 0];
+        }
+      }
+    },
 
-    // ⭐ Table
-    autoTable(doc, {
-      startY: 120,
-      head: [
-        [
-          'Spare Entry ID',
-          'Code',
-          'Entry Date',
-          'Type',
-          'Call ID',
-          'Asset ID',
-          'Client Name',
-          'Engineer Name',
-          'Department',
-          'Status',
-          'Category',
-          'Spare Name',
-          'Compatible Asset Type',
-          'Qty Used',
-          'Unit',
-          'Serial No.',
-          'Warranty',
-          'Remarks',
-          'Unit Cost',
-          'Total Cost',
-          'Stock Available',
-          'Stock After Entry',
-          'Login ID',
-        ],
-      ],
-      body: data.map((row: TableRow) => [
-        row.spareEntryId,
-        row.spareEntryCode,
-        row.spareEntryDate,
-        row.spareEntryType,
-        row.spareEntrycallId,
-        row.spareEntryassetId,
-        row.spareEntryclientName,
-        row.spareEntryengineerName,
-        row.department,
-        row.spareEntryStatus,
-        row.spareEntryCategory,
-        row.spareEntryName,
-        row.spareEntryCompatibleAssetType,
-        row.spareEntryquantityUsed,
-        row.spareEntryunit,
-        row.spareEntryserialNumber,
-        row.spareEntrywarrantyApplicable,
-        row.spareEntryremarks,
-        row.spareEntryunitCost,
-        row.spareEntrytotalCost,
-        row.spareEntrystockAvailable,
-        row.spareEntrystockAfterEntry,
-        row.loginId,
-      ]),
-      theme: 'grid',
-      headStyles: {
-        fillColor: [0, 92, 179],
-        textColor: [255, 255, 255],
-        halign: 'center',
-        fontSize: 10,
-      },
-      bodyStyles: {
-        halign: 'center',
-        textColor: [0, 0, 0],
-        fontSize: 9,
-      },
-      styles: {
-        lineWidth: 0.5,
-        lineColor: [0, 0, 0],
-        cellPadding: 2,
-      },
-      // Optional: Split table across pages automatically
-      didDrawPage: (dataArg) => {
-        // Could add page numbers here if needed
-      },
-    });
+    // ⭐ Page number footer
+    didDrawPage: function (dataArg) {
+      const pageCount = doc.getNumberOfPages();
+      doc.setFontSize(10);
+      doc.text(
+        `Page ${dataArg.pageNumber} of ${pageCount}`,
+        pageWidth - 100,
+        doc.internal.pageSize.getHeight() - 10
+      );
+    }
+  });
 
-    doc.save('Filtered_Spare_Entries_Report.pdf');
-  }
+  doc.save('Filtered_Spare_Entries_Report.pdf');
+}
 }

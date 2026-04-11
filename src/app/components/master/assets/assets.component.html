@@ -425,32 +425,54 @@
 <div class="col-md-4">
   <label>Asset Make</label>
 
-  <select
-    class="form-select"
+  <ng-select
+    [items]="assetMakes"
+    bindLabel="assetMakeName"
+    bindValue="assetMakeId"
+    placeholder="Search & Select Asset Make"
     [(ngModel)]="forms[i].newRecord.assetMake"
     name="assetMake{{ i }}"
+    [searchable]="true"
+    [clearable]="true"
   >
-    <option value="">Select Asset Make</option>
+    
+    <!-- 🔥 Custom Option (ID + Name show karaycha) -->
+    <ng-template ng-option-tmp let-item="item">
+      {{ item.assetMakeId }} - {{ item.assetMakeName }}
+    </ng-template>
 
-    <option *ngFor="let m of assetMakes" [value]="m.assetMakeId">
-      {{ m.assetMakeId }} - {{ m.assetMakeName }}
-    </option>
-  </select>
+    <!-- 🔥 Selected value madhe pan same show -->
+    <ng-template ng-label-tmp let-item="item">
+      {{ item.assetMakeId }} - {{ item.assetMakeName }}
+    </ng-template>
+
+  </ng-select>
 </div>
 <div class="col-md-4">
   <label>Purchase Order</label>
 
-  <select
-    class="form-select"
+  <ng-select
+    [items]="purchaseOrders"
+    bindLabel="purchaseOrderName"
+    bindValue="purchaseOrderId"
+    placeholder="Search & Select Purchase Order"
     [(ngModel)]="forms[i].newRecord.purchaseOrderId"
     name="purchaseOrderId{{ i }}"
+    [searchable]="true"
+    [clearable]="true"
   >
-    <option value="">Select Purchase Order</option>
 
-    <option *ngFor="let po of purchaseOrders" [value]="po.purchaseOrderId">
-      {{ po.purchaseOrderId }} - {{ po.purchaseOrderName }}
-    </option>
-  </select>
+    <!-- 🔥 Option UI (ID + Name) -->
+    <ng-template ng-option-tmp let-item="item">
+      {{ item.purchaseOrderId }} - {{ item.purchaseOrderName }}
+    </ng-template>
+
+    <!-- 🔥 Selected UI -->
+    <ng-template ng-label-tmp let-item="item">
+      {{ item.purchaseOrderId }} - {{ item.purchaseOrderName }}
+    </ng-template>
+
+  </ng-select>
 </div>
 <div class="col-md-4">
   <label>Invoice Number</label>
@@ -459,27 +481,42 @@
     name="invoiceNumber{{ i }}">
 </div>
             <!-- Asset Type -->
-         <div class="col-md-4">
+       <div class="col-md-4">
   <label>Asset Type <span class="text-danger">*</span></label>
 
-  <select
-    class="form-select"
-    required
+  <ng-select
+    [items]="assetTypes"
+    bindLabel="assetTypeName"
+    bindValue="assetTypeId"
+    placeholder="Search & Select Asset Type"
     [(ngModel)]="forms[i].newRecord.assetType"
     name="assetType{{ i }}"
     #assetType="ngModel"
+    [searchable]="true"
+    [clearable]="true"
     [ngClass]="{
       'is-invalid': (showErrors || assetType.touched) && assetType.invalid
     }"
+    required
   >
-    <option value="">Select Type</option>
 
-    <option *ngFor="let t of assetTypes" [value]="t.assetTypeId">
-      {{ t.assetTypeId }} - {{ t.assetTypeName }}
-    </option>
-  </select>
+    <!-- 🔥 Option UI (ID + Name) -->
+    <ng-template ng-option-tmp let-item="item">
+      {{ item.assetTypeId }} - {{ item.assetTypeName }}
+    </ng-template>
 
-  <div class="invalid-feedback">
+    <!-- 🔥 Selected value UI -->
+    <ng-template ng-label-tmp let-item="item">
+      {{ item.assetTypeId }} - {{ item.assetTypeName }}
+    </ng-template>
+
+  </ng-select>
+
+  <!-- Validation -->
+  <div
+    class="text-danger mt-1"
+    *ngIf="(showErrors || assetType.touched) && assetType.invalid"
+  >
     Asset Type is required
   </div>
 </div>
@@ -569,8 +606,9 @@
   </select>
 </div>
 
-            <!-- Warranty Start -->
-            <div class="col-md-4">
+<!-- Warranty Start -->
+<div class="col-md-4"
+     *ngIf="forms[i].newRecord.warrantyApplicable === 'Yes'">
   <label>Warranty Start Date</label>
 
   <input
@@ -578,11 +616,13 @@
     class="form-control"
     [(ngModel)]="forms[i].newRecord.warrantyStartDate"
     name="warrantyStartDate{{ i }}"
+    required
   />
 </div>
 
-            <!-- Warranty End -->
-            <div class="col-md-4">
+<!-- Warranty End -->
+<div class="col-md-4"
+     *ngIf="forms[i].newRecord.warrantyApplicable === 'Yes'">
   <label>Warranty End Date</label>
 
   <input
@@ -590,6 +630,7 @@
     class="form-control"
     [(ngModel)]="forms[i].newRecord.warrantyEndDate"
     name="warrantyEndDate{{ i }}"
+    required
   />
 </div>
 
@@ -612,7 +653,7 @@
           
 
             <!-- Created Date -->
-        <!-- Created Date -->
+<!-- Created Date (ONLY VIEW) -->
 <div class="col-md-4">
   <label>Created Date</label>
 
@@ -625,6 +666,17 @@
   />
 </div>
 
+<!-- Updated Date (ONLY EDIT MODE) -->
+<div class="col-md-4" *ngIf="isEditMode">
+  <label>Updated Date</label>
+
+  <input
+    type="text"
+    class="form-control"
+    readonly
+    [value]="currentDate"
+  />
+</div>
 <!-- Created By -->
 <div class="col-md-4">
   <label>Created By</label>
@@ -637,17 +689,7 @@
     name="createdBy{{ i }}"
   />
 </div>
-       <div class="col-md-4">
-  <label>Updated Date</label>
 
-  <input
-    type="date"
-    class="form-control"
-    readonly
-    [(ngModel)]="forms[i].newRecord.updatedDate"
-    name="updatedDate{{ i }}"
-  />
-</div>
           </div>
 
           <!-- SAVE + RESET (ONLY LAST FORM) -->
