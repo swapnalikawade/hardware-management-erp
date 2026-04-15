@@ -108,366 +108,217 @@
       <div class="table-scroll-wrapper">
         <table class="table table-bordered w-auto big-table">
           <!-- ================= TABLE HEADER ================= -->
-          <thead>
-            <tr>
-              <th>
-                <input type="checkbox" (change)="toggleAll($event)" />
-              </th>
+  <thead>
+  <tr>
+    <th>
+      <input type="checkbox" (change)="toggleAll($event)" />
+    </th>
 
-              <th>
-                Allocation ID
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationId', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Allocation ID
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('allocationId','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('allocationId','desc')"></i>
+    </th>
 
-              <th>
-                Allocation Code
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationCode', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationCode', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Allocation Number
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('allocationNumber','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('allocationNumber','desc')"></i>
+    </th>
 
-              <th>
-                Allocation Date
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationDate', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationDate', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Allocation Date
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('allocationDate','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('allocationDate','desc')"></i>
+    </th>
 
-              <th>
-                Allocation Type
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationType', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationType', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Employee ID
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('employeeId','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('employeeId','desc')"></i>
+    </th>
 
-              <th>
-                Requested By
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationRequestedBy', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationRequestedBy', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Department ID
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('departmentId','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('departmentId','desc')"></i>
+    </th>
 
-              <th>
-                Approved By
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationApprovedBy', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationApprovedBy', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Location
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('location','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('location','desc')"></i>
+    </th>
 
-              <th>
-                Asset ID
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationAssetId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationAssetId', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Asset ID
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('assetId','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('assetId','desc')"></i>
+    </th>
 
-              <th>
-                Asset Name
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationAssetName', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationAssetName', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Expected Return
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('expectedReturnDate','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('expectedReturnDate','desc')"></i>
+    </th>
 
-              <th>
-                Asset Type
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationAssetType', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationAssetType', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Actual Return
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('actualReturnDate','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('actualReturnDate','desc')"></i>
+    </th>
 
-              <th>
-                Asset Make
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationAssetMake', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationAssetMake', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Condition Issue
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('conditionAtIssue','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('conditionAtIssue','desc')"></i>
+    </th>
 
-              <th>
-                Model
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationModel', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationModel', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Condition Return
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('conditionAtReturn','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('conditionAtReturn','desc')"></i>
+    </th>
 
-              <th>
-                Serial Number
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationSerialNumber', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationSerialNumber', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Purpose
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('purpose','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('purpose','desc')"></i>
+    </th>
 
-              <th>
-                Allocate To
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationAllocateTo', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationAllocateTo', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Approval By
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('approvalBy','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('approvalBy','desc')"></i>
+    </th>
 
-              <th>
-                Employee Name
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationEmployeeName', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationEmployeeName', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Approval Date   <!-- ✅ ADD -->
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('approvalDate','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('approvalDate','desc')"></i>
+    </th>
 
-              <th>
-                Department
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationDepartment', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationDepartment', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Remarks   <!-- ✅ ADD -->
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('remarks','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('remarks','desc')"></i>
+    </th>
 
-              <th>
-                Location
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationLocation', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationLocation', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Created By   <!-- ✅ ADD -->
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('createdBy','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('createdBy','desc')"></i>
+    </th>
 
-              <th>
-                Start Date
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationStartDate', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationStartDate', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Created Date   <!-- ✅ ADD -->
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('createdDate','asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('createdDate','desc')"></i>
+    </th>
 
-              <th>
-                Return Date
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="
-                    sortTable('assetallocationExpectedReturnDate', 'asc')
-                  "
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="
-                    sortTable('assetallocationExpectedReturnDate', 'desc')
-                  "
-                ></i>
-              </th>
-
-              <th>
-                Acknowledged By
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationAcknowledgedBy', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationAcknowledgedBy', 'desc')"
-                ></i>
-              </th>
-
-              <th>
-                Acknowledgement Date
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="
-                    sortTable('assetallocationAcknowledgementDate', 'asc')
-                  "
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="
-                    sortTable('assetallocationAcknowledgementDate', 'desc')
-                  "
-                ></i>
-              </th>
-
-              <th>
-                Remarks
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetallocationRemarks', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetallocationRemarks', 'desc')"
-                ></i>
-              </th>
-
-              <th>
+    <th>
                 Status
                 <i
                   class="bi bi-arrow-up"
-                  (click)="sortTable('assetallocationStatus', 'asc')"
+                  (click)="sortTable('allocationStatus', 'asc')"
                 ></i>
                 <i
                   class="bi bi-arrow-down"
-                  (click)="sortTable('assetallocationStatus', 'desc')"
+                  (click)="sortTable('allocationStatus', 'desc')"
                 ></i>
               </th>
 
-              <th>Action</th>
-            </tr>
-          </thead>
+
+    <th>Action</th>
+  </tr>
+</thead>
           <!-- ================= TABLE BODY ================= -->
-          <tbody>
-            <tr
-              *ngFor="
-                let row of filteredData
-                  | slice
-                    : (currentPage - 1) * itemsPerPage
-                    : currentPage * itemsPerPage;
-                let i = index
-              "
-            >
-              <td>
-                <input
-                  type="checkbox"
-                  [checked]="selectedRows.includes(row)"
-                  (change)="toggleRowSelection(row, $event)"
-                />
-              </td>
+  <tbody>
+  <tr
+    *ngFor="
+      let row of filteredData
+        | slice
+          : (currentPage - 1) * itemsPerPage
+          : currentPage * itemsPerPage;
+      let i = index
+    "
+  >
+    <!-- ✅ Checkbox -->
+    <td>
+      <input
+        type="checkbox"
+        [checked]="selectedRows.includes(row)"
+        (change)="toggleRowSelection(row, $event)"
+      />
+    </td>
 
-              <td>
-                <span
-                  class="leave-link"
-                  [ngClass]="{
-                    'active-id':
-                      selectedRow?.assetallocationId === row.assetallocationId,
-                  }"
-                  (click)="openDetails(row)"
-                >
-                  {{ row.assetallocationId }}
-                </span>
-              </td>
+    <!-- ✅ Allocation ID (Clickable) -->
+    <td>
+      <span
+        class="leave-link"
+        [ngClass]="{
+          'active-id': selectedRow?.allocationId === row.allocationId
+        }"
+        (click)="openDetails(row)"
+      >
+        {{ row.allocationId }}
+      </span>
+    </td>
 
-              <td>{{ row.assetallocationCode }}</td>
-              <td>{{ row.assetallocationDate }}</td>
-              <td>{{ row.assetallocationType }}</td>
-              <td>{{ row.assetallocationRequestedBy }}</td>
-              <td>{{ row.assetallocationApprovedBy }}</td>
+    <!-- ✅ Basic -->
+    <td>{{ row.allocationNumber }}</td>
+    <td>{{ row.allocationDate }}</td>
 
-              <td>{{ row.assetallocationAssetId }}</td>
-              <td>{{ row.assetallocationAssetName }}</td>
-              <td>{{ row.assetallocationAssetType }}</td>
-              <td>{{ row.assetallocationAssetMake }}</td>
-              <td>{{ row.assetallocationModel }}</td>
-              <td>{{ row.assetallocationSerialNumber }}</td>
+    <!-- ✅ Employee -->
+    <td>{{ row.employeeId }}</td>
+    <td>{{ row.departmentId }}</td>
+    <td>{{ row.location }}</td>
 
-              <td>{{ row.assetallocationAllocateTo }}</td>
-              <td>{{ row.assetallocationEmployeeName }}</td>
-              <td>{{ row.assetallocationDepartment }}</td>
-              <td>{{ row.assetallocationLocation }}</td>
+    <!-- ✅ Asset -->
+    <td>{{ row.assetId }}</td>
 
-              <td>{{ row.assetallocationStartDate }}</td>
-              <td>{{ row.assetallocationExpectedReturnDate }}</td>
+    <!-- ✅ Dates -->
+    <td>{{ row.expectedReturnDate }}</td>
+    <td>{{ row.actualReturnDate }}</td>
 
-              <td>{{ row.assetallocationAcknowledgedBy }}</td>
-              <td>{{ row.assetallocationAcknowledgementDate }}</td>
-              <td>{{ row.assetallocationRemarks }}</td>
+    <!-- ✅ Condition -->
+    <td>{{ row.conditionAtIssue }}</td>
+    <td>{{ row.conditionAtReturn }}</td>
 
-              <td>
-                <span
-                  [ngClass]="{
-                    'status-active': row.assetallocationStatus === 'Active',
-                    'status-inactive': row.assetallocationStatus !== 'Active',
-                  }"
-                >
-                  <span *ngIf="row.assetallocationStatus === 'Active'">✔</span>
-                  <span *ngIf="row.assetallocationStatus !== 'Active'">❌</span>
-                  {{ row.assetallocationStatus }}
-                </span>
-              </td>
+    <!-- ✅ Business -->
+    <td>{{ row.purpose }}</td>
+    <td>{{ row.approvalBy }}</td>
 
-              <!-- ACTION -->
+    <!-- ✅ Approval Date (missing before) -->
+    <td>{{ row.approvalDate }}</td>
 
-              <td>
-                <button class="btn-edit" (click)="onEdit(row, i)">
-                  <i class="bi bi-pencil-square me-1"></i> Edit
-                </button>
-              </td>
-            </tr>
-          </tbody>
+    <!-- ✅ Remarks -->
+    <td>{{ row.remarks }}</td>
+
+    <!-- ✅ CREATED BY (IMPORTANT ADD) -->
+    <td>{{ row.createdBy }}</td>
+    <td>{{ row.createdDate }}</td>
+
+    <!-- ✅ STATUS (Professional Badge) -->
+    <td>
+      <span
+        [ngClass]="{
+          'badge bg-success': row.allocationStatus === 'Active',
+          'badge bg-danger': row.allocationStatus === 'Inactive'
+        }"
+      >
+        {{ row.allocationStatus }}
+      </span>
+    </td>
+
+    <!-- ✅ ACTION -->
+    <td>
+      <button class="btn btn-sm btn-primary" (click)="onEdit(row, i)">
+        <i class="bi bi-pencil-square me-1"></i> Edit
+      </button>
+    </td>
+  </tr>
+</tbody>
         </table>
       </div>
       <div class="no-data-message" *ngIf="filteredData.length === 0">
@@ -536,7 +387,7 @@
             {{
               isEditMode
                 ? "Update Assets Allocation Details (ID: " +
-                  tableData[editIndex!].assetallocationId +
+               tableData[editIndex!].allocationId+
                   ")"
                 : "Add  Assets Allocation  Details " + (i + 1)
             }}
@@ -552,478 +403,218 @@
         </div>
 
         <!-- FORM -->
-        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
-          <div class="row mb-3">
-            <div class="row mb-3">
-              <!-- Allocation Code -->
-              <div class="col-md-4">
-                <label
-                  >Allocation Code <span class="text-danger">*</span></label
-                >
-                <input
-                  class="form-control"
-                  required
-                  placeholder="e.g. ALC-1001"
-                  pattern="^ALC-\d{3,}$"
-                  #allocationCode="ngModel"
-                  [(ngModel)]="forms[i].assetallocationCode"
-                  name="assetallocationCode{{ i }}"
-                />
-                <div
-                  class="invalid-feedback"
-                  *ngIf="allocationCode.errors?.['required']"
-                >
-                  Allocation Code is required
-                </div>
-                <div
-                  class="invalid-feedback"
-                  *ngIf="allocationCode.errors?.['pattern']"
-                >
-                  Format should be like <b>ALC-1001</b>
-                </div>
-              </div>
+<form #recordForm="ngForm" class="new-record-form container-fluid p-0">
+  <div class="row mb-3">
 
-              <!-- Allocation Date -->
-              <div class="col-md-4">
-                <label
-                  >Allocation Date <span class="text-danger">*</span></label
-                >
-                <input
-                  type="date"
-                  class="form-control"
-                  required
-                  #allocationDate="ngModel"
-                  [(ngModel)]="forms[i].assetallocationDate"
-                  name="assetallocationDate{{ i }}"
-                />
-                <div
-                  class="invalid-feedback"
-                  *ngIf="allocationDate.errors?.['required']"
-                >
-                  Allocation Date is required
-                </div>
-              </div>
-
-              <!-- Allocation Type -->
-              <div class="col-md-4">
-                <label
-                  >Allocation Type <span class="text-danger">*</span></label
-                >
-                <select
-                  class="form-control"
-                  required
-                  #allocationType="ngModel"
-                  [(ngModel)]="forms[i].assetallocationType"
-                  name="assetallocationType{{ i }}"
-                >
-                  <option value="" disabled>Select allocation type</option>
-                  <option value="Temporary">Temporary</option>
-                  <option value="Permanent">Permanent</option>
-                </select>
-                <div
-                  class="invalid-feedback"
-                  *ngIf="allocationType.errors?.['required']"
-                >
-                  Allocation Type is required
-                </div>
-              </div>
-
-              <!-- Requested By -->
-              <div class="col-md-4">
-                <label>Requested By</label>
-
-                <input
-                  class="form-control"
-                  placeholder="e.g. Amit Sharma"
-                  #assetallocationRequestedBy="ngModel"
-                  [ngClass]="{
-                    'is-invalid':
-                      assetallocationRequestedBy.invalid &&
-                      (assetallocationRequestedBy.touched ||
-                        assetallocationRequestedBy.dirty),
-                  }"
-                  [(ngModel)]="forms[i].assetallocationRequestedBy"
-                  name="assetallocationRequestedBy{{ i }}"
-                />
-
-                <div
-                  class="invalid-feedback"
-                  *ngIf="assetallocationRequestedBy.errors?.['pattern']"
-                >
-                  Only letters allowed (min 3 chars)
-                </div>
-              </div>
-              <!-- Approved By -->
-              <div class="col-md-4">
-                <label>Approved By</label>
-
-                <input
-                  class="form-control"
-                  placeholder="e.g. Rohit Patil"
-                  pattern="^[a-zA-Z ]{3,40}$"
-                  #approvedBy="ngModel"
-                  [ngClass]="{
-                    'is-invalid':
-                      approvedBy.invalid &&
-                      (approvedBy.touched || approvedBy.dirty),
-                  }"
-                  [(ngModel)]="forms[i].assetallocationApprovedBy"
-                  name="assetallocationApprovedBy{{ i }}"
-                />
-
-                <div
-                  class="invalid-feedback"
-                  *ngIf="approvedBy.errors?.['pattern']"
-                >
-                  Only letters allowed (min 3 chars)
-                </div>
-              </div>
-
-              <!-- Status -->
-              <!--<div class="col-md-4">
-    <label>Status <span class="text-danger">*</span></label>
-    <select
-      class="form-control"
-      required
-      #status="ngModel"
-      [ngClass]="{ 'is-invalid': status.invalid && (status.touched || status.dirty) }"
-      [(ngModel)]="form.newRecord.status"
-      name="status{{ i }}"
-    >
-      <option value="" disabled>Select status</option>
-      <option value="Pending">Pending</option>
-      <option value="Approved">Approved</option>
-      <option value="In Progress">In Progress</option>
-      <option value="Returned">Returned</option>
-    </select>
-    <div class="invalid-feedback" *ngIf="status.errors?.['required']">
-      Status is required
+    <!-- Allocation Number -->
+    <div class="col-md-6">
+      <label>Allocation Number <span class="text-danger">*</span></label>
+      <input
+        class="form-control"
+        required
+        placeholder="Enter Allocation Number (e.g. ALLOC/2026/001)"
+        [(ngModel)]="forms[i].allocationNumber"
+        name="allocationNumber{{ i }}"
+      />
     </div>
-  </div>-->
 
-              <!-- Asset Type -->
-              <div class="col-md-4">
-                <label>Asset <span class="text-danger">*</span></label>
+    <!-- Allocation Date -->
+    <div class="col-md-6">
+      <label>Allocation Date <span class="text-danger">*</span></label>
+      <input
+        type="date"
+        class="form-control"
+        required
+        placeholder="Select Allocation Date"
+        [(ngModel)]="forms[i].allocationDate"
+        name="allocationDate{{ i }}"
+      />
+    </div>
 
-                <select
-                  class="form-control"
-                  required
-                  #assetSelect="ngModel"
-                  [ngClass]="{
-                    'is-invalid':
-                      assetSelect.invalid &&
-                      (assetSelect.touched || assetSelect.dirty),
-                  }"
-                  [(ngModel)]="forms[i].assetallocationAssetId"
-                  name="assetallocationAssetId{{ i }}"
-                  (change)="onAssetChange(i)"
-                >
-                  <option value="" disabled>Select Asset</option>
+ <div class="col-md-4 mt-2">
+  <label class="form-label">Employee <span class="text-danger">*</span></label>
 
-                  <option *ngFor="let a of assetTypes" [value]="a.assetId">
-                    {{ a.assetId }} - {{ a.assetName }}
-                  </option>
-                </select>
+  <ng-select
+    [items]="employees"
+    bindLabel="employeeName"
+    bindValue="employeeId"
+    placeholder="Search & Select Employee"
+    [(ngModel)]="forms[i].employeeId"
+    name="employeeId{{ i }}"
+    [searchable]="true"
+    [clearable]="true"
+    [loading]="employees.length === 0"
+    (change)="onEmployeeChange(i)"
+  >
+  </ng-select>
 
-                <div
-                  class="invalid-feedback"
-                  *ngIf="assetSelect.errors?.['required']"
-                >
-                  Asset is required
-                </div>
-              </div>
+</div>
 
-              <!-- Department -->
-              <div class="col-md-4">
-                <label>Department <span class="text-danger">*</span></label>
+  <div class="col-md-4 mt-2">
+  <label class="form-label">
+    Department <span class="text-danger">*</span>
+  </label>
 
-                <select
-                  class="form-control"
-                  required
-                  #assetallocationDepartment="ngModel"
-                  [(ngModel)]="forms[i].assetallocationDepartment"
-                  name="assetallocationDepartment{{ i }}"
-                  [ngClass]="{
-                    'is-invalid':
-                      assetallocationDepartment.invalid &&
-                      (assetallocationDepartment.touched ||
-                        assetallocationDepartment.dirty),
-                  }"
-                >
-                  <option value="">-- Select Department --</option>
+  <ng-select
+    [items]="departments"
+    bindLabel="departmentName"
+    bindValue="departmentId"
+    placeholder="Search & Select Department"
+    [(ngModel)]="forms[i].departmentId"
+    name="departmentId{{ i }}"
+    [searchable]="true"
+    [clearable]="true"
+    [loading]="departments.length === 0"
+  >
+  </ng-select>
 
-                  <option
-                    *ngFor="let dept of departments"
-                    [value]="dept.departmentId"
-                  >
-                    {{ dept.departmentName }}
-                  </option>
-                </select>
+</div>
+    <div class="col-md-4">
+      <label>Location</label>
+      <input
+        class="form-control"
+        placeholder="Enter Location (e.g. Pune, Mumbai)"
+        [(ngModel)]="forms[i].location"
+        name="location{{ i }}"
+      />
+    </div>
 
-                <div
-                  class="invalid-feedback"
-                  *ngIf="assetallocationDepartment.errors?.['required']"
-                >
-                  Department is required
-                </div>
-              </div>
-              <!-- Allocate To -->
-              <div class="col-md-4">
-                <label
-                  >Allocate To (Employee)
-                  <span class="text-danger">*</span></label
-                >
+  <div class="col-md-4 mt-2">
+  <label class="form-label">
+    Asset <span class="text-danger">*</span>
+  </label>
 
-                <select
-                  class="form-control"
-                  required
-                  #allocateToSelect="ngModel"
-                  [ngClass]="{
-                    'is-invalid':
-                      allocateToSelect.invalid &&
-                      (allocateToSelect.touched || allocateToSelect.dirty),
-                  }"
-                  [(ngModel)]="forms[i].assetallocationAllocateTo"
-                  name="assetallocationAllocateTo{{ i }}"
-                  (change)="onEmployeeChange(i)"
-                >
-                  <option value="" disabled>Select Employee</option>
+  <ng-select
+    [items]="assetTypes"
+    bindLabel="assetName"
+    bindValue="assetId"
+    placeholder="Search & Select Asset"
+    [(ngModel)]="forms[i].assetId"
+    name="assetId{{ i }}"
+    [searchable]="true"
+    [clearable]="true"
+    [loading]="assetTypes.length === 0"
+    (change)="onAssetChange(i)"
+  >
+  </ng-select>
 
-                  <option *ngFor="let e of employees" [value]="e.employeeId">
-                    {{ e.employeeId }} - {{ e.employeeName }}
-                  </option>
-                </select>
+</div>
 
-                <div
-                  class="invalid-feedback"
-                  *ngIf="allocateToSelect.errors?.['required']"
-                >
-                  Employee is required
-                </div>
-              </div>
-              <!-- Allocation Start Date -->
-              <div class="col-md-4">
-                <label>
-                  Allocation Start Date <span class="text-danger">*</span>
-                </label>
+    <!-- Expected Return -->
+    <div class="col-md-4">
+      <label>Expected Return Date</label>
+      <input
+        type="date"
+        class="form-control"
+        placeholder="Select Expected Return Date"
+        [(ngModel)]="forms[i].expectedReturnDate"
+        name="expectedReturnDate{{ i }}"
+      />
+    </div>
 
-                <input
-                  type="date"
-                  class="form-control"
-                  required
-                  #assetallocationStartDate="ngModel"
-                  [ngClass]="{
-                    'is-invalid':
-                      assetallocationStartDate.invalid &&
-                      (assetallocationStartDate.touched ||
-                        assetallocationStartDate.dirty),
-                  }"
-                  [(ngModel)]="forms[i].assetallocationStartDate"
-                  name="assetallocationStartDate{{ i }}"
-                />
+    <!-- Actual Return -->
+    <div class="col-md-4">
+      <label>Actual Return Date</label>
+      <input
+        type="date"
+        class="form-control"
+        placeholder="Select Actual Return Date"
+        [(ngModel)]="forms[i].actualReturnDate"
+        name="actualReturnDate{{ i }}"
+      />
+    </div>
 
-                <div
-                  class="invalid-feedback"
-                  *ngIf="assetallocationStartDate.errors?.['required']"
-                >
-                  Allocation Start Date is required
-                </div>
-              </div>
-              <!-- Expected Return Date (Temporary साठी compulsory) -->
-              <div class="col-md-4">
-                <label>Expected Return Date</label>
+    <!-- Condition Issue -->
+    <div class="col-md-4">
+      <label>Condition At Issue</label>
+      <input
+        class="form-control"
+        placeholder="Enter Condition at Issue"
+        [(ngModel)]="forms[i].conditionAtIssue"
+        name="conditionAtIssue{{ i }}"
+      />
+    </div>
 
-                <input
-                  type="date"
-                  class="form-control"
-                  [required]="forms[i].assetallocationType === 'Temporary'"
-                  [disabled]="forms[i].assetallocationType !== 'Temporary'"
-                  #assetallocationExpectedReturnDate="ngModel"
-                  [ngClass]="{
-                    'is-invalid':
-                      assetallocationExpectedReturnDate.invalid &&
-                      (assetallocationExpectedReturnDate.touched ||
-                        assetallocationExpectedReturnDate.dirty) &&
-                      forms[i].assetallocationType === 'Temporary',
-                  }"
-                  [(ngModel)]="forms[i].assetallocationExpectedReturnDate"
-                  name="assetallocationExpectedReturnDate{{ i }}"
-                />
+    <!-- Condition Return -->
+    <div class="col-md-4">
+      <label>Condition At Return</label>
+      <input
+        class="form-control"
+        placeholder="Enter Condition at Return"
+        [(ngModel)]="forms[i].conditionAtReturn"
+        name="conditionAtReturn{{ i }}"
+      />
+    </div>
 
-                <div
-                  class="invalid-feedback"
-                  *ngIf="
-                    forms[i].assetallocationType === 'Temporary' &&
-                    assetallocationExpectedReturnDate.errors?.['required']
-                  "
-                >
-                  Expected Return Date is required for Temporary allocation
-                </div>
-              </div>
-              <!-- Asset Make -->
-              <div class="col-md-4">
-                <label>Asset Make</label>
+    <!-- Purpose -->
+    <div class="col-md-4">
+      <label>Purpose</label>
+      <input
+        class="form-control"
+        placeholder="Enter Purpose (e.g. Office Work)"
+        [(ngModel)]="forms[i].purpose"
+        name="purpose{{ i }}"
+      />
+    </div>
 
-                <select
-                  class="form-control"
-                  [(ngModel)]="forms[i].assetallocationAssetMake"
-                  name="assetallocationAssetMake{{ i }}"
-                >
-                  <option value="">-- Select Make --</option>
+    <!-- Approval By -->
+    <div class="col-md-4">
+      <label>Approval By</label>
+      <input
+        class="form-control"
+        placeholder="Enter Approver Name or ID"
+        [(ngModel)]="forms[i].approvalBy"
+        name="approvalBy{{ i }}"
+      />
+    </div>
 
-                  <option
-                    *ngFor="let make of assetMakes"
-                    [value]="make.assetMakeName"
-                  >
-                    {{ make.assetMakeName }}
-                  </option>
-                </select>
-              </div>
+    <!-- Approval Date -->
+    <div class="col-md-4">
+      <label>Approval Date</label>
+      <input
+        type="date"
+        class="form-control"
+        placeholder="Select Approval Date"
+        [(ngModel)]="forms[i].approvalDate"
+        name="approvalDate{{ i }}"
+      />
+    </div>
 
-              <!-- Model -->
-              <div class="col-md-4">
-                <label>Model</label>
+    <!-- Remarks -->
+    <div class="col-md-12">
+      <label>Remarks</label>
+      <textarea
+        class="form-control"
+        placeholder="Enter Remarks..."
+        [(ngModel)]="forms[i].remarks"
+        name="remarks{{ i }}"
+      ></textarea>
+    </div>
 
-                <input
-                  class="form-control"
-                  placeholder="e.g. Latitude 5420"
-                  pattern="^[a-zA-Z0-9 .,&'-]{2,40}$"
-                  #assetallocationModel="ngModel"
-                  [ngClass]="{
-                    'is-invalid':
-                      assetallocationModel.invalid &&
-                      (assetallocationModel.touched ||
-                        assetallocationModel.dirty),
-                  }"
-                  [(ngModel)]="forms[i].assetallocationModel"
-                  name="assetallocationModel{{ i }}"
-                />
+    <!-- Status -->
+    <div class="col-md-4">
+      <label>Status</label>
+      <select
+        class="form-control"
+        [(ngModel)]="forms[i].allocationStatus"
+        name="allocationStatus{{ i }}"
+      >
+        <option value="" disabled selected>Select Status</option>
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+      </select>
+    </div>
 
-                <div
-                  class="invalid-feedback"
-                  *ngIf="assetallocationModel.errors?.['pattern']"
-                >
-                  Enter valid model name
-                </div>
-              </div>
-              <!-- Serial Number -->
-              <div class="col-md-3">
-                <label>Serial Number</label>
+  </div>
 
-                <input
-                  class="form-control"
-                  placeholder="e.g. SN-9A83K21"
-                  pattern="^[A-Za-z0-9\-]{5,30}$"
-                  #assetallocationSerialNumber="ngModel"
-                  [ngClass]="{
-                    'is-invalid':
-                      assetallocationSerialNumber.invalid &&
-                      (assetallocationSerialNumber.touched ||
-                        assetallocationSerialNumber.dirty),
-                  }"
-                  [(ngModel)]="forms[i].assetallocationSerialNumber"
-                  name="assetallocationSerialNumber{{ i }}"
-                />
-
-                <div
-                  class="invalid-feedback"
-                  *ngIf="assetallocationSerialNumber.errors?.['pattern']"
-                >
-                  Only letters, numbers & hyphen allowed (min 5 chars)
-                </div>
-              </div>
-
-              <!-- Location -->
-              <div class="col-md-3">
-                <label>Location</label>
-
-                <input
-                  class="form-control"
-                  placeholder="e.g. Pune Office / Mumbai Branch"
-                  pattern="^[a-zA-Z0-9 .,&'-]{3,40}$"
-                  #assetallocationLocation="ngModel"
-                  [ngClass]="{
-                    'is-invalid':
-                      assetallocationLocation.invalid &&
-                      (assetallocationLocation.touched ||
-                        assetallocationLocation.dirty),
-                  }"
-                  [(ngModel)]="forms[i].assetallocationLocation"
-                  name="assetallocationLocation{{ i }}"
-                />
-
-                <div
-                  class="invalid-feedback"
-                  *ngIf="assetallocationLocation.errors?.['pattern']"
-                >
-                  Enter valid location (min 3 characters)
-                </div>
-              </div>
-              <!-- Acknowledged By -->
-              <div class="col-md-3">
-                <label>Acknowledged By</label>
-
-                <input
-                  class="form-control"
-                  placeholder="e.g. Amit Sharma"
-                  pattern="^[a-zA-Z ]{3,40}$"
-                  #assetallocationAcknowledgedBy="ngModel"
-                  [ngClass]="{
-                    'is-invalid':
-                      assetallocationAcknowledgedBy.invalid &&
-                      (assetallocationAcknowledgedBy.touched ||
-                        assetallocationAcknowledgedBy.dirty),
-                  }"
-                  [(ngModel)]="forms[i].assetallocationAcknowledgedBy"
-                  name="assetallocationAcknowledgedBy{{ i }}"
-                />
-
-                <div
-                  class="invalid-feedback"
-                  *ngIf="assetallocationAcknowledgedBy.errors?.['pattern']"
-                >
-                  Only letters allowed (min 3 characters)
-                </div>
-              </div>
-
-              <!-- Acknowledgement Date -->
-              <div class="col-md-3">
-                <label>Acknowledgement Date</label>
-
-                <input
-                  type="date"
-                  class="form-control"
-                  #assetallocationAcknowledgementDate="ngModel"
-                  [(ngModel)]="forms[i].assetallocationAcknowledgementDate"
-                  name="assetallocationAcknowledgementDate{{ i }}"
-                  [max]="today"
-                />
-              </div>
-
-              <!-- Remarks -->
-              <div class="col-md-12">
-                <label>Remarks</label>
-
-                <textarea
-                  class="form-control"
-                  rows="2"
-                  maxlength="250"
-                  placeholder="Any additional notes (optional)"
-                  [(ngModel)]="forms[i].assetallocationRemarks"
-                  name="assetallocationRemarks{{ i }}"
-                ></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- SAVE + RESET -->
-          <div
-            class="mt-3 d-flex gap-2 justify-content-end"
+  <!-- ACTION -->
+     <div
             *ngIf="i === forms.length - 1"
+            class="mt-3 d-flex gap-2 justify-content-end"
           >
             <button type="button" class="btn-save" (click)="saveAllRecords()">
-              <i class="bi bi-floppy-fill"></i>
-              {{ isEditMode ? "Update" : "Save All" }}
+              <i class="bi bi-floppy"></i>
+              {{ isEditMode ? "Update" : "Save" }}
             </button>
 
             <button
@@ -1031,10 +622,11 @@
               class="btn-cancel"
               (click)="cancelRecord(recordForm)"
             >
-              <i class="bi bi-arrow-counterclockwise"></i> Reset
+              <i class="bi bi-arrow-counterclockwise"></i>
+              Reset
             </button>
           </div>
-        </form>
+</form>
       </div>
     </div>
 
@@ -1354,136 +946,130 @@
   <div class="modal-content">
     <!-- HEADER -->
     <div class="modal-header">
-      <h5>Allocation Details (ID: {{ selectedRow?.assetallocationId }})</h5>
+   <h5>Allocation Details (ID: {{ selectedRow?.allocationId }})</h5>
       <button class="close-btn1" (click)="closeViewModal()">×</button>
     </div>
 
     <!-- BODY -->
-    <div class="modal-body">
-      <table class="popup-table">
-        <tr>
-          <th>Allocation ID</th>
-          <td>{{ selectedRow?.assetallocationId }}</td>
-        </tr>
+   <div class="modal-body">
+  <table class="popup-table">
 
-        <tr>
-          <th>Allocation Code</th>
-          <td>{{ selectedRow?.assetallocationCode }}</td>
-        </tr>
+    <!-- BASIC -->
+    <tr>
+      <th>Allocation ID</th>
+      <td>{{ selectedRow?.allocationId }}</td>
+    </tr>
 
-        <tr>
-          <th>Allocation Date</th>
-          <td>{{ selectedRow?.assetallocationDate }}</td>
-        </tr>
+    <tr>
+      <th>Allocation Number</th>
+      <td>{{ selectedRow?.allocationNumber }}</td>
+    </tr>
 
-        <tr>
-          <th>Allocation Type</th>
-          <td>{{ selectedRow?.assetallocationType }}</td>
-        </tr>
+    <tr>
+      <th>Allocation Date</th>
+      <td>{{ selectedRow?.allocationDate }}</td>
+    </tr>
 
-        <tr>
-          <th>Requested By</th>
-          <td>{{ selectedRow?.assetallocationRequestedBy }}</td>
-        </tr>
+    <tr>
+      <th>Status</th>
+      <td>{{ selectedRow?.allocationStatus }}</td>
+    </tr>
 
-        <tr>
-          <th>Approved By</th>
-          <td>{{ selectedRow?.assetallocationApprovedBy }}</td>
-        </tr>
+    <!-- EMPLOYEE -->
 
-        <tr>
-          <th>Status</th>
-          <td>{{ selectedRow?.assetallocationStatus }}</td>
-        </tr>
+    <tr>
+      <th>Employee ID</th>
+      <td>{{ selectedRow?.employeeId }}</td>
+    </tr>
 
-        <!-- Asset Info -->
+    <tr>
+      <th>Department ID</th>
+      <td>{{ selectedRow?.departmentId }}</td>
+    </tr>
 
-        <tr>
-          <th>Asset ID</th>
-          <td>{{ selectedRow?.assetallocationAssetId }}</td>
-        </tr>
+    <tr>
+      <th>Location</th>
+      <td>{{ selectedRow?.location }}</td>
+    </tr>
 
-        <tr>
-          <th>Asset Name</th>
-          <td>{{ selectedRow?.assetallocationAssetName }}</td>
-        </tr>
+    <!-- ASSET -->
 
-        <tr>
-          <th>Asset Type</th>
-          <td>{{ selectedRow?.assetallocationAssetType }}</td>
-        </tr>
+    <tr>
+      <th>Asset ID</th>
+      <td>{{ selectedRow?.assetId }}</td>
+    </tr>
 
-        <tr>
-          <th>Asset Make</th>
-          <td>{{ selectedRow?.assetallocationAssetMake }}</td>
-        </tr>
+    <!-- DATES -->
 
-        <tr>
-          <th>Model</th>
-          <td>{{ selectedRow?.assetallocationModel }}</td>
-        </tr>
+    <tr>
+      <th>Expected Return Date</th>
+      <td>{{ selectedRow?.expectedReturnDate }}</td>
+    </tr>
 
-        <tr>
-          <th>Serial Number</th>
-          <td>{{ selectedRow?.assetallocationSerialNumber }}</td>
-        </tr>
+    <tr>
+      <th>Actual Return Date</th>
+      <td>{{ selectedRow?.actualReturnDate }}</td>
+    </tr>
 
-        <!-- Employee Info -->
+    <!-- CONDITION -->
 
-        <tr>
-          <th>Allocated To</th>
-          <td>{{ selectedRow?.assetallocationAllocateTo }}</td>
-        </tr>
+    <tr>
+      <th>Condition At Issue</th>
+      <td>{{ selectedRow?.conditionAtIssue }}</td>
+    </tr>
 
-        <tr>
-          <th>Employee Name</th>
-          <td>{{ selectedRow?.assetallocationEmployeeName }}</td>
-        </tr>
+    <tr>
+      <th>Condition At Return</th>
+      <td>{{ selectedRow?.conditionAtReturn }}</td>
+    </tr>
 
-        <tr>
-          <th>Department</th>
-          <td>{{ selectedRow?.assetallocationDepartment }}</td>
-        </tr>
+    <!-- BUSINESS -->
 
-        <tr>
-          <th>Location</th>
-          <td>{{ selectedRow?.assetallocationLocation }}</td>
-        </tr>
+    <tr>
+      <th>Purpose</th>
+      <td>{{ selectedRow?.purpose }}</td>
+    </tr>
 
-        <!-- Allocation Dates -->
+    <tr>
+      <th>Approval By</th>
+      <td>{{ selectedRow?.approvalBy }}</td>
+    </tr>
 
-        <tr>
-          <th>Allocation Start Date</th>
-          <td>{{ selectedRow?.assetallocationStartDate }}</td>
-        </tr>
+    <tr>
+      <th>Approval Date</th>
+      <td>{{ selectedRow?.approvalDate }}</td>
+    </tr>
 
-        <tr>
-          <th>Expected Return Date</th>
-          <td>{{ selectedRow?.assetallocationExpectedReturnDate }}</td>
-        </tr>
+    <!-- REMARKS -->
 
-        <!-- Asset Condition -->
+    <tr>
+      <th>Remarks</th>
+      <td>{{ selectedRow?.remarks }}</td>
+    </tr>
 
-        <tr>
-          <th>Asset Condition</th>
-          <td>{{ selectedRow?.assetallocationCondition }}</td>
-        </tr>
+    <!-- AUDIT -->
 
-        <tr>
-          <th>Acknowledged By</th>
-          <td>{{ selectedRow?.assetallocationAcknowledgedBy }}</td>
-        </tr>
+    <tr>
+      <th>Created By</th>
+      <td>{{ selectedRow?.createdBy }}</td>
+    </tr>
 
-        <tr>
-          <th>Acknowledgement Date</th>
-          <td>{{ selectedRow?.assetallocationAcknowledgementDate }}</td>
-        </tr>
+    <tr>
+      <th>Created Date</th>
+      <td>{{ selectedRow?.createdDate }}</td>
+    </tr>
 
-        <tr>
-          <th>Remarks</th>
-          <td>{{ selectedRow?.assetallocationRemarks }}</td>
-        </tr>
-      </table>
-    </div>
+    <tr>
+      <th>Updated By</th>
+      <td>{{ selectedRow?.updatedBy }}</td>
+    </tr>
+
+    <tr>
+      <th>Updated Date</th>
+      <td>{{ selectedRow?.updatedDate }}</td>
+    </tr>
+
+  </table>
+</div>
   </div>
 </div>

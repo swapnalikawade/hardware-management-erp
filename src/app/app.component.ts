@@ -10,6 +10,7 @@ import {
 } from '@angular/animations';
 import { Router, NavigationEnd } from '@angular/router';
 import { TOAST_POSITIONS } from 'ng-angular-popup';
+import { ModalService } from './services/modal.service';
 @Component({
   selector: 'app-root',
   standalone: false,
@@ -61,15 +62,19 @@ import { TOAST_POSITIONS } from 'ng-angular-popup';
         </div>
       </mat-toolbar>
 
-      <mat-sidenav-container>
-        <mat-sidenav opened mode="side" [style.width]="sidenavWidth()">
-          <app-custom-sidenav [collapsed]="collapsed()" />
+<mat-sidenav-container>   
+<mat-sidenav 
+  opened 
+  mode="side" 
+  [style.width]="sidenavWidth()"
+  [class.blur-sidebar]="isModalOpen"
+>          <app-custom-sidenav [collapsed]="collapsed()" />
         </mat-sidenav>
-
-        <mat-sidenav-content
-          class="content"
-          [style.marginLeft]="sidenavWidth()"
-        >
+<mat-sidenav-content
+  class="content"
+  [style.marginLeft]="sidenavWidth()"
+>
+  
           <ng-toast
             [position]="TOAST_POSITIONS.BOTTOM_RIGHT"
             [width]="400"
@@ -139,6 +144,8 @@ export class AppComponent {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
+    private modalService: ModalService
+
   ) {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
@@ -152,6 +159,10 @@ export class AppComponent {
     if (isPlatformBrowser(this.platformId)) {
       this.onResize();
     }
+      // 🔥 ADD THIS (MOST IMPORTANT)
+  this.modalService.isModalOpen$.subscribe(val => {
+    this.isModalOpen = val;
+  });
   }
 
   // Automatically collapse when screen < 768px
@@ -191,4 +202,5 @@ export class AppComponent {
     // redirect to login page
     this.router.navigate(['/auth/login']);
   }
+  isModalOpen = false;
 }

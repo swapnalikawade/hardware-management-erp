@@ -231,9 +231,7 @@ private initializeForm(): void {
   }
 loadEmployee(): void {
 
-  console.log('LoginId:', this.loginId); // EMP002
-
-  this.commonService.fetchAllEmployeeByLoginId(this.loginId)
+  this.commonService.fetchAllEmployee()
     .subscribe({
       next: (res) => {
         console.log('Employee API Response:', res);

@@ -57,27 +57,54 @@ import { NgToastService } from 'ng-angular-popup';
 import { AuthService } from '../../../services/auth/auth-service';
 import { CommonService } from '../../../services/common/common-service';
 
-interface TableRow {
-  assetReplacementId: string;
-  assetReplacementCode: string;
-  assetReplacementDate: string;
-  assetReplacementType: string;
-  assetReplacementCallId: string;
-  assetReplacementInitiatedBy: string;
-  department: string;
+export interface TableRow {
 
+  /* ================= PRIMARY ================= */
+  replacementId: string;
+  replacementNumber: string;
+
+  /* ================= BASIC ================= */
+  replacementDate: string; // YYYY-MM-DD
+  allocationId: string;
+  callLoggingId: string;
+  employeeId: string;
+  departmentId: string;
+  location: string;
+
+  /* ================= OLD ASSET ================= */
   oldAssetId: string;
-  oldAssetName: string;
-  oldAssetType: string;
   oldAssetSerialNumber: string;
-  oldAmcStatus: 'AMC' | 'Warranty' | 'Out of AMC';
-  assetCondition: string;
-  assetFaultDescription: string;
+  oldAssetCondition: string;   // Faulty / Damaged / Obsolete
+  oldAssetReturnStatus: string; // Returned / Not Returned
+
+  /* ================= NEW ASSET ================= */
   newAssetId: string;
-  newAssetName: string;
   newAssetSerialNumber: string;
-  status: 'Active' | 'Inactive';
-  loginId: string;
+
+  /* ================= REPLACEMENT DETAILS ================= */
+  assetCategory: string;
+  replacementType: string; // Warranty / Upgrade / Damage / Breakdown
+  reasonForReplacement: string;
+  replacementCost: number;
+
+  /* ================= APPROVAL ================= */
+  approvedBy: string;
+  approvalDate: string;
+
+  /* ================= TECHNICAL ================= */
+  technicianName: string;
+
+  /* ================= STATUS ================= */
+  replacementStatus: 'Active' | 'Inactive';   // 🔥 REQUIRED FIX
+
+  /* ================= REMARKS ================= */
+  remarks?: string;
+
+  /* ================= AUDIT ================= */
+  createdBy: string;
+  createdDate: string;
+  updatedBy?: string;
+  updatedDate?: string;
 }
 
 @Component({
@@ -103,9 +130,10 @@ export class AssetReplacementComponent {
   currentDate: any | null = null;
   callList: any[] = [];
   loading: any = false;
-
+employeeList: any[] = [];
+departmentList: any[] = [];
   filteredData: TableRow[] = [];
-
+assetList: any[] = [];
   constructor(
     private router: Router,
     private toast: NgToastService,
@@ -141,80 +169,73 @@ export class AssetReplacementComponent {
     this.initializeForm();
     this.loadAssetReplacements();
     this.loadCallLoggingList();
+    this.loadEmployees()
+    this.loadAssets();  ;
+this.loadDepartments();
     this.filteredData = [...this.tableData];
   }
 
-  private initializeForm(): void {
-    this.forms = [
-      {
-        assetReplacementCode: '',
-        assetReplacementDate: this.currentDate || '',
-        assetReplacementType: '',
-        assetReplacementCallId: '',
-        assetReplacementInitiatedBy: '',
+private initializeForm(): void {
+  this.forms = [
+    {
+      newRecord: {
 
-        /* ================= DEPARTMENT ================= */
-        department: '', // UI display
-        departmentId: '', // 🔥 backend use
+        /* ================= PRIMARY ================= */
+        replacementId: '0',
+        replacementNumber: '',
+
+        /* ================= BASIC ================= */
+        replacementDate: this.currentDate || '',
+        allocationId: '',
+        callLoggingId: '',
+        employeeId: '',
+        departmentId: '',
+        location: '',
 
         /* ================= OLD ASSET ================= */
         oldAssetId: '',
-        oldAssetName: '',
-        oldAssetType: '',
         oldAssetSerialNumber: '',
-        oldAmcStatus: 'AMC',
-
-        assetCondition: '',
-        assetFaultDescription: '',
+        oldAssetCondition: '',      // Faulty / Damaged / Obsolete
+        oldAssetReturnStatus: '',   // Returned / Not Returned
 
         /* ================= NEW ASSET ================= */
         newAssetId: '',
-        newAssetName: '',
         newAssetSerialNumber: '',
 
-        /* ================= SYSTEM ================= */
-        status: 'Active',
+        /* ================= REPLACEMENT DETAILS ================= */
+        assetCategory: '',
+        replacementType: '',
+        reasonForReplacement: '',
+        replacementCost: 0,
 
-        /* ================= LOGIN ================= */
-        loginId: this.loginId || '',
+        /* ================= APPROVAL ================= */
+        approvedBy: '',
+        approvalDate: this.currentDate || '',
 
-        /* ================= NEW RECORD ================= */
-        newRecord: {
-          assetReplacementId: '0',
-          assetReplacementCode: '',
-          assetReplacementDate: this.currentDate || '',
-          assetReplacementType: '',
-          assetReplacementCallId: '',
-          assetReplacementInitiatedBy: '',
+        /* ================= TECHNICAL ================= */
+        technicianName: '',
 
-          department: '', // UI
-          departmentId: '', // 🔥 backend
+        /* ================= STATUS ================= */
+        replacementStatus: 'Active',
 
-          oldAssetId: '',
-          oldAssetName: '',
-          oldAssetType: '',
-          oldAssetSerialNumber: '',
-          oldAmcStatus: 'AMC',
+        /* ================= REMARKS ================= */
+        remarks: '',
 
-          assetCondition: '',
-          assetFaultDescription: '',
+        /* ================= AUDIT ================= */
+        createdBy: this.loginId || '',   // 🔥 IMPORTANT
+        createdDate: this.currentDate || '',
 
-          newAssetId: '',
-          newAssetName: '',
-          newAssetSerialNumber: '',
-
-          status: 'Active',
-          loginId: this.loginId || '',
-        },
+        updatedBy: '',
+        updatedDate: '',
       },
-    ];
-  }
-
+    },
+  ];
+}
   get editHeading(): string {
     if (this.isEditMode && this.editIndex !== null) {
       return (
         'Update Asset Replacement Details (ID: ' +
-        this.tableData[this.editIndex].assetReplacementId +
+        this.tableData[this.editIndex].replacementId +
         ')'
       );
     }
@@ -234,34 +255,46 @@ export class AssetReplacementComponent {
       },
     });
   }
-  onCallSelect(callId: string, index: number) {
-    const form = this.forms[index];
-    const record = this.forms[index].newRecord;
+loadEmployees() {
+  this.commonService.fetchAllEmployee().subscribe((res: any[]) => {
+    this.employeeList = res;
+  });
+}
 
-    const selected = this.callList.find((c) => c.callLogId === callId);
+loadDepartments() {
+  this.commonService.fetchAllDepartments().subscribe((res: any[]) => {
+    this.departmentList = res;
+  });
+}
+loadAssets() {
+  this.commonService.fetchAllAssets().subscribe((res: any[]) => {
+    this.assetList = res;
+  });
+}
+onCallSelect(callId: string, index: number) {
 
-    if (selected) {
-      // 🔥 BOTH SET (UI + BACKEND)
+  const record = this.forms[index].newRecord;
 
-      form.oldAssetId = record.oldAssetId = selected.assetId || '';
-      form.oldAssetName = record.oldAssetName = selected.assetName || '';
-      form.oldAssetType = record.oldAssetType = selected.problemType || '';
-      form.oldAssetSerialNumber = record.oldAssetSerialNumber =
-        selected.serialNumber || '';
+  const selected = this.callList.find(
+    (c) => c.callLoggingId === callId
+  );
 
-      form.assetFaultDescription = record.assetFaultDescription =
-        selected.problemDescription || '';
+  if (selected) {
 
-      // 🔥 MOST IMPORTANT
-      form.departmentId = record.departmentId = selected.departmentId;
+    // OLD ASSET
+    record.oldAssetId = selected.assetId || '';
+    record.oldAssetSerialNumber = selected.serialNumber || '';
+    record.oldAssetCondition = selected.assetCondition || '';
 
-      this.commonService
-        .fetchSingalDepartmentByDepartment(selected.departmentId)
-        .subscribe((dept: any) => {
-          form.department = record.department = dept.departmentName;
-        });
-    }
+    // 🔥 AUTO FILL
+    record.employeeId = selected.employeeId || '';
+    record.departmentId = selected.departmentId || '';
+    record.location = selected.location || '';
+
+    // Optional
+    record.reasonForReplacement = selected.problemDescription || '';
   }
+}
   loadAssetReplacements(): void {
     this.commonService
       .fetchAllAssetReplacementByCompany(this.loginId)
@@ -270,7 +303,7 @@ export class AssetReplacementComponent {
           this.tableData = res.map((item) => ({
             ...item,
 
-            assetReplacementDate: item.assetReplacementDate,
+            assetReplacementDate: item.replacementDate,
           }));
 
           this.filteredData = [...this.tableData];
@@ -374,7 +407,7 @@ export class AssetReplacementComponent {
       next: () => {
         // remove deleted rows from table
         this.tableData = this.tableData.filter(
-          (row) => !ids.includes(row.assetReplacementId),
+          (row) => !ids.includes(row.replacementId),
         );
 
         this.filteredData = [...this.tableData];
@@ -438,60 +471,94 @@ export class AssetReplacementComponent {
     this.tableData = sorted; // keep main data updated
   }
 
-  exportExcel() {
-    const exportData = this.tableData.map((row: TableRow) => ({
-      Replacement_ID: row.assetReplacementId,
+exportExcel() {
 
-      Replacement_Code: row.assetReplacementCode,
-
-      Replacement_Date: row.assetReplacementDate,
-
-      Replacement_Type: row.assetReplacementType,
-
-      Call_ID: row.assetReplacementCallId,
-
-      Initiated_By: row.assetReplacementInitiatedBy,
-
-      Department: row.department,
-
-      Status: row.status,
-
-      Old_Asset_ID: row.oldAssetId,
-
-      Old_Asset_Name: row.oldAssetName,
-
-      Old_Asset_Type: row.oldAssetType,
-
-      Old_Serial_Number: row.oldAssetSerialNumber,
-
-      Old_AMC_Status: row.oldAmcStatus,
-
-      Fault_Description: row.assetFaultDescription,
-
-      Asset_Condition: row.assetCondition,
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-
-    // Auto column width
-    worksheet['!cols'] = Object.keys(exportData[0]).map(() => ({
-      wch: 22,
-    }));
-
-    const workbook = XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'AssetReplacementData');
-
-    XLSX.writeFile(workbook, 'Asset_Replacement_Report.xlsx');
+  if (!this.tableData || this.tableData.length === 0) {
+    this.showToast('No data available to export', 'Warning');
+    return;
   }
 
-  exportDoc() {
-    const currentDate = new Date().toLocaleDateString();
+  const exportData = this.tableData.map((row: TableRow) => ({
 
-    let content = `
+    /* ================= PRIMARY ================= */
+    Replacement_ID: row.replacementId,
+    Replacement_Number: row.replacementNumber,
+
+    /* ================= BASIC ================= */
+    Replacement_Date: row.replacementDate,
+    Allocation_ID: row.allocationId,
+    Call_Logging_ID: row.callLoggingId,
+    Employee_ID: row.employeeId,
+    Department_ID: row.departmentId,
+    Location: row.location,
+
+    /* ================= OLD ASSET ================= */
+    Old_Asset_ID: row.oldAssetId,
+    Old_Serial_Number: row.oldAssetSerialNumber,
+    Old_Condition: row.oldAssetCondition,
+    Old_Return_Status: row.oldAssetReturnStatus,
+
+    /* ================= NEW ASSET ================= */
+    New_Asset_ID: row.newAssetId,
+    New_Serial_Number: row.newAssetSerialNumber,
+
+    /* ================= REPLACEMENT DETAILS ================= */
+    Asset_Category: row.assetCategory,
+    Replacement_Type: row.replacementType,
+    Reason: row.reasonForReplacement,
+    Replacement_Cost: row.replacementCost,
+
+    /* ================= APPROVAL ================= */
+    Approved_By: row.approvedBy,
+    Approval_Date: row.approvalDate,
+
+    /* ================= TECHNICAL ================= */
+    Technician: row.technicianName,
+
+    /* ================= STATUS ================= */
+    Status: row.replacementStatus,
+
+    /* ================= REMARKS ================= */
+    Remarks: row.remarks ?? '',
+
+    /* ================= AUDIT ================= */
+    Created_By: row.createdBy,
+    Created_Date: row.createdDate,
+    Updated_By: row.updatedBy ?? '',
+    Updated_Date: row.updatedDate ?? '',
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+  /* ================= AUTO WIDTH ================= */
+  worksheet['!cols'] = Object.keys(exportData[0]).map(() => ({
+    wch: 22,
+  }));
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Asset_Replacement');
+
+  /* ================= DOWNLOAD ================= */
+  const today = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(workbook, `Asset_Replacement_Report_${today}.xlsx`);
+
+  this.showToast('Excel exported successfully', 'Success');
+}
+
+ exportDoc() {
+
+  if (!this.tableData || this.tableData.length === 0) {
+    this.showToast('No data available to export', 'Warning');
+    return;
+  }
+
+  const currentDate = new Date().toLocaleDateString();
+
+  let content = `
 <html xmlns:o='urn:schemas-microsoft-com:office:office'
       xmlns:w='urn:schemas-microsoft-com:office:word'
       xmlns='http://www.w3.org/TR/REC-html40'>
+
 <head>
 <meta charset="utf-8">
 
@@ -523,7 +590,6 @@ th{
 }
 
 </style>
-
 </head>
 
 <body>
@@ -539,162 +605,206 @@ th{
 <tr>
 
 <th>Replacement ID</th>
-<th>Replacement Code</th>
-<th>Replacement Date</th>
-<th>Replacement Type</th>
+<th>Replacement No</th>
+<th>Date</th>
+<th>Type</th>
 <th>Call ID</th>
-<th>Initiated By</th>
+<th>Employee</th>
 <th>Department</th>
 <th>Status</th>
 
 <th>Old Asset ID</th>
-<th>Old Asset Name</th>
-<th>Old Asset Type</th>
-<th>Old Serial No</th>
-<th>Old AMC Status</th>
-<th>Fault Description</th>
-<th>Asset Condition</th>
+<th>Old Serial</th>
+<th>Condition</th>
+<th>Return Status</th>
+
+<th>New Asset ID</th>
+<th>New Serial</th>
+
+<th>Category</th>
+<th>Reason</th>
+<th>Cost</th>
+
+<th>Approved By</th>
+<th>Approval Date</th>
+
+<th>Technician</th>
+
+<th>Remarks</th>
 
 </tr>
 `;
 
-    this.tableData.forEach((row: TableRow) => {
-      content += `
-
+  this.tableData.forEach((row: TableRow) => {
+    content += `
 <tr>
 
-<td>${row.assetReplacementId || ''}</td>
-<td>${row.assetReplacementCode || ''}</td>
-<td>${row.assetReplacementDate || ''}</td>
-<td>${row.assetReplacementType || ''}</td>
-<td>${row.assetReplacementCallId || ''}</td>
-<td>${row.assetReplacementInitiatedBy || ''}</td>
-<td>${row.department || ''}</td>
-<td>${row.status || ''}</td>
+<td>${row.replacementId || ''}</td>
+<td>${row.replacementNumber || ''}</td>
+<td>${row.replacementDate || ''}</td>
+<td>${row.replacementType || ''}</td>
+<td>${row.callLoggingId || ''}</td>
+<td>${row.employeeId || ''}</td>
+<td>${row.departmentId || ''}</td>
+<td>${row.replacementStatus || ''}</td>
 
 <td>${row.oldAssetId || ''}</td>
-<td>${row.oldAssetName || ''}</td>
-<td>${row.oldAssetType || ''}</td>
 <td>${row.oldAssetSerialNumber || ''}</td>
-<td>${row.oldAmcStatus || ''}</td>
-<td>${row.assetFaultDescription || ''}</td>
-<td>${row.assetCondition || ''}</td>
+<td>${row.oldAssetCondition || ''}</td>
+<td>${row.oldAssetReturnStatus || ''}</td>
+
+<td>${row.newAssetId || ''}</td>
+<td>${row.newAssetSerialNumber || ''}</td>
+
+<td>${row.assetCategory || ''}</td>
+<td>${row.reasonForReplacement || ''}</td>
+<td>${row.replacementCost || ''}</td>
+
+<td>${row.approvedBy || ''}</td>
+<td>${row.approvalDate || ''}</td>
+
+<td>${row.technicianName || ''}</td>
+
+<td>${row.remarks ?? ''}</td>
 
 </tr>
 `;
-    });
+  });
 
-    content += `
+  content += `
 </table>
 
 </div>
-
 </body>
 </html>
 `;
 
-    const blob = new Blob(['\ufeff', content], {
-      type: 'application/msword',
-    });
+  const blob = new Blob(['\ufeff', content], {
+    type: 'application/msword',
+  });
 
-    saveAs(blob, 'Asset_Replacement_Report.doc');
+  const today = new Date().toISOString().split('T')[0];
+  saveAs(blob, `Asset_Replacement_Report_${today}.doc`);
+
+  this.showToast('Word document exported successfully', 'Success');
+}
+
+ exportPDF() {
+
+  if (!this.tableData || this.tableData.length === 0) {
+    this.showToast('No data available to export', 'Warning');
+    return;
   }
 
-  exportPDF() {
-    const doc = new jsPDF('l', 'mm', 'a4');
+  const doc = new jsPDF('l', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const currentDate = new Date().toLocaleDateString();
 
-    const pageWidth = doc.internal.pageSize.getWidth();
+  /* ================= HEADER ================= */
+  doc.setFontSize(10);
+  doc.text(`Date: ${currentDate}`, 10, 12);
 
-    const currentDate = new Date().toLocaleDateString();
+  doc.setFontSize(18);
+  doc.text('Asset Replacement Records', pageWidth / 2, 12, {
+    align: 'center',
+  });
 
-    // Date (left)
-    doc.setFontSize(10);
-    doc.text(`Date: ${currentDate}`, 10, 12);
+  /* ================= TABLE ================= */
+  autoTable(doc, {
+    startY: 20,
 
-    // Title (center)
-    doc.setFontSize(18);
-    doc.text('Asset Replacement Records', pageWidth / 2, 12, {
-      align: 'center',
-    });
+    styles: {
+      fontSize: 7,
+      cellPadding: 2,
+      halign: 'left',
+      valign: 'middle',
+      lineColor: [0, 0, 0],
+      lineWidth: 0.2,
+    },
 
-    autoTable(doc, {
-      startY: 20,
+    headStyles: {
+      fillColor: [41, 128, 185],
+      textColor: '#ffffff',
+      halign: 'center',
+      fontStyle: 'bold',
+    },
 
-      styles: {
-        fontSize: 7,
-        cellPadding: 2,
-        halign: 'left',
-        valign: 'middle',
-        lineColor: [0, 0, 0],
-        lineWidth: 0.2,
-      },
+    tableWidth: 'auto',
 
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: '#fff',
-        halign: 'center',
-        fontStyle: 'bold',
-      },
+    head: [[
+      'Replacement ID',
+      'Number',
+      'Date',
+      'Type',
+      'Call ID',
+      'Employee',
+      'Department',
+      'Status',
 
-      tableWidth: 'auto',
+      'Old Asset ID',
+      'Old Serial',
+      'Condition',
+      'Return Status',
 
-      head: [
-        [
-          'Replacement ID',
-          'Code',
-          'Date',
-          'Type',
-          'Call ID',
-          'Initiated By',
-          'Department',
-          'Status',
+      'New Asset ID',
+      'New Serial',
 
-          'Old Asset ID',
-          'Old Name',
-          'Old Type',
-          'Old Serial',
-          'Old AMC',
+      'Category',
+      'Reason',
+      'Cost',
 
-          'Fault Description',
-          'Condition',
-        ],
-      ],
+      'Approved By',
+      'Approval Date',
 
-      body: this.tableData.map((row: TableRow) => [
-        row.assetReplacementId || '',
-        row.assetReplacementCode || '',
-        row.assetReplacementDate || '',
-        row.assetReplacementType || '',
-        row.assetReplacementCallId || '',
-        row.assetReplacementInitiatedBy || '',
-        row.department || '',
-        row.status || '',
+      'Technician',
+      'Remarks',
+    ]],
 
-        row.oldAssetId || '',
-        row.oldAssetName || '',
-        row.oldAssetType || '',
-        row.oldAssetSerialNumber || '',
-        row.oldAmcStatus || '',
+    body: this.tableData.map((row: TableRow) => [
+      row.replacementId || '',
+      row.replacementNumber || '',
+      row.replacementDate || '',
+      row.replacementType || '',
+      row.callLoggingId || '',
+      row.employeeId || '',
+      row.departmentId || '',
+      row.replacementStatus || '',
 
-        row.assetFaultDescription || '',
-        row.assetCondition || '',
-      ]),
+      row.oldAssetId || '',
+      row.oldAssetSerialNumber || '',
+      row.oldAssetCondition || '',
+      row.oldAssetReturnStatus || '',
 
-      didDrawCell: (data) => {
-        doc.setDrawColor(0);
-        doc.setLineWidth(0.2);
+      row.newAssetId || '',
+      row.newAssetSerialNumber || '',
 
-        doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height);
-      },
+      row.assetCategory || '',
+      row.reasonForReplacement || '',
+      row.replacementCost || '',
 
-      margin: { left: 5, right: 5 },
+      row.approvedBy || '',
+      row.approvalDate || '',
 
-      pageBreak: 'auto',
-    });
+      row.technicianName || '',
+      row.remarks ?? '',
+    ]),
 
-    doc.save('Asset_Replacement_Report.pdf');
-  }
+    didDrawCell: (data) => {
+      doc.setDrawColor(0);
+      doc.setLineWidth(0.2);
+      doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height);
+    },
 
+    margin: { left: 5, right: 5 },
+    pageBreak: 'auto',
+  });
+
+  /* ================= SAVE ================= */
+  const today = new Date().toISOString().split('T')[0];
+  doc.save(`Asset_Replacement_Report_${today}.pdf`);
+
+  this.showToast('PDF exported successfully', 'Success');
+}
   //pagination
   // Pagination Variables
   itemsPerPage: number = 5; // default 5
@@ -725,13 +835,9 @@ th{
   }
   //current date format
   // Converts Date → "dd-mm-yyyy"
-  getTodayDate(): string {
-    const today = new Date();
-    const d = String(today.getDate()).padStart(2, '0');
-    const m = String(today.getMonth() + 1).padStart(2, '0');
-    const y = today.getFullYear();
-    return `${d}-${m}-${y}`; // dd-mm-yyyy ✅
-  }
+getTodayDate(): string {
+  return new Date().toISOString().split('T')[0]; // ✅ yyyy-MM-dd
+}
 
   // ngOnInit() {
   //   // Ensure first form has today's date
@@ -746,27 +852,56 @@ th{
   // --------------------------
   // INITIAL RECORD STRUCTURE
   // --------------------------
-  newRecord: TableRow = {
-    assetReplacementId: '', // auto generate
-    assetReplacementCode: '',
-    assetReplacementDate: this.getTodayDate(),
-    assetReplacementType: '', // Permanent / Temporary
-    assetReplacementCallId: '',
-    assetReplacementInitiatedBy: '',
-    department: '',
-    newAssetId: '',
-    newAssetName: '',
-    newAssetSerialNumber: '',
-    status: 'Active',
-    oldAssetId: '',
-    oldAssetName: '',
-    oldAssetType: '',
-    oldAssetSerialNumber: '',
-    oldAmcStatus: 'AMC',
-    assetCondition: '',
-    assetFaultDescription: '',
-    loginId: this.loginId || '',
-  };
+newRecord: TableRow = {
+
+  /* ================= PRIMARY ================= */
+  replacementId: '',          // auto generate
+  replacementNumber: '',
+
+  /* ================= BASIC ================= */
+  replacementDate: this.getTodayDate(),
+  allocationId: '',
+  callLoggingId: '',
+  employeeId: '',
+  departmentId: '',
+  location: '',
+
+  /* ================= OLD ASSET ================= */
+  oldAssetId: '',
+  oldAssetSerialNumber: '',
+  oldAssetCondition: 'Faulty',        // default
+  oldAssetReturnStatus: 'Not Returned',
+
+  /* ================= NEW ASSET ================= */
+  newAssetId: '',
+  newAssetSerialNumber: '',
+
+  /* ================= REPLACEMENT DETAILS ================= */
+  assetCategory: '',
+  replacementType: '',                // Warranty / Upgrade / Damage / Breakdown
+  reasonForReplacement: '',
+  replacementCost: 0,
+
+  /* ================= APPROVAL ================= */
+  approvedBy: '',
+  approvalDate: this.getTodayDate(),
+
+  /* ================= TECHNICAL ================= */
+  technicianName: '',
+
+  /* ================= STATUS ================= */
+  replacementStatus: 'Active',
+
+  /* ================= REMARKS ================= */
+  remarks: '',
+
+  /* ================= AUDIT ================= */
+  createdBy: this.loginId || '',   // 🔥 IMPORTANT
+  createdDate: this.getTodayDate(),
+
+  updatedBy: '',
+  updatedDate: '',
+};
 
   // --------------------------
   // STATE VARIABLES
@@ -794,72 +929,72 @@ th{
   // --------------------------
   // ADD NEW FORM
   // --------------------------
-  addForm() {
-    if (this.isEditMode) {
-      return;
-    }
+ addForm() {
 
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const currentDate = `${yyyy}-${mm}-${dd}`;
+  if (this.isEditMode) return;
 
-    this.forms.push({
-      /* ================= UI BINDING ================= */
-      assetReplacementCode: '',
-      assetReplacementDate: currentDate,
-      assetReplacementType: '',
-      assetReplacementCallId: '',
-      assetReplacementInitiatedBy: '',
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
 
-      department: '',
+  const currentDate = `${yyyy}-${mm}-${dd}`;
+
+  this.forms.push({
+
+    /* ================= BACKEND STRUCTURE ================= */
+    newRecord: {
+
+      /* ================= PRIMARY ================= */
+      replacementId: '0',
+      replacementNumber: '',
+
+      /* ================= BASIC ================= */
+      replacementDate: currentDate,
+      allocationId: '',
+      callLoggingId: '',
+      employeeId: '',
       departmentId: '',
+      location: '',
+
+      /* ================= OLD ASSET ================= */
       oldAssetId: '',
-      oldAssetName: '',
-      oldAssetType: '',
       oldAssetSerialNumber: '',
-      oldAmcStatus: 'AMC',
+      oldAssetCondition: 'Faulty',
+      oldAssetReturnStatus: 'Not Returned',
 
-      assetCondition: '',
-      assetFaultDescription: '',
-
+      /* ================= NEW ASSET ================= */
       newAssetId: '',
-      newAssetName: '',
       newAssetSerialNumber: '',
 
-      status: 'Active',
-      loginId: this.loginId,
+      /* ================= REPLACEMENT DETAILS ================= */
+      assetCategory: '',
+      replacementType: '',
+      reasonForReplacement: '',
+      replacementCost: 0,
 
-      /* ================= BACKEND ================= */
-      newRecord: {
-        assetReplacementId: '0',
-        assetReplacementCode: '',
-        assetReplacementDate: currentDate,
-        assetReplacementType: '',
-        assetReplacementCallId: '',
-        assetReplacementInitiatedBy: '',
+      /* ================= APPROVAL ================= */
+      approvedBy: '',
+      approvalDate: currentDate,
 
-        department: '',
-        departmentId: '',
-        oldAssetId: '',
-        oldAssetName: '',
-        oldAssetType: '',
-        oldAssetSerialNumber: '',
-        oldAmcStatus: 'AMC',
+      /* ================= TECHNICAL ================= */
+      technicianName: '',
 
-        assetCondition: '',
-        assetFaultDescription: '',
+      /* ================= STATUS ================= */
+      replacementStatus: 'Active',
 
-        newAssetId: '',
-        newAssetName: '',
-        newAssetSerialNumber: '',
+      /* ================= REMARKS ================= */
+      remarks: '',
 
-        status: 'Active',
-        loginId: this.loginId,
-      },
-    });
-  }
+      /* ================= AUDIT ================= */
+      createdBy: this.loginId || '',
+      createdDate: currentDate,
+
+      updatedBy: '',
+      updatedDate: '',
+    },
+  });
+}
   // --------------------------
   // REMOVE FORM
   // --------------------------
@@ -874,102 +1009,123 @@ th{
   // --------------------------
   // SAVE RECORD (SINGLE OR MULTIPLE)
   // --------------------------
-  saveAllRecords(form?: NgForm) {
-    this.showErrors = true;
+saveAllRecords(form?: NgForm) {
 
-    /* ================= VALIDATION ================= */
-    if (form) {
-      Object.keys(form.controls).forEach((key) => {
-        form.controls[key].markAsTouched();
-        form.controls[key].markAsDirty();
-      });
-    }
+  this.showErrors = true;
 
-    if (form && !form.valid) return;
-
-    /* ================= COMMON FUNCTION ================= */
-    const preparePayload = (data: any) => ({
-      assetReplacementCode: data.assetReplacementCode || '',
-      assetReplacementDate: data.assetReplacementDate || this.getTodayDate(),
-      assetReplacementType: data.assetReplacementType || '',
-      assetReplacementCallId: data.assetReplacementCallId || '',
-      assetReplacementInitiatedBy: data.assetReplacementInitiatedBy || '',
-      department: data.departmentId || '',
-
-      /* NEW ASSET */
-      newAssetId: data.newAssetId || '',
-      newAssetName: data.newAssetName || '',
-      newAssetSerialNumber: data.newAssetSerialNumber || '',
-
-      status: data.status || 'Active',
-
-      /* OLD ASSET */
-      oldAssetId: data.oldAssetId || '',
-      oldAssetName: data.oldAssetName || '',
-      oldAssetType: data.oldAssetType || '',
-      oldAssetSerialNumber: data.oldAssetSerialNumber || '',
-      oldAmcStatus: data.oldAmcStatus || 'AMC',
-
-      assetFaultDescription: data.assetFaultDescription || '',
-      assetCondition: data.assetCondition || '',
-
-      loginId: this.loginId,
-    });
-
-    /* ================= EDIT MODE ================= */
-    if (this.isEditMode && this.editIndex !== -1) {
-      const formData = this.forms[0].newRecord;
-
-      const payload = preparePayload(formData);
-
-      const replacementId = this.tableData[this.editIndex].assetReplacementId;
-
-      this.commonService
-        .updateAssetReplacement(replacementId, this.loginId, payload)
-        .subscribe({
-          next: () => {
-            this.toast.success(
-              'Asset Replacement updated successfully',
-              'SUCCESS',
-              4000,
-            );
-
-            this.resetAfterSave();
-            this.loadAssetReplacements();
-          },
-          error: (err) => {
-            console.error('UPDATE ERROR:', err);
-            this.toast.danger('Update failed!', 'ERROR', 4000);
-          },
-        });
-
-      return;
-    }
-
-    /* ================= ADD MODE ================= */
-
-    const payload = this.forms.map((f) => preparePayload(f.newRecord));
-
-    console.log('SAVE PAYLOAD:', payload); // 🔥 debug
-
-    this.commonService.submitAssetReplacement(payload).subscribe({
-      next: () => {
-        this.toast.success(
-          'Asset Replacement record added successfully!',
-          'SUCCESS',
-          4000,
-        );
-
-        this.resetAfterSave();
-        this.loadAssetReplacements();
-      },
-      error: (err) => {
-        console.error('SAVE ERROR:', err);
-        this.toast.danger('Save failed!', 'ERROR', 4000);
-      },
+  /* ================= VALIDATION ================= */
+  if (form) {
+    Object.keys(form.controls).forEach((key) => {
+      form.controls[key].markAsTouched();
+      form.controls[key].markAsDirty();
     });
   }
 
+  if (form && !form.valid) return;
+
+  /* ================= PAYLOAD BUILDER ================= */
+  const preparePayload = (data: any, isEdit = false, existing?: any) => {
+
+    return {
+
+      /* ================= PRIMARY ================= */
+      replacementNumber: (data.replacementNumber || '').trim(),
+
+      /* ================= BASIC ================= */
+      replacementDate: data.replacementDate || this.getTodayDate(),
+      callLoggingId: data.callLoggingId || '',
+      employeeId: data.employeeId || '',
+      departmentId: data.departmentId || '',
+      location: data.location || '',
+
+      /* ================= OLD ASSET ================= */
+      oldAssetId: data.oldAssetId || '',
+      oldAssetSerialNumber: data.oldAssetSerialNumber || '',
+      oldAssetCondition: data.oldAssetCondition || 'Faulty',
+      oldAssetReturnStatus: data.oldAssetReturnStatus || 'Not Returned',
+
+      /* ================= NEW ASSET ================= */
+      newAssetId: data.newAssetId || '',
+      newAssetSerialNumber: data.newAssetSerialNumber || '',
+
+      /* ================= DETAILS ================= */
+      replacementType: data.replacementType || '',
+      reasonForReplacement: data.reasonForReplacement || '',
+      replacementCost: Number(data.replacementCost) || 0,
+
+      /* ================= APPROVAL ================= */
+      approvedBy: data.approvedBy || '',
+      approvalDate: data.approvalDate || this.getTodayDate(),
+
+      /* ================= TECH ================= */
+      technicianName: data.technicianName || '',
+
+      /* ================= STATUS ================= */
+      replacementStatus: data.replacementStatus || 'Active',
+
+      /* ================= AUDIT ================= */
+      createdBy: isEdit ? existing?.createdBy : this.loginId,
+      createdDate: isEdit ? existing?.createdDate : this.getTodayDate(),
+
+      updatedBy: isEdit ? this.loginId : '',   // ✅ FIX
+      updatedDate: isEdit ? this.getTodayDate() : '', // ✅ FIX
+    };
+  };
+
+  /* ================= EDIT MODE ================= */
+  if (this.isEditMode && this.editIndex !== -1) {
+
+    const formData = this.forms[0].newRecord;
+    const existing = this.tableData[this.editIndex];
+
+    const payload = preparePayload(formData, true, existing);
+
+    const replacementId = existing?.replacementId;
+
+    if (!replacementId) {
+      this.toast.danger('Invalid Replacement ID!', 'ERROR', 3000);
+      return;
+    }
+
+    console.log('UPDATE PAYLOAD:', payload);
+
+    this.commonService
+      .updateAssetReplacement(replacementId, this.loginId, payload)
+      .subscribe({
+        next: () => {
+          this.toast.success('Updated Successfully', 'SUCCESS', 4000);
+          this.resetAfterSave();
+          this.loadAssetReplacements();
+        },
+        error: (err) => {
+          console.error('UPDATE ERROR:', err);
+          this.toast.danger('Update failed!', 'ERROR', 4000);
+        },
+      });
+
+    return;
+  }
+
+  /* ================= ADD MODE ================= */
+
+  const payload = this.forms.map((f) =>
+    preparePayload(f.newRecord, false)
+  );
+
+  console.log('FINAL SAVE PAYLOAD:', payload);
+
+  this.commonService.submitAssetReplacement(payload).subscribe({
+    next: () => {
+      this.toast.success('Saved Successfully', 'SUCCESS', 4000);
+      this.resetAfterSave();
+      this.loadAssetReplacements();
+    },
+    error: (err) => {
+      console.error('SAVE ERROR:', err);
+      this.toast.danger('Save failed!', 'ERROR', 4000);
+    },
+  });
+}
   resetAfterSave() {
     this.forms = [
       {
@@ -1017,55 +1173,27 @@ th{
   //bulk export date format
   startDateError: string = '';
   endDateError: string = '';
+formatDate(event: any, type?: 'start' | 'end') {
 
-  formatDate(event: any, type: 'start' | 'end') {
-    let value = event.target.value.replace(/\D/g, ''); // only digits
-    if (value.length > 8) value = value.substring(0, 8);
+  if (!event) return null;
 
-    let formatted = value;
+  let date;
 
-    if (value.length > 2) formatted = value.slice(0, 2) + '-' + value.slice(2);
-    if (value.length > 4)
-      formatted =
-        value.slice(0, 2) + '-' + value.slice(2, 4) + '-' + value.slice(4);
-
-    event.target.value = formatted;
-
-    // Clear previous error for the correct field
-    if (type === 'start') {
-      this.startDateError = '';
-    } else {
-      this.endDateError = '';
-    }
-
-    // Validate only if 8 digits entered
-    if (value.length === 8) {
-      const day = parseInt(value.slice(0, 2), 10);
-      const month = parseInt(value.slice(2, 4), 10);
-      const year = parseInt(value.slice(4, 8), 10);
-
-      let errorMsg = '';
-
-      if (day < 1 || day > 31) errorMsg = 'Day must be between 1 and 31.';
-      else if (month < 1 || month > 12)
-        errorMsg = 'Month must be between 1 and 12.';
-      else if (year < 2000)
-        errorMsg = 'Year must be greater than or equal to 2000.';
-      else {
-        const date = new Date(year, month - 1, day);
-        if (
-          date.getDate() !== day ||
-          date.getMonth() + 1 !== month ||
-          date.getFullYear() !== year
-        ) {
-          errorMsg = 'Invalid date.';
-        }
-      }
-      if (type === 'start') this.startDateError = errorMsg;
-      else this.endDateError = errorMsg;
-    }
+  // if event from input
+  if (event?.target?.value) {
+    date = new Date(event.target.value);
+  } else {
+    date = new Date(event);
   }
 
+  if (isNaN(date.getTime())) return null;
+
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+
+  return `${yyyy}-${mm}-${dd}`;
+}
   //bulk import buttons function
   // Trigger when file is selected
   onFileSelected(event: any) {
@@ -1110,448 +1238,525 @@ th{
   csvRecords: any[] = [];
 
   // Convert CSV → JSON and store in tableData
-  parseCSV(csv: string) {
-    const lines = csv
-      .split('\n')
-      .map((l) => l.trim())
-      .filter((l) => l);
+parseCSV(csv: string) {
 
-    if (lines.length <= 1) {
-      this.showToast('CSV has no data', 'warning');
-      return;
+  const lines = csv
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l);
+
+  if (lines.length <= 1) {
+    this.showToast('CSV has no data', 'warning');
+    return;
+  }
+
+  /* ================= HEADER MAPPING ================= */
+  const mapHeader = (h: string) => {
+    switch (h.toLowerCase()) {
+
+      case 'replacement id': return 'replacementId';
+      case 'replacement number': return 'replacementNumber';
+      case 'replacement date': return 'replacementDate';
+
+      case 'allocation id': return 'allocationId';
+      case 'call id': return 'callLoggingId';
+      case 'employee id': return 'employeeId';
+      case 'department id': return 'departmentId';
+      case 'location': return 'location';
+
+      case 'old asset id': return 'oldAssetId';
+      case 'old serial': return 'oldAssetSerialNumber';
+      case 'condition': return 'oldAssetCondition';
+      case 'return status': return 'oldAssetReturnStatus';
+
+      case 'new asset id': return 'newAssetId';
+      case 'new serial': return 'newAssetSerialNumber';
+
+      case 'category': return 'assetCategory';
+      case 'replacement type': return 'replacementType';
+      case 'reason': return 'reasonForReplacement';
+      case 'cost': return 'replacementCost';
+
+      case 'approved by': return 'approvedBy';
+      case 'approval date': return 'approvalDate';
+
+      case 'technician': return 'technicianName';
+
+      case 'status': return 'replacementStatus';
+      case 'remarks': return 'remarks';
+
+      case 'created by': return 'createdBy';
+      case 'created date': return 'createdDate';
+      case 'updated by': return 'updatedBy';
+      case 'updated date': return 'updatedDate';
+
+      default:
+        return h;
     }
+  };
 
-    /* ================= HEADER MAPPING ================= */
+  const csvHeaders = lines[0].split(',').map((h) => mapHeader(h.trim()));
+  const results: TableRow[] = [];
 
-    const mapHeader = (h: string) => {
-      switch (h.toLowerCase()) {
-        case 'replacement id':
-          return 'assetReplacementId';
+  /* ================= ROW PARSING ================= */
+  for (let i = 1; i < lines.length; i++) {
 
-        case 'replacement code':
-          return 'assetReplacementCode';
+    const values = lines[i].split(',');
+    const obj: any = {};
 
-        case 'replacement date':
-          return 'assetReplacementDate';
+    csvHeaders.forEach((h, idx) => {
+      obj[h] = values[idx] ? values[idx].trim() : '';
+    });
 
-        case 'replacement type':
-          return 'assetReplacementType';
+    const newRecord: TableRow = {
 
-        case 'call id':
-          return 'assetReplacementCallId';
+      /* ================= PRIMARY ================= */
+      replacementId:
+        obj['replacementId'] || `AR-${this.tableData.length + i}`,
 
-        case 'initiated by':
-          return 'assetReplacementInitiatedBy';
+      replacementNumber: obj['replacementNumber'] || '',
 
-        case 'department':
-          return 'department';
+      /* ================= BASIC ================= */
+      replacementDate: obj['replacementDate'] || this.getTodayDate(),
+      allocationId: obj['allocationId'] || '',
+      callLoggingId: obj['callLoggingId'] || '',
+      employeeId: obj['employeeId'] || '',
+      departmentId: obj['departmentId'] || '',
+      location: obj['location'] || '',
 
-        case 'status':
-          return 'status';
+      /* ================= OLD ASSET ================= */
+      oldAssetId: obj['oldAssetId'] || '',
+      oldAssetSerialNumber: obj['oldAssetSerialNumber'] || '',
+      oldAssetCondition: obj['oldAssetCondition'] || 'Faulty',
+      oldAssetReturnStatus: obj['oldAssetReturnStatus'] || 'Not Returned',
 
-        case 'old asset id':
-          return 'oldAssetId';
+      /* ================= NEW ASSET ================= */
+      newAssetId: obj['newAssetId'] || '',
+      newAssetSerialNumber: obj['newAssetSerialNumber'] || '',
 
-        case 'old asset name':
-          return 'oldAssetName';
+      /* ================= REPLACEMENT DETAILS ================= */
+      assetCategory: obj['assetCategory'] || '',
+      replacementType: obj['replacementType'] || '',
+      reasonForReplacement: obj['reasonForReplacement'] || '',
+      replacementCost: Number(obj['replacementCost']) || 0,
 
-        case 'old asset type':
-          return 'oldAssetType';
+      /* ================= APPROVAL ================= */
+      approvedBy: obj['approvedBy'] || '',
+      approvalDate: obj['approvalDate'] || this.getTodayDate(),
 
-        case 'old serial number':
-          return 'oldAssetSerialNumber';
+      /* ================= TECHNICAL ================= */
+      technicianName: obj['technicianName'] || '',
 
-        case 'amc status':
-          return 'oldAmcStatus';
+      /* ================= STATUS ================= */
+      replacementStatus: (obj['replacementStatus'] === 'Inactive'
+        ? 'Inactive'
+        : 'Active') as 'Active' | 'Inactive',
 
-        case 'fault description':
-          return 'assetFaultDescription';
+      /* ================= REMARKS ================= */
+      remarks: obj['remarks'] || '',
 
-        case 'asset condition':
-          return 'assetCondition';
-
-        default:
-          return h;
-      }
+      /* ================= AUDIT ================= */
+      createdBy: this.loginId || '',
+      createdDate: obj['createdDate'] || this.getTodayDate(),
+      updatedBy: obj['updatedBy'] || '',
+      updatedDate: obj['updatedDate'] || '',
     };
 
-    const csvHeaders = lines[0].split(',').map((h) => mapHeader(h.trim()));
+    results.push(newRecord);
+  }
 
-    const results: TableRow[] = [];
+  /* ================= MERGE ================= */
+  this.tableData = [...this.tableData, ...results];
+  this.filteredData = [...this.tableData];
+  this.currentPage = 1;
 
-    /* ================= ROW PARSING ================= */
+  this.cdr.detectChanges();
 
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',');
+  this.showToast('Asset Replacement CSV imported successfully!', 'success');
+}
 
-      const obj: any = {};
+  // ---------------- Excel Parsing ----------------
+readExcel(file: File) {
 
-      csvHeaders.forEach((h, idx) => {
-        obj[h] = values[idx] ? values[idx].trim() : '';
-      });
+  const reader = new FileReader();
+
+  reader.onload = () => {
+
+    const workbook = XLSX.read(reader.result, { type: 'binary' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+
+    const json = XLSX.utils.sheet_to_json<any>(sheet);
+
+    json.forEach((obj: any, i: number) => {
 
       const newRecord: TableRow = {
-        assetReplacementId:
-          obj['assetReplacementId'] || `AR-${this.tableData.length + i}`,
 
-        assetReplacementCode: obj['assetReplacementCode'] || '',
+        /* ================= PRIMARY ================= */
+        replacementId:
+          obj['Replacement ID'] || `AR-${this.tableData.length + i + 1}`,
 
-        assetReplacementDate:
-          obj['assetReplacementDate'] || this.getTodayDate(),
+        replacementNumber: obj['Replacement Number'] || '',
 
-        assetReplacementType: obj['assetReplacementType'] || '',
-
-        assetReplacementCallId: obj['assetReplacementCallId'] || '',
-
-        assetReplacementInitiatedBy: obj['assetReplacementInitiatedBy'] || '',
-
-        department: obj['department'] || '',
-
-        status: (['Open', 'Approved', 'Rejected', 'Closed'].includes(
-          obj['status'],
-        )
-          ? obj['status']
-          : 'Open') as any,
+        /* ================= BASIC ================= */
+        replacementDate: obj['Replacement Date'] || this.getTodayDate(),
+        allocationId: obj['Allocation ID'] || '',
+        callLoggingId: obj['Call ID'] || '',
+        employeeId: obj['Employee ID'] || '',
+        departmentId: obj['Department ID'] || '',
+        location: obj['Location'] || '',
 
         /* ================= OLD ASSET ================= */
-        oldAssetId: obj['oldAssetId'] || '',
-        oldAssetName: obj['oldAssetName'] || '',
-        oldAssetType: obj['oldAssetType'] || '',
-        oldAssetSerialNumber: obj['oldAssetSerialNumber'] || '',
-
-        oldAmcStatus: (['AMC', 'Warranty', 'Out of AMC'].includes(
-          obj['oldAmcStatus'],
-        )
-          ? obj['oldAmcStatus']
-          : 'AMC') as any,
-
-        assetFaultDescription: obj['assetFaultDescription'] || '',
-        assetCondition: obj['assetCondition'] || '',
+        oldAssetId: obj['Old Asset ID'] || '',
+        oldAssetSerialNumber: obj['Old Serial Number'] || '',
+        oldAssetCondition: obj['Old Condition'] || 'Faulty',
+        oldAssetReturnStatus: obj['Return Status'] || 'Not Returned',
 
         /* ================= NEW ASSET ================= */
-        newAssetId: obj['newAssetId'] || '',
-        newAssetName: obj['newAssetName'] || '',
-        newAssetSerialNumber: obj['newAssetSerialNumber'] || '',
+        newAssetId: obj['New Asset ID'] || '',
+        newAssetSerialNumber: obj['New Serial Number'] || '',
 
-        /* ================= LOGIN ================= */
-        loginId: this.loginId || '',
+        /* ================= REPLACEMENT DETAILS ================= */
+        assetCategory: obj['Category'] || '',
+        replacementType: obj['Replacement Type'] || '',
+        reasonForReplacement: obj['Reason'] || '',
+        replacementCost: Number(obj['Cost']) || 0,
+
+        /* ================= APPROVAL ================= */
+        approvedBy: obj['Approved By'] || '',
+        approvalDate: obj['Approval Date'] || this.getTodayDate(),
+
+        /* ================= TECHNICAL ================= */
+        technicianName: obj['Technician'] || '',
+
+        /* ================= STATUS ================= */
+        replacementStatus:
+          obj['Status'] === 'Inactive' ? 'Inactive' : 'Active',
+
+        /* ================= REMARKS ================= */
+        remarks: obj['Remarks'] || '',
+
+        /* ================= AUDIT ================= */
+        createdBy: this.loginId || '',
+        createdDate: obj['Created Date'] || this.getTodayDate(),
+        updatedBy: obj['Updated By'] || '',
+        updatedDate: obj['Updated Date'] || '',
       };
 
-      results.push(newRecord);
-    }
+      this.tableData.push(newRecord);
+    });
 
-    /* ================= MERGE DATA ================= */
-
-    this.tableData = [...this.tableData, ...results];
-
+    /* ================= REFRESH ================= */
     this.filteredData = [...this.tableData];
-
     this.currentPage = 1;
 
     this.cdr.detectChanges();
 
-    this.showToast('Asset Replacement CSV imported successfully!', 'success');
-  }
+    this.showToast(
+      'Asset Replacement Excel imported successfully!',
+      'success',
+    );
+  };
 
-  // ---------------- Excel Parsing ----------------
-  readExcel(file: File) {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const workbook = XLSX.read(reader.result, { type: 'binary' });
-
-      const sheetName = workbook.SheetNames[0];
-
-      const sheet = workbook.Sheets[sheetName];
-
-      const json = XLSX.utils.sheet_to_json(sheet);
-
-      json.forEach((obj: any, i: number) => {
-        const newRecord: TableRow = {
-          assetReplacementId:
-            obj['Replacement ID'] || `AR-${this.tableData.length + i + 1}`,
-
-          assetReplacementCode: obj['Replacement Code'] || '',
-
-          assetReplacementDate: obj['Replacement Date'] || this.getTodayDate(),
-
-          assetReplacementType: obj['Replacement Type'] || '',
-
-          assetReplacementCallId: obj['Call ID'] || '',
-
-          assetReplacementInitiatedBy: obj['Initiated By'] || '',
-
-          department: obj['Department'] || '',
-
-          status: obj['Status'] === 'Inactive' ? 'Inactive' : 'Active',
-
-          /* ================= OLD ASSET ================= */
-          oldAssetId: obj['Old Asset ID'] || '',
-          oldAssetName: obj['Old Asset Name'] || '',
-          oldAssetType: obj['Old Asset Type'] || '',
-          oldAssetSerialNumber: obj['Old Serial Number'] || '',
-
-          oldAmcStatus: (['AMC', 'Warranty', 'Out of AMC'].includes(
-            obj['AMC Status'],
-          )
-            ? obj['AMC Status']
-            : 'AMC') as 'AMC' | 'Warranty' | 'Out of AMC',
-
-          assetFaultDescription: obj['Fault Description'] || '',
-          assetCondition: obj['Asset Condition'] || '',
-
-          /* ================= NEW ASSET ================= */
-          newAssetId: obj['New Asset ID'] || '',
-          newAssetName: obj['New Asset Name'] || '',
-          newAssetSerialNumber: obj['New Serial Number'] || '',
-
-          /* ================= LOGIN ================= */
-          loginId: this.loginId || '',
-        };
-
-        this.tableData.push(newRecord);
-      });
-
-      this.filteredData = [...this.tableData];
-
-      this.currentPage = 1;
-
-      this.cdr.detectChanges();
-
-      this.showToast(
-        'Asset Replacement Excel imported successfully!',
-        'success',
-      );
-    };
-
-    reader.readAsBinaryString(file);
-  }
+  reader.readAsBinaryString(file);
+}
 
   // ---------------- TXT Parsing ----------------
-  readTXT(file: File) {
-    const reader = new FileReader();
+readTXT(file: File) {
 
-    reader.onload = () => {
-      const text = reader.result as string;
+  const reader = new FileReader();
 
-      const lines = text.split(/\r?\n/).filter((line) => line.trim() !== '');
+  reader.onload = () => {
 
-      lines.forEach((line, idx) => {
-        const cols = line.split(',').map((c) => c.trim());
+    const text = reader.result as string;
 
-        // Ensure minimum columns
-        while (cols.length < 15) cols.push('');
+    const lines = text
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter((l) => l !== '');
 
-        const newRecord: TableRow = {
-          assetReplacementId:
-            cols[0] || `AR-${this.tableData.length + idx + 1}`,
+    lines.forEach((line, idx) => {
 
-          assetReplacementCode: cols[1] || '',
+      const cols = line.split(',').map((c) => c.trim());
 
-          assetReplacementDate: cols[2] || this.getTodayDate(),
+      // Ensure minimum columns
+      while (cols.length < 20) cols.push('');
 
-          assetReplacementType: cols[3] || '',
+      const newRecord: TableRow = {
 
-          assetReplacementCallId: cols[4] || '',
+        /* ================= PRIMARY ================= */
+        replacementId:
+          cols[0] || `AR-${this.tableData.length + idx + 1}`,
 
-          assetReplacementInitiatedBy: cols[5] || '',
+        replacementNumber: cols[1] || '',
 
-          department: cols[6] || '',
+        /* ================= BASIC ================= */
+        replacementDate: cols[2] || this.getTodayDate(),
+        allocationId: cols[3] || '',
+        callLoggingId: cols[4] || '',
+        employeeId: cols[5] || '',
+        departmentId: cols[6] || '',
+        location: cols[7] || '',
 
-          status: (['Open', 'Approved', 'Rejected', 'Closed'].includes(cols[7])
-            ? cols[7]
-            : 'Open') as any,
+        /* ================= OLD ASSET ================= */
+        oldAssetId: cols[8] || '',
+        oldAssetSerialNumber: cols[9] || '',
+        oldAssetCondition: cols[10] || 'Faulty',
+        oldAssetReturnStatus: cols[11] || 'Not Returned',
 
-          /* ================= OLD ASSET ================= */
-          oldAssetId: cols[8] || '',
-          oldAssetName: cols[9] || '',
-          oldAssetType: cols[10] || '',
-          oldAssetSerialNumber: cols[11] || '',
+        /* ================= NEW ASSET ================= */
+        newAssetId: cols[12] || '',
+        newAssetSerialNumber: cols[13] || '',
 
-          oldAmcStatus: (['AMC', 'Warranty', 'Out of AMC'].includes(cols[12])
-            ? cols[12]
-            : 'AMC') as any,
+        /* ================= REPLACEMENT DETAILS ================= */
+        assetCategory: cols[14] || '',
+        replacementType: cols[15] || '',
+        reasonForReplacement: cols[16] || '',
+        replacementCost: Number(cols[17]) || 0,
 
-          assetFaultDescription: cols[13] || '',
-          assetCondition: cols[14] || '',
+        /* ================= APPROVAL ================= */
+        approvedBy: cols[18] || '',
+        approvalDate: cols[19] || this.getTodayDate(),
 
-          /* ================= NEW ASSET ================= */
-          newAssetId: cols[15] || '',
-          newAssetName: cols[16] || '',
-          newAssetSerialNumber: cols[17] || '',
+        /* ================= TECHNICAL ================= */
+        technicianName: cols[20] || '',
 
-          /* ================= LOGIN ================= */
-          loginId: this.loginId || '',
-        };
+        /* ================= STATUS ================= */
+        replacementStatus:
+          cols[21] === 'Inactive' ? 'Inactive' : 'Active',
 
-        this.tableData.push(newRecord);
-      });
+        /* ================= REMARKS ================= */
+        remarks: cols[22] || '',
 
-      this.filteredData = [...this.tableData];
+        /* ================= AUDIT ================= */
+        createdBy: this.loginId || '',
+        createdDate: this.getTodayDate(),
+        updatedBy: '',
+        updatedDate: '',
+      };
 
-      this.currentPage = 1;
+      this.tableData.push(newRecord);
+    });
 
-      this.cdr.detectChanges();
+    /* ================= REFRESH ================= */
+    this.filteredData = [...this.tableData];
+    this.currentPage = 1;
 
-      this.showToast('Asset Replacement TXT imported successfully!', 'success');
-    };
+    this.cdr.detectChanges();
 
-    reader.readAsText(file);
-  }
+    this.showToast(
+      'Asset Replacement TXT imported successfully!',
+      'success'
+    );
+  };
+
+  reader.readAsText(file);
+}
 
   // ---------------- DOCX Parsing (mammoth.js) ----------------
-  async readDOCX(file: File) {
-    const reader = new FileReader();
+async readDOCX(file: File) {
 
-    reader.onload = async () => {
-      const arrayBuffer = reader.result as ArrayBuffer;
+  const reader = new FileReader();
 
-      const result = await mammoth.convertToHtml({ arrayBuffer });
+  reader.onload = async () => {
 
-      const html = result.value;
+    const arrayBuffer = reader.result as ArrayBuffer;
 
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
+    const result = await mammoth.convertToHtml({ arrayBuffer });
+    const html = result.value;
 
-      const table = doc.querySelector('table');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
 
-      if (!table) {
-        this.showToast('No table found in DOCX!', 'warning');
-        return;
-      }
+    const table = doc.querySelector('table');
 
-      const rows = table.querySelectorAll('tr');
+    if (!table) {
+      this.showToast('No table found in DOCX!', 'warning');
+      return;
+    }
 
-      rows.forEach((row, rowIndex) => {
-        if (rowIndex === 0) return;
+    const rows = table.querySelectorAll('tr');
 
-        const cells = Array.from(row.querySelectorAll('td')).map(
-          (cell) => cell.textContent?.trim() || '',
-        );
+    rows.forEach((row, rowIndex) => {
 
-        while (cells.length < 15) cells.push('');
+      if (rowIndex === 0) return; // skip header
 
-        const newRecord: TableRow = {
-          assetReplacementId:
-            cells[0] || `AR-${this.tableData.length + rowIndex}`,
-
-          assetReplacementCode: cells[1] || '',
-
-          assetReplacementDate: cells[2] || this.getTodayDate(),
-
-          assetReplacementType: cells[3] || '',
-
-          assetReplacementCallId: cells[4] || '',
-
-          assetReplacementInitiatedBy: cells[5] || '',
-
-          department: cells[6] || '',
-
-          status: cells[7] === 'Inactive' ? 'Inactive' : 'Active',
-
-          /* ================= OLD ASSET ================= */
-          oldAssetId: cells[8] || '',
-          oldAssetName: cells[9] || '',
-          oldAssetType: cells[10] || '',
-          oldAssetSerialNumber: cells[11] || '',
-
-          oldAmcStatus: (['AMC', 'Warranty', 'Out of AMC'].includes(cells[12])
-            ? cells[12]
-            : 'AMC') as 'AMC' | 'Warranty' | 'Out of AMC',
-
-          assetFaultDescription: cells[13] || '',
-          assetCondition: cells[14] || '',
-
-          /* ================= NEW ASSET ================= */
-          newAssetId: cells[15] || '',
-          newAssetName: cells[16] || '',
-          newAssetSerialNumber: cells[17] || '',
-
-          /* ================= LOGIN ================= */
-          loginId: this.loginId || '',
-        };
-
-        this.tableData.push(newRecord);
-      });
-
-      this.filteredData = [...this.tableData];
-
-      this.currentPage = 1;
-
-      this.cdr.detectChanges();
-
-      this.showToast(
-        'Asset Replacement DOCX imported successfully!',
-        'success',
+      const cells = Array.from(row.querySelectorAll('td')).map(
+        (cell) => cell.textContent?.trim() || ''
       );
-    };
 
-    reader.readAsArrayBuffer(file);
-  }
+      // Ensure minimum columns
+      while (cells.length < 22) cells.push('');
 
-  downloadSampleCSV() {
-    // CSV headers
-    const headers = [
-      'Replacement ID',
-      'Replacement Code',
-      'Replacement Date',
-      'Replacement Type',
-      'Call ID',
-      'Initiated By',
-      'Department',
-      'Status',
+      const newRecord: TableRow = {
 
-      'Old Asset ID',
-      'Old Asset Name',
-      'Old Asset Type',
-      'Old Serial Number',
-      'Old AMC Status',
-      'Fault Description',
-      'Asset Condition',
-    ];
+        /* ================= PRIMARY ================= */
+        replacementId:
+          cells[0] || `AR-${this.tableData.length + rowIndex}`,
 
-    const csvRows: string[] = [];
+        replacementNumber: cells[1] || '',
 
-    // Header row
-    csvRows.push(headers.join(','));
+        /* ================= BASIC ================= */
+        replacementDate: cells[2] || this.getTodayDate(),
+        allocationId: cells[3] || '',
+        callLoggingId: cells[4] || '',
+        employeeId: cells[5] || '',
+        departmentId: cells[6] || '',
+        location: cells[7] || '',
 
-    // Sample row
-    const sampleRow = [
-      'AR-001',
-      'REP-2026-001',
-      '2026-03-10',
-      'Permanent',
-      'CALL-101',
-      'Engineer A',
-      'IT',
-      'Open',
+        /* ================= OLD ASSET ================= */
+        oldAssetId: cells[8] || '',
+        oldAssetSerialNumber: cells[9] || '',
+        oldAssetCondition: cells[10] || 'Faulty',
+        oldAssetReturnStatus: cells[11] || 'Not Returned',
 
-      'AST-001',
-      'HP Laptop',
-      'Laptop',
-      'SN-HP-123',
-      'AMC',
-      'Screen not working',
-      'Not Working',
-    ];
+        /* ================= NEW ASSET ================= */
+        newAssetId: cells[12] || '',
+        newAssetSerialNumber: cells[13] || '',
 
-    csvRows.push(sampleRow.join(','));
+        /* ================= REPLACEMENT DETAILS ================= */
+        assetCategory: cells[14] || '',
+        replacementType: cells[15] || '',
+        reasonForReplacement: cells[16] || '',
+        replacementCost: Number(cells[17]) || 0,
 
-    const csvString = csvRows.join('\n');
+        /* ================= APPROVAL ================= */
+        approvedBy: cells[18] || '',
+        approvalDate: cells[19] || this.getTodayDate(),
 
-    const blob = new Blob([csvString], { type: 'text/csv' });
+        /* ================= TECHNICAL ================= */
+        technicianName: cells[20] || '',
 
-    const url = window.URL.createObjectURL(blob);
+        /* ================= STATUS ================= */
+        replacementStatus:
+          cells[21] === 'Inactive' ? 'Inactive' : 'Active',
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Asset_Replacement_Sample.csv';
-    a.click();
+        /* ================= REMARKS ================= */
+        remarks: cells[22] || '',
 
-    window.URL.revokeObjectURL(url);
+        /* ================= AUDIT ================= */
+        createdBy: this.loginId || '',
+        createdDate: this.getTodayDate(),
+        updatedBy: '',
+        updatedDate: '',
+      };
 
-    this.showToast('Sample CSV downloaded successfully!', 'success');
-  }
+      this.tableData.push(newRecord);
+    });
+
+    /* ================= REFRESH ================= */
+    this.filteredData = [...this.tableData];
+    this.currentPage = 1;
+
+    this.cdr.detectChanges();
+
+    this.showToast(
+      'Asset Replacement DOCX imported successfully!',
+      'success'
+    );
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+ downloadSampleCSV() {
+
+  /* ================= HEADERS ================= */
+  const headers = [
+
+    'Replacement ID',
+    'Replacement Number',
+    'Replacement Date',
+
+    'Allocation ID',
+    'Call ID',
+    'Employee ID',
+    'Department ID',
+    'Location',
+
+    'Old Asset ID',
+    'Old Serial Number',
+    'Old Condition',
+    'Return Status',
+
+    'New Asset ID',
+    'New Serial Number',
+
+    'Category',
+    'Replacement Type',
+    'Reason',
+    'Cost',
+
+    'Approved By',
+    'Approval Date',
+
+    'Technician',
+
+    'Status',
+    'Remarks'
+  ];
+
+  const csvRows: string[] = [];
+
+  /* ================= HEADER ROW ================= */
+  csvRows.push(headers.join(','));
+
+  /* ================= SAMPLE DATA ================= */
+  const sampleRow = [
+
+    'AR-001',
+    'REP-2026-001',
+    '2026-03-10',
+
+    'ALLOC-001',
+    'CALL-101',
+    'EMP-001',
+    'DEPT-IT',
+    'Pune',
+
+    'AST-001',
+    'SN-OLD-123',
+    'Faulty',
+    'Returned',
+
+    'AST-NEW-001',
+    'SN-NEW-999',
+
+    'IT',
+    'Replacement',
+    'Motherboard failure',
+    '15000',
+
+    'Manager A',
+    '2026-03-11',
+
+    'Technician X',
+
+    'Active',
+    'Sample record'
+  ];
+
+  csvRows.push(
+    sampleRow.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(',')
+  );
+
+  /* ================= DOWNLOAD ================= */
+  const csvString = csvRows.join('\n');
+
+  const blob = new Blob([csvString], {
+    type: 'text/csv;charset=utf-8;'
+  });
+
+  const url = window.URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Asset_Replacement_Sample.csv';
+  a.click();
+
+  window.URL.revokeObjectURL(url);
+
+  this.showToast('Sample CSV downloaded successfully!', 'success');
+}
   //bulk export
   // ---------------- Component Variables ----------------
   startDate: string = '';
@@ -1600,7 +1805,7 @@ th{
     const end = this.endDate ? this.parseDDMMYYYY(this.endDate) : null;
 
     const filteredData = this.tableData.filter((row) => {
-      const rowDate = this.parseDDMMYYYY(row.assetReplacementDate);
+      const rowDate = this.parseDDMMYYYY(row.replacementDate);
       if (!rowDate) return false;
 
       const includeStart = start && rowDate.getTime() === start.getTime();
@@ -1632,290 +1837,424 @@ th{
   }
 
   // ---------------- CSV Export ----------------
-  exportCSVfile(data: TableRow[]) {
-    const today = new Date();
+exportCSVfile(data: TableRow[]) {
 
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+  const today = new Date();
 
-    const csvRows: string[] = [];
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
 
-    /* ================= HEADER INFO ================= */
+  const csvRows: string[] = [];
 
-    csvRows.push(this.companyName || 'Company Name');
+  /* ================= HEADER INFO ================= */
 
-    csvRows.push(`Date:,${formattedDate}`);
+  csvRows.push(this.companyName || 'Asset Replacement Report');
 
-    csvRows.push('');
+  if (this.companyEmail) {
+    csvRows.push(`Email:,${this.companyEmail}`);
+  }
 
-    /* ================= CSV HEADERS ================= */
+  csvRows.push(`Date:,${formattedDate}`);
+  csvRows.push('');
 
-    const headers = [
+  /* ================= CSV HEADERS ================= */
+
+  const headers = [
+
+    'Replacement ID',
+    'Replacement Number',
+    'Replacement Date',
+
+    'Allocation ID',
+    'Call ID',
+    'Employee ID',
+    'Department ID',
+    'Location',
+
+    'Old Asset ID',
+    'Old Serial Number',
+    'Old Condition',
+    'Return Status',
+
+    'New Asset ID',
+    'New Serial Number',
+
+    'Category',
+    'Replacement Type',
+    'Reason',
+    'Cost',
+
+    'Approved By',
+    'Approval Date',
+
+    'Technician',
+
+    'Status',
+    'Remarks'
+  ];
+
+  csvRows.push(headers.join(','));
+
+  /* ================= DATA ROWS ================= */
+
+  data.forEach((row: TableRow) => {
+
+    const rowData = [
+
+      row.replacementId || '',
+      row.replacementNumber || '',
+      row.replacementDate || '',
+
+      row.allocationId || '',
+      row.callLoggingId || '',
+      row.employeeId || '',
+      row.departmentId || '',
+      row.location || '',
+
+      row.oldAssetId || '',
+      row.oldAssetSerialNumber || '',
+      row.oldAssetCondition || '',
+      row.oldAssetReturnStatus || '',
+
+      row.newAssetId || '',
+      row.newAssetSerialNumber || '',
+
+      row.assetCategory || '',
+      row.replacementType || '',
+      row.reasonForReplacement || '',
+      row.replacementCost ?? 0,
+
+      row.approvedBy || '',
+      row.approvalDate || '',
+
+      row.technicianName || '',
+
+      row.replacementStatus || '',
+      row.remarks || '',
+    ];
+
+    csvRows.push(
+      rowData.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(',')
+    );
+  });
+
+  /* ================= DOWNLOAD ================= */
+
+  const blob = new Blob([csvRows.join('\n')], {
+    type: 'text/csv;charset=utf-8;',
+  });
+
+  saveAs(blob, 'Asset_Replacement_Report.csv');
+}
+  // ---------------- Excel Export ----------------
+exportExcelfile(data: TableRow[]) {
+
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+
+  const wsData: any[][] = [
+
+    [this.companyName || 'Asset Replacement Report'],
+
+    this.companyEmail ? ['Email:', this.companyEmail] : [],
+
+    ['Date:', formattedDate],
+
+    [],
+
+    [
       'Replacement ID',
-      'Replacement Code',
+      'Replacement Number',
       'Replacement Date',
-      'Replacement Type',
 
+      'Allocation ID',
       'Call ID',
-      'Initiated By',
-      'Department',
-      'Status',
+      'Employee ID',
+      'Department ID',
+      'Location',
 
       'Old Asset ID',
-      'Old Asset Name',
-      'Old Asset Type',
       'Old Serial Number',
-      'Old AMC Status',
+      'Old Condition',
+      'Return Status',
 
-      'Fault Description',
-      'Asset Condition',
-    ];
+      'New Asset ID',
+      'New Serial Number',
 
-    csvRows.push(headers.join(','));
+      'Category',
+      'Replacement Type',
+      'Reason',
+      'Cost',
 
-    /* ================= DATA ROWS ================= */
+      'Approved By',
+      'Approval Date',
 
-    data.forEach((row: TableRow) => {
-      csvRows.push(
-        [
-          row.assetReplacementId || '',
-          row.assetReplacementCode || '',
-          row.assetReplacementDate || '',
-          row.assetReplacementType || '',
+      'Technician',
 
-          row.assetReplacementCallId || '',
-          row.assetReplacementInitiatedBy || '',
-          row.department || '',
-          row.status || '',
+      'Status',
+      'Remarks'
+    ],
+  ];
 
-          row.oldAssetId || '',
-          row.oldAssetName || '',
-          row.oldAssetType || '',
-          row.oldAssetSerialNumber || '',
-          row.oldAmcStatus || '',
+  /* ================= DATA ROWS ================= */
 
-          row.assetFaultDescription || '',
-          row.assetCondition || '',
-        ].join(','),
-      );
-    });
+  data.forEach((row: TableRow) => {
 
-    /* ================= DOWNLOAD ================= */
+    wsData.push([
 
-    const blob = new Blob([csvRows.join('\n')], {
-      type: 'text/csv;charset=utf-8;',
-    });
+      row.replacementId || '',
+      row.replacementNumber || '',
+      row.replacementDate || '',
 
-    saveAs(blob, 'Filtered_AssetReplacement_Report.csv');
-  }
+      row.allocationId || '',
+      row.callLoggingId || '',
+      row.employeeId || '',
+      row.departmentId || '',
+      row.location || '',
 
-  // ---------------- Excel Export ----------------
-  exportExcelfile(data: TableRow[]) {
-    const today = new Date();
+      row.oldAssetId || '',
+      row.oldAssetSerialNumber || '',
+      row.oldAssetCondition || '',
+      row.oldAssetReturnStatus || '',
 
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+      row.newAssetId || '',
+      row.newAssetSerialNumber || '',
 
-    const wsData: any[][] = [
-      [this.companyName || 'Company Name'],
+      row.assetCategory || '',
+      row.replacementType || '',
+      row.reasonForReplacement || '',
+      row.replacementCost ?? 0,
 
-      ['Date:', formattedDate],
+      row.approvedBy || '',
+      row.approvalDate || '',
 
-      [],
+      row.technicianName || '',
 
-      [
-        'Replacement ID',
-        'Replacement Code',
-        'Replacement Date',
-        'Replacement Type',
+      row.replacementStatus || '',
+      row.remarks || '',
+    ]);
+  });
 
-        'Call ID',
-        'Initiated By',
-        'Department',
-        'Status',
+  /* ================= CREATE SHEET ================= */
 
-        'Old Asset ID',
-        'Old Asset Name',
-        'Old Asset Type',
-        'Old Serial Number',
-        'Old AMC Status',
+  const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
 
-        'Fault Description',
-        'Asset Condition',
-      ],
-    ];
+  /* ================= COLUMN WIDTH ================= */
 
-    /* ================= DATA ROWS ================= */
+  worksheet['!cols'] = [
 
-    data.forEach((row: TableRow) => {
-      wsData.push([
-        row.assetReplacementId || '',
-        row.assetReplacementCode || '',
-        row.assetReplacementDate || '',
-        row.assetReplacementType || '',
+    { wch: 15 }, // ID
+    { wch: 20 }, // Number
+    { wch: 15 }, // Date
 
-        row.assetReplacementCallId || '',
-        row.assetReplacementInitiatedBy || '',
-        row.department || '',
-        row.status || '',
+    { wch: 18 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 18 },
+    { wch: 18 },
 
-        row.oldAssetId || '',
-        row.oldAssetName || '',
-        row.oldAssetType || '',
-        row.oldAssetSerialNumber || '',
-        row.oldAmcStatus || '',
+    { wch: 16 },
+    { wch: 18 },
+    { wch: 18 },
+    { wch: 18 },
 
-        row.assetFaultDescription || '',
-        row.assetCondition || '',
-      ]);
-    });
+    { wch: 16 },
+    { wch: 18 },
 
-    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
+    { wch: 18 },
+    { wch: 18 },
+    { wch: 26 },
+    { wch: 14 },
 
-    /* ================= COLUMN WIDTH ================= */
+    { wch: 18 },
+    { wch: 18 },
 
-    worksheet['!cols'] = [
-      { wch: 15 },
-      { wch: 18 },
-      { wch: 15 },
-      { wch: 18 },
+    { wch: 18 },
 
-      { wch: 12 },
-      { wch: 18 },
-      { wch: 15 },
-      { wch: 12 },
+    { wch: 14 },
+    { wch: 26 },
+  ];
 
-      { wch: 14 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 16 },
+  /* ================= CREATE WORKBOOK ================= */
 
-      { wch: 22 },
-      { wch: 16 },
-    ];
+  const workbook: XLSX.WorkBook = XLSX.utils.book_new();
 
-    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    'Asset_Replacement_Report'
+  );
 
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      'Filtered Asset Replacement',
-    );
+  /* ================= DOWNLOAD ================= */
 
-    const excelBuffer: any = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
-    });
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
 
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+  const blob = new Blob([excelBuffer], {
+    type: 'application/octet-stream',
+  });
 
-    saveAs(blob, 'Filtered_AssetReplacement_Report.xlsx');
-  }
+  saveAs(blob, 'Asset_Replacement_Report.xlsx');
+}
 
   // ---------------- PDF Export ----------------
-  exportPDFfile(data: TableRow[]) {
-    if (!data || data.length === 0) {
-      this.showToast('No data available to export!', 'warning');
-      return;
-    }
+exportPDFfile(data: TableRow[]) {
 
-    const doc = new jsPDF('l', 'pt', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    const title = 'Filtered Asset Replacement Records';
-
-    doc.setFontSize(20);
-    doc.setTextColor(0, 70, 140);
-    doc.text(title, pageWidth / 2, 40, { align: 'center' });
-
-    doc.setDrawColor(0, 70, 140);
-    doc.setLineWidth(1);
-
-    doc.line(
-      pageWidth / 2 - doc.getTextWidth(title) / 2,
-      45,
-      pageWidth / 2 + doc.getTextWidth(title) / 2,
-      45,
-    );
-
-    const topY = 70;
-
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-
-    doc.text(this.companyName || 'Company Name', 40, topY);
-
-    doc.text(new Date().toLocaleDateString(), pageWidth - 40, topY, {
-      align: 'right',
-    });
-
-    autoTable(doc, {
-      startY: topY + 20,
-
-      head: [
-        [
-          'Replacement ID',
-          'Replacement Code',
-          'Replacement Date',
-          'Replacement Type',
-
-          'Call ID',
-          'Initiated By',
-          'Department',
-          'Status',
-
-          'Old Asset ID',
-          'Old Asset Name',
-          'Old Asset Type',
-          'Old Serial No',
-          'Old AMC Status',
-
-          'Fault Description',
-          'Asset Condition',
-        ],
-      ],
-
-      body: data.map((row: TableRow) => [
-        row.assetReplacementId || '',
-        row.assetReplacementCode || '',
-        row.assetReplacementDate || '',
-        row.assetReplacementType || '',
-
-        row.assetReplacementCallId || '',
-        row.assetReplacementInitiatedBy || '',
-        row.department || '',
-        row.status || '',
-
-        row.oldAssetId || '',
-        row.oldAssetName || '',
-        row.oldAssetType || '',
-        row.oldAssetSerialNumber || '',
-        row.oldAmcStatus || '',
-
-        row.assetFaultDescription || '',
-        row.assetCondition || '',
-      ]),
-
-      theme: 'grid',
-
-      styles: {
-        fontSize: 7,
-        cellPadding: 2,
-        overflow: 'linebreak',
-        halign: 'center',
-        valign: 'middle',
-      },
-
-      headStyles: {
-        fillColor: [0, 92, 179],
-        textColor: 255,
-        fontStyle: 'bold',
-      },
-
-      margin: { left: 20, right: 20 },
-
-      pageBreak: 'auto',
-    });
-
-    doc.save('Filtered_AssetReplacement_Report.pdf');
+  if (!data || data.length === 0) {
+    this.showToast('No data available to export!', 'warning');
+    return;
   }
+
+  const doc = new jsPDF('l', 'pt', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  const title = 'Asset Replacement Report';
+
+  /* ================= TITLE ================= */
+  doc.setFontSize(20);
+  doc.setTextColor(0, 70, 140);
+  doc.text(title, pageWidth / 2, 40, { align: 'center' });
+
+  doc.setDrawColor(0, 70, 140);
+  doc.setLineWidth(1);
+  doc.line(
+    pageWidth / 2 - doc.getTextWidth(title) / 2,
+    45,
+    pageWidth / 2 + doc.getTextWidth(title) / 2,
+    45
+  );
+
+  /* ================= HEADER ================= */
+  const topY = 70;
+
+  doc.setFontSize(11);
+  doc.setTextColor(0, 0, 0);
+
+  doc.text(this.companyName || 'Asset Management', 40, topY);
+
+  if (this.companyEmail) {
+    doc.text(this.companyEmail, 40, topY + 14);
+  }
+
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 40, topY, {
+    align: 'right',
+  });
+
+  /* ================= TABLE ================= */
+  autoTable(doc, {
+
+    startY: topY + 30,
+
+    head: [[
+      'ID',
+      'Number',
+      'Date',
+
+      'Allocation',
+      'Call ID',
+      'Employee',
+      'Department',
+      'Location',
+
+      'Old Asset',
+      'Old Serial',
+      'Condition',
+      'Return',
+
+      'New Asset',
+      'New Serial',
+
+      'Category',
+      'Type',
+      'Reason',
+      'Cost',
+
+      'Approved By',
+      'Approval Date',
+
+      'Technician',
+
+      'Status',
+      'Remarks'
+    ]],
+
+    body: data.map((row: TableRow) => [
+
+      row.replacementId || '',
+      row.replacementNumber || '',
+      row.replacementDate || '',
+
+      row.allocationId || '',
+      row.callLoggingId || '',
+      row.employeeId || '',
+      row.departmentId || '',
+      row.location || '',
+
+      row.oldAssetId || '',
+      row.oldAssetSerialNumber || '',
+      row.oldAssetCondition || '',
+      row.oldAssetReturnStatus || '',
+
+      row.newAssetId || '',
+      row.newAssetSerialNumber || '',
+
+      row.assetCategory || '',
+      row.replacementType || '',
+      row.reasonForReplacement || '',
+      row.replacementCost ?? 0,
+
+      row.approvedBy || '',
+      row.approvalDate || '',
+
+      row.technicianName || '',
+
+      row.replacementStatus || '',
+      row.remarks || '',
+    ]),
+
+    theme: 'grid',
+    tableWidth: 'auto',
+
+    styles: {
+      fontSize: 7,
+      cellPadding: 3,
+      halign: 'center',
+      valign: 'middle',
+    },
+
+    headStyles: {
+      fillColor: [0, 92, 179],
+      textColor: 255,
+      fontStyle: 'bold',
+    },
+
+    margin: { left: 10, right: 10 },
+
+    pageBreak: 'auto',
+  });
+
+  /* ================= SAVE ================= */
+  doc.save('Asset_Replacement_Report.pdf');
+}
+// Call select → OLD asset auto fill
+onCallChange(callId: string, index: number) {
+  const selectedCall = this.callList.find(c => c.callLoggingId === callId);
+
+  if (selectedCall) {
+    this.forms[index].newRecord.oldAssetId = selectedCall.assetId;
+    this.forms[index].newRecord.oldAssetSerialNumber = selectedCall.serialNumber;
+    this.forms[index].newRecord.oldAssetCondition = selectedCall.assetCondition;
+    this.forms[index].newRecord.employeeId = selectedCall.employeeId;
+    this.forms[index].newRecord.departmentId = selectedCall.departmentId;
+    this.forms[index].newRecord.location = selectedCall.location;
+  }
+}onNewAssetChange(assetId: string, index: number) {
+  const asset = this.assetList.find(a => a.assetId === assetId);
+
+  if (asset) {
+    this.forms[index].newRecord.newAssetId = asset.assetId;
+    this.forms[index].newRecord.newAssetSerialNumber = asset.serialNumber;
+  }
+}
 }

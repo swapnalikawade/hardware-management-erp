@@ -15,32 +15,47 @@ import { CommonService } from '../../../services/common/common-service';
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc =
   'node_modules/pdfjs-dist/build/pdf.worker.min.js';
 
-interface TableRow {
-  myassetId: string;
-  myassetCode: string;
-  myassetName: string;
-  myassetType: string;
-  myassetCategory: string;
+export interface TableRow {
 
-  departmentCode: string;
-  departmentName: string;
+  /* ========= PRIMARY ========= */
+  allocationId: string;
+  allocationNumber: string;
 
-  assetMake?: string;
-  assetModel?: string;
+  /* ========= EMPLOYEE ========= */
+  employeeId: string;
+  departmentId: string;
+  location?: string;
 
-  myassetLocation?: string;
-  myassetTag?: string;
+  /* ========= ASSET ========= */
+  assetId: string;
 
-  myassetPurchaseDate?: string;
-  myassetVendorName?: string;
-  myassetInvoiceNo?: string;
+  /* ========= DATES ========= */
+  allocationDate?: string;
+  expectedReturnDate?: string;
+  actualReturnDate?: string;
 
-  myassetStatus: 'PENDING' | 'ACTIVE' | 'APPROVAL';
-  myassetWorkingStatus?: string;
+  /* ========= CONDITION ========= */
+  conditionAtIssue?: string;
+  conditionAtReturn?: string;
 
-  myassetCreatedDate: string;
-  loginId: string;
+  /* ========= BUSINESS ========= */
+  purpose?: string;
+  approvalBy?: string;
+  approvalDate?: string;
+
+  /* ========= REMARKS ========= */
+  remarks?: string;
+
+  /* ========= AUDIT ========= */
+  createdBy: string;
+  createdDate: string;
+  updatedBy?: string;
+  updatedDate?: string;
+
+  /* ========= STATUS ========= */
+  allocationStatus: 'Active' | 'Inactive';
 }
+
 @Component({
   selector: 'app-my-asset',
   standalone: false,
@@ -106,98 +121,95 @@ export class MyAssetComponent {
 
   toastMessage: string | null = null;
   toastType: string = 'success';
-  ngOnInit(): void {
-    this.token = this.authService.getToken();
-    this.userName = this.authService.getUsername();
-    this.userRoles = this.authService.getUserRoles();
-    this.date = this.authService.getCurrentDate();
-    this.headCompanyName = this.authService.getEmployeeName();
-    this.loginId = this.authService.getEmployeeId();
-    alert(this.loginId);
-    if (!this.token) {
-      this.router.navigate(['/login-page']);
-      return;
+ngOnInit(): void {
+
+  /* ================= AUTH ================= */
+  this.token = this.authService.getToken();
+  this.userName = this.authService.getUsername();
+  this.userRoles = this.authService.getUserRoles();
+  this.date = this.authService.getCurrentDate();
+  this.headCompanyName = this.authService.getEmployeeName();
+
+  /* 🔥 FIX 1: loginId NULL CHECK */
+  const rawId = this.authService.getEmployeeId();   // string | null
+
+  if (!rawId) {
+    console.error("Employee ID is null");
+    this.toast.danger('Employee ID missing!', 'ERROR', 3000);
+    return;
+  }
+
+  this.loginId = this.formatLoginId(rawId);   // ✅ safe now
+
+  console.log("FINAL LOGIN ID:", this.loginId);
+
+  /* ================= AUTH CHECK ================= */
+  if (!this.token) {
+    this.router.navigate(['/login-page']);
+    return;
+  }
+
+  /* 🔥 FIX 2: DATE */
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+
+  this.currentDate = `${yyyy}-${mm}-${dd}`;
+
+  /* ================= INIT ================= */
+  this.initializeForm();
+
+  this.filteredData = [];
+
+  /* 🔥 DATA LOAD */
+  this.loadMyAsset();       // ✅ now correct loginId जाएगा
+  this.loadDepartments();
+}
+
+ private initializeForm(): void {
+  this.forms = [
+    {
+      /* ========= PRIMARY ========= */
+      allocationId: '',
+      allocationNumber: '',
+
+      /* ========= EMPLOYEE ========= */
+      employeeId: '',
+      departmentId: '',
+      location: '',
+
+      /* ========= ASSET ========= */
+      assetId: '',
+
+      /* ========= DATES ========= */
+      allocationDate: this.currentDate,
+      expectedReturnDate: '',
+      actualReturnDate: '',
+
+      /* ========= CONDITION ========= */
+      conditionAtIssue: '',
+      conditionAtReturn: '',
+
+      /* ========= BUSINESS ========= */
+      purpose: '',
+      approvalBy: '',
+      approvalDate: '',
+
+      /* ========= REMARKS ========= */
+      remarks: '',
+
+      /* ========= AUDIT ========= */
+      createdBy: this.loginId,   // 🔥 VERY IMPORTANT
+      createdDate: this.currentDate,
+      updatedBy: '',
+      updatedDate: '',
+
+      /* ========= STATUS ========= */
+      allocationStatus: 'Active'
     }
-
-    const today = new Date();
-    this.currentDate = this.today.toISOString().split('T')[0];
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    this.currentDate = `${yyyy}-${mm}-${dd}`;
-
-    // 🗓 Initialize form & data
-    this.initializeForm();
-    this.filteredData = [...this.tableData];
-
-    // Table Data
-    //this.loadMyAsset();
-    // 🔥 ADD THIS LINE
-    this.loadMyAsset();
-    // Department dropdown
-    this.loadDepartments();
-
-    // Dropdown APIs together
-  }
-
-  private initializeForm(): void {
-    this.forms = [
-      {
-        // ✅ UI binding
-        myassetCode: '',
-        myassetName: '',
-        myassetType: '',
-        myassetCategory: '',
-
-        departmentCode: '',
-        departmentName: '',
-
-        assetMake: '',
-        assetModel: '',
-
-        myassetLocation: '',
-        myassetTag: '',
-
-        myassetPurchaseDate: this.currentDate,
-        myassetVendorName: '',
-        myassetInvoiceNo: '',
-
-        myassetStatus: 'PENDING',
-        myassetWorkingStatus: '',
-
-        myassetCreatedDate: this.currentDate,
-        loginId: this.loginId,
-
-        // ✅ backend
-        newRecord: {
-          myassetId: '0',
-          myassetCode: '',
-          myassetName: '',
-          myassetType: '',
-          myassetCategory: '',
-
-          departmentCode: '',
-          departmentName: '',
-
-          assetMake: '',
-          assetModel: '',
-
-          myassetLocation: '',
-          myassetTag: '',
-
-          myassetPurchaseDate: this.currentDate,
-          myassetVendorName: '',
-          myassetInvoiceNo: '',
-
-          myassetStatus: 'PENDING',
-          myassetWorkingStatus: '',
-
-          myassetCreatedDate: this.currentDate,
-          loginId: this.loginId,
-        },
-      },
-    ];
-  }
+  ];
+}
   loadDepartments(): void {
     this.commonService.fetchAllDepartments().subscribe({
       next: (res: any) => {
@@ -217,61 +229,77 @@ export class MyAssetComponent {
       },
     });
   }
+formatLoginId(id: string): string {
+  if (!id) return '';
 
-  loadMyAsset(): void {
-    if (!this.loginId) {
-      console.warn('Login ID missing');
-      return;
-    }
+  // EMP002 → EMP/2026/002
+  const prefix = id.substring(0, 3);
+  const code = id.substring(3).padStart(3, '0');
+  const year = new Date().getFullYear();
 
-    this.commonService.fetchMyAssetByLoginId(this.loginId).subscribe({
-      next: (res: any) => {
-        console.log('My Asset Response:', res);
-
-        const list = Array.isArray(res) ? res : res?.data || [];
-
-        // 🔥 FIX START (IMPORTANT)
-        this.tableData = list.map((item: any) => ({
-          myassetId: item.myassetId || item.assetallocationAssetId || '',
-          myassetCode: item.myassetCode || item.assetallocationCode || '',
-          myassetName: item.myassetName || item.assetallocationAssetName || '',
-          myassetType: item.myassetType || item.assetallocationAssetType || '',
-          myassetCategory: item.myassetCategory || '',
-
-          departmentCode:
-            item.departmentCode || item.assetallocationDepartment || '',
-          departmentName:
-            item.departmentName || item.assetallocationDepartment || '',
-
-          assetMake: item.assetMake || item.assetallocationAssetMake || '',
-          assetModel: item.assetModel || item.assetallocationModel || '',
-
-          myassetLocation:
-            item.myassetLocation || item.assetallocationLocation || '',
-          myassetTag: item.myassetTag || item.assetallocationSerialNumber || '',
-
-          myassetPurchaseDate:
-            item.myassetPurchaseDate || item.assetallocationStartDate || '',
-          myassetVendorName: item.myassetVendorName || '',
-          myassetInvoiceNo: item.myassetInvoiceNo || '',
-
-          myassetStatus:
-            item.myassetStatus || item.assetallocationStatus || 'PENDING',
-          myassetWorkingStatus: item.myassetWorkingStatus || '',
-
-          myassetCreatedDate: item.myassetCreatedDate || item.createdDate || '',
-          loginId: item.loginId || '',
-        }));
-        // 🔥 FIX END
-
-        this.filteredData = [...this.tableData];
-      },
-
-      error: (err) => {
-        console.error('My Asset API Error:', err);
-      },
-    });
+  return `${prefix}/${year}/${code}`;
+}
+loadMyAsset(): void {
+  if (!this.loginId) {
+    console.warn('Login ID missing');
+    return;
   }
+
+  this.commonService.fetchMyAssetByLoginId(this.loginId).subscribe({
+    next: (res: any) => {
+      console.log('My Asset Response:', res);
+
+      const list = Array.isArray(res) ? res : res?.data || [];
+
+      // ✅ FIXED MAPPING (TableRow interface अनुसार)
+      this.tableData = list.map((item: any) => ({
+        
+        /* ========= PRIMARY ========= */
+        allocationId: item.allocationId || '',
+        allocationNumber: item.allocationNumber || '',
+
+        /* ========= EMPLOYEE ========= */
+        employeeId: item.employeeId || '',
+        departmentId: item.departmentId || '',
+        location: item.location || '',
+
+        /* ========= ASSET ========= */
+        assetId: item.assetId || '',
+
+        /* ========= DATES ========= */
+        allocationDate: item.allocationDate || '',
+        expectedReturnDate: item.expectedReturnDate || '',
+        actualReturnDate: item.actualReturnDate || '',
+
+        /* ========= CONDITION ========= */
+        conditionAtIssue: item.conditionAtIssue || '',
+        conditionAtReturn: item.conditionAtReturn || '',
+
+        /* ========= BUSINESS ========= */
+        purpose: item.purpose || '',
+        approvalBy: item.approvalBy || '',
+        approvalDate: item.approvalDate || '',
+
+        /* ========= REMARKS ========= */
+        remarks: item.remarks || '',
+
+        /* ========= AUDIT (🔥 IMPORTANT) ========= */
+createdBy: item.createdBy || '',        createdDate: item.createdDate || '',
+        updatedBy: item.updatedBy || '',
+        updatedDate: item.updatedDate || '',
+
+        /* ========= STATUS ========= */
+        allocationStatus: item.allocationStatus || 'Active',
+      }));
+
+      this.filteredData = [...this.tableData];
+    },
+
+    error: (err) => {
+      console.error('My Asset API Error:', err);
+    },
+  });
+}
   formatDate(date: any): string {
     if (!date) return '';
 
@@ -429,7 +457,7 @@ export class MyAssetComponent {
 
         // ✅ UI update (instant)
         this.tableData = this.tableData.filter(
-          (row) => !ids.includes(row.myassetId),
+          (row) => !ids.includes(row.allocationId),
         );
 
         this.filteredData = [...this.tableData];
@@ -511,69 +539,83 @@ export class MyAssetComponent {
 
     return `${day}-${month}-${year}`;
   }
-  exportExcel(): void {
-    if (!this.tableData || this.tableData.length === 0) {
-      this.toast.warning('No data available to export!', '', 3000);
-      return;
-    }
-
-    const exportData = this.tableData.map((row: TableRow) => ({
-      Asset_ID: row.myassetId ?? '',
-      Created_Date: this.formatDateForExcel(row.myassetCreatedDate),
-
-      Asset_Code: row.myassetCode ?? '',
-      Asset_Name: row.myassetName ?? '',
-      Asset_Type: row.myassetType ?? '',
-      Asset_Category: row.myassetCategory ?? '',
-
-      Department_Code: row.departmentCode ?? '',
-      Department_Name: row.departmentName ?? '',
-
-      Asset_Make: row.assetMake ?? '',
-      Asset_Model: row.assetModel ?? '',
-
-      Location: row.myassetLocation ?? '',
-      Asset_Tag: row.myassetTag ?? '',
-
-      Purchase_Date: this.formatDateForExcel(row.myassetPurchaseDate),
-      Vendor_Name: row.myassetVendorName ?? '',
-      Invoice_No: row.myassetInvoiceNo ?? '',
-
-      Asset_Status: row.myassetStatus ?? '',
-      Working_Status: row.myassetWorkingStatus ?? '',
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-
-    worksheet['!cols'] = Object.keys(exportData[0]).map((key) => ({
-      wch: Math.max(key.length + 2, 20),
-    }));
-
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'MyAssetData');
-
-    const fileName = `My_Asset_Data_${this.getTodayDate()}.xlsx`;
-
-    XLSX.writeFile(workbook, fileName);
-
-    this.toast.success('Excel exported successfully!', 'Success', 3000);
+ exportExcel(): void {
+  if (!this.tableData || this.tableData.length === 0) {
+    this.toast.warning('No data available to export!', '', 3000);
+    return;
   }
-  exportDoc(): void {
-    if (!this.tableData || this.tableData.length === 0) {
-      this.toast.warning('No data available to export!', '', 3000);
-      return;
-    }
 
-    const currentDate = this.getTodayDate();
+  const exportData = this.tableData.map((row: TableRow) => ({
 
-    let content = `
+    /* ========= PRIMARY ========= */
+    Allocation_ID: row.allocationId ?? '',
+    Allocation_Number: row.allocationNumber ?? '',
+
+    /* ========= EMPLOYEE ========= */
+    Employee_ID: row.employeeId ?? '',
+    Department_ID: row.departmentId ?? '',
+    Location: row.location ?? '',
+
+    /* ========= ASSET ========= */
+    Asset_ID: row.assetId ?? '',
+
+    /* ========= DATES ========= */
+    Allocation_Date: this.formatDateForExcel(row.allocationDate),
+    Expected_Return_Date: this.formatDateForExcel(row.expectedReturnDate),
+    Actual_Return_Date: this.formatDateForExcel(row.actualReturnDate),
+
+    /* ========= CONDITION ========= */
+    Condition_Issue: row.conditionAtIssue ?? '',
+    Condition_Return: row.conditionAtReturn ?? '',
+
+    /* ========= BUSINESS ========= */
+    Purpose: row.purpose ?? '',
+    Approval_By: row.approvalBy ?? '',
+    Approval_Date: this.formatDateForExcel(row.approvalDate),
+
+    /* ========= REMARKS ========= */
+    Remarks: row.remarks ?? '',
+
+    /* ========= AUDIT ========= */
+    Created_By: row.createdBy ?? '',
+    Created_Date: this.formatDateForExcel(row.createdDate),
+
+    /* ========= STATUS ========= */
+    Status: row.allocationStatus ?? '',
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+  // ✅ column width auto सेट
+  worksheet['!cols'] = Object.keys(exportData[0]).map((key) => ({
+    wch: Math.max(key.length + 2, 20),
+  }));
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'AssetAllocation');
+
+  const fileName = `Asset_Allocation_${this.getTodayDate()}.xlsx`;
+
+  XLSX.writeFile(workbook, fileName);
+
+  this.toast.success('Excel exported successfully!', 'Success', 3000);
+}
+ exportDoc(): void {
+  if (!this.tableData || this.tableData.length === 0) {
+    this.toast.warning('No data available to export!', '', 3000);
+    return;
+  }
+
+  const currentDate = this.getTodayDate();
+
+  let content = `
 <html xmlns:o="urn:schemas-microsoft-com:office:office"
       xmlns:w="urn:schemas-microsoft-com:office:word"
       xmlns="http://www.w3.org/TR/REC-html40">
 
 <head>
 <meta charset="utf-8" />
-<title>My Asset Report</title>
+<title>Asset Allocation Report</title>
 
 <style>
 @page WordSection1 { size: 842pt 595pt; mso-page-orientation: landscape; margin: 20pt; }
@@ -609,176 +651,188 @@ font-weight:bold;
 <body>
 <div class="WordSection1">
 
-<p class="title">My Asset Report</p>
+<p class="title">Asset Allocation Report</p>
 <p>Date: ${currentDate}</p>
 
 <table>
 
 <tr>
-<th>ID</th>
-<th>Code</th>
-<th>Name</th>
-<th>Type</th>
-<th>Category</th>
+<th>Allocation ID</th>
+<th>Allocation Number</th>
 
-<th>Dept Code</th>
-<th>Dept Name</th>
-
-<th>Make</th>
-<th>Model</th>
-
+<th>Employee</th>
+<th>Department</th>
 <th>Location</th>
-<th>Tag</th>
 
-<th>Purchase Date</th>
-<th>Vendor</th>
-<th>Invoice</th>
+<th>Asset</th>
+
+<th>Allocation Date</th>
+<th>Expected Return</th>
+<th>Actual Return</th>
+
+<th>Condition Issue</th>
+<th>Condition Return</th>
+
+<th>Purpose</th>
+<th>Approval By</th>
+<th>Approval Date</th>
+
+<th>Remarks</th>
+
+<th>Created By</th>
+<th>Created Date</th>
 
 <th>Status</th>
-<th>Working Status</th>
-
-<th>Created Date</th>
 </tr>
 `;
 
-    this.tableData.forEach((row: TableRow) => {
-      content += `
+  this.tableData.forEach((row: TableRow) => {
+    content += `
 <tr>
-<td>${row.myassetId ?? ''}</td>
-<td>${row.myassetCode ?? ''}</td>
-<td>${row.myassetName ?? ''}</td>
-<td>${row.myassetType ?? ''}</td>
-<td>${row.myassetCategory ?? ''}</td>
+<td>${row.allocationId ?? ''}</td>
+<td>${row.allocationNumber ?? ''}</td>
 
-<td>${row.departmentCode ?? ''}</td>
-<td>${row.departmentName ?? ''}</td>
+<td>${row.employeeId ?? ''}</td>
+<td>${row.departmentId ?? ''}</td>
+<td>${row.location ?? ''}</td>
 
-<td>${row.assetMake ?? ''}</td>
-<td>${row.assetModel ?? ''}</td>
+<td>${row.assetId ?? ''}</td>
 
-<td>${row.myassetLocation ?? ''}</td>
-<td>${row.myassetTag ?? ''}</td>
+<td>${this.formatDateForExcel(row.allocationDate)}</td>
+<td>${this.formatDateForExcel(row.expectedReturnDate)}</td>
+<td>${this.formatDateForExcel(row.actualReturnDate)}</td>
 
-<td>${this.formatDateForExcel(row.myassetPurchaseDate)}</td>
-<td>${row.myassetVendorName ?? ''}</td>
-<td>${row.myassetInvoiceNo ?? ''}</td>
+<td>${row.conditionAtIssue ?? ''}</td>
+<td>${row.conditionAtReturn ?? ''}</td>
 
-<td>${row.myassetStatus ?? ''}</td>
-<td>${row.myassetWorkingStatus ?? ''}</td>
+<td>${row.purpose ?? ''}</td>
+<td>${row.approvalBy ?? ''}</td>
+<td>${this.formatDateForExcel(row.approvalDate)}</td>
 
-<td>${this.formatDateForExcel(row.myassetCreatedDate)}</td>
+<td>${row.remarks ?? ''}</td>
+
+<td>${row.createdBy ?? ''}</td>
+<td>${this.formatDateForExcel(row.createdDate)}</td>
+
+<td>${row.allocationStatus ?? ''}</td>
 </tr>
 `;
-    });
+  });
 
-    content += `</table></div></body></html>`;
+  content += `</table></div></body></html>`;
 
-    const blob = new Blob(['\ufeff', content], {
-      type: 'application/msword',
-    });
+  const blob = new Blob(['\ufeff', content], {
+    type: 'application/msword',
+  });
 
-    saveAs(blob, `My_Asset_Report_${currentDate}.doc`);
+  saveAs(blob, `Asset_Allocation_Report_${currentDate}.doc`);
 
-    this.toast.success('DOC exported successfully!', 'Success', 3000);
-  }
+  this.toast.success('DOC exported successfully!', 'Success', 3000);
+}
 
   exportPDF(): void {
-    if (!this.tableData || this.tableData.length === 0) {
-      this.toast.warning('No data available to export!', '', 3000);
-      return;
-    }
-
-    const doc = new jsPDF('l', 'mm', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const currentDate = this.getTodayDate();
-
-    // 🔹 Header
-    doc.setFontSize(10);
-    doc.text(`Date: ${currentDate}`, 10, 10);
-
-    doc.setFontSize(14);
-    doc.text('My Asset Report', pageWidth / 2, 10, { align: 'center' });
-
-    autoTable(doc, {
-      startY: 16,
-
-      styles: {
-        fontSize: 8,
-        cellPadding: 2,
-        valign: 'middle',
-        overflow: 'linebreak',
-      },
-
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: 255,
-        fontSize: 8,
-        halign: 'center',
-      },
-
-      tableWidth: 'auto',
-      margin: { left: 5, right: 5 },
-
-      head: [
-        [
-          'ID',
-          'Code',
-          'Name',
-          'Type',
-          'Category',
-
-          'Dept Code',
-          'Dept Name',
-
-          'Make',
-          'Model',
-
-          'Location',
-          'Tag',
-
-          'Purchase Date',
-          'Vendor',
-          'Invoice',
-
-          'Asset Status',
-          'Working Status',
-
-          'Created Date',
-        ],
-      ],
-
-      body: this.tableData.map((row: TableRow) => [
-        row.myassetId ?? '',
-        row.myassetCode ?? '',
-        row.myassetName ?? '',
-        row.myassetType ?? '',
-        row.myassetCategory ?? '',
-
-        row.departmentCode ?? '',
-        row.departmentName ?? '',
-
-        row.assetMake ?? '',
-        row.assetModel ?? '',
-
-        row.myassetLocation ?? '',
-        row.myassetTag ?? '',
-
-        this.formatDateForExcel(row.myassetPurchaseDate),
-        row.myassetVendorName ?? '',
-        row.myassetInvoiceNo ?? '',
-
-        row.myassetStatus ?? '',
-        row.myassetWorkingStatus ?? '',
-
-        this.formatDateForExcel(row.myassetCreatedDate),
-      ]),
-    });
-
-    // 🔹 Save with date
-    doc.save(`My_Asset_Report_${currentDate}.pdf`);
-
-    this.toast.success('PDF exported successfully!', 'Success', 3000);
+  if (!this.tableData || this.tableData.length === 0) {
+    this.toast.warning('No data available to export!', '', 3000);
+    return;
   }
+
+  const doc = new jsPDF('l', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const currentDate = this.getTodayDate();
+
+  // 🔹 Header
+  doc.setFontSize(10);
+  doc.text(`Date: ${currentDate}`, 10, 10);
+
+  doc.setFontSize(14);
+  doc.text('Asset Allocation Report', pageWidth / 2, 10, { align: 'center' });
+
+  autoTable(doc, {
+    startY: 16,
+
+    styles: {
+      fontSize: 7,
+      cellPadding: 2,
+      valign: 'middle',
+      overflow: 'linebreak',
+    },
+
+    headStyles: {
+      fillColor: [41, 128, 185],
+      textColor: 255,
+      fontSize: 8,
+      halign: 'center',
+    },
+
+    tableWidth: 'auto',
+    margin: { left: 5, right: 5 },
+
+    // ✅ UPDATED HEADERS
+    head: [[
+      'Allocation ID',
+      'Allocation No',
+
+      'Employee',
+      'Department',
+      'Location',
+
+      'Asset',
+
+      'Allocation Date',
+      'Expected Return',
+      'Actual Return',
+
+      'Cond Issue',
+      'Cond Return',
+
+      'Purpose',
+      'Approval By',
+      'Approval Date',
+
+      'Remarks',
+
+      'Created By',
+      'Created Date',
+
+      'Status'
+    ]],
+
+    // ✅ UPDATED BODY
+    body: this.tableData.map((row: TableRow) => [
+      row.allocationId ?? '',
+      row.allocationNumber ?? '',
+
+      row.employeeId ?? '',
+      row.departmentId ?? '',
+      row.location ?? '',
+
+      row.assetId ?? '',
+
+      this.formatDateForExcel(row.allocationDate),
+      this.formatDateForExcel(row.expectedReturnDate),
+      this.formatDateForExcel(row.actualReturnDate),
+
+      row.conditionAtIssue ?? '',
+      row.conditionAtReturn ?? '',
+
+      row.purpose ?? '',
+      row.approvalBy ?? '',
+      this.formatDateForExcel(row.approvalDate),
+
+      row.remarks ?? '',
+
+      row.createdBy ?? '',
+      this.formatDateForExcel(row.createdDate),
+
+      row.allocationStatus ?? '',
+    ]),
+  });
+
+  // 🔹 Save
+  doc.save(`Asset_Allocation_Report_${currentDate}.pdf`);
+
+  this.toast.success('PDF exported successfully!', 'Success', 3000);
+}
 
   //pagination
   // Pagination Variables
@@ -820,37 +874,46 @@ font-weight:bold;
   // --------------------------
   // INITIAL RECORD STRUCTURE
   // --------------------------
-  newRecord: TableRow = {
-    // System
-    myassetId: '',
-    myassetCreatedDate: this.getTodayDate(),
+newRecord: TableRow = {
 
-    // Core Mandatory
-    myassetCode: '',
-    myassetName: '',
-    myassetType: '',
-    myassetCategory: '',
+  /* ========= PRIMARY ========= */
+  allocationId: '',
+  allocationNumber: '',
 
-    departmentCode: '',
-    departmentName: '',
+  /* ========= EMPLOYEE ========= */
+  employeeId: '',
+  departmentId: '',
+  location: '',
 
-    assetMake: '',
-    assetModel: '',
+  /* ========= ASSET ========= */
+  assetId: '',
 
-    myassetLocation: '',
-    myassetTag: '',
+  /* ========= DATES ========= */
+  allocationDate: this.getTodayDate(),
+  expectedReturnDate: '',
+  actualReturnDate: '',
 
-    myassetPurchaseDate: this.getTodayDate(),
-    myassetVendorName: '',
-    myassetInvoiceNo: '',
+  /* ========= CONDITION ========= */
+  conditionAtIssue: '',
+  conditionAtReturn: '',
 
-    // ✅ FIXED (IMPORTANT 🔥)
-    myassetStatus: 'PENDING',
-    myassetWorkingStatus: 'Working',
+  /* ========= BUSINESS ========= */
+  purpose: '',
+  approvalBy: '',
+  approvalDate: '',
 
-    // ✅ Missing field add
-    loginId: this.loginId,
-  };
+  /* ========= REMARKS ========= */
+  remarks: '',
+
+  /* ========= AUDIT (🔥 IMPORTANT) ========= */
+  createdBy: this.loginId,                 // 🔥 login wise data
+  createdDate: this.getTodayDate(),
+  updatedBy: '',
+  updatedDate: '',
+
+  /* ========= STATUS ========= */
+  allocationStatus: 'Active'
+};
 
   // --------------------------
   // STATE VARIABLES
@@ -875,53 +938,61 @@ font-weight:bold;
   // --------------------------
   // ADD NEW FORM
   // --------------------------
-  cancelRecord(form?: NgForm, index?: number): void {
-    const currentDate = this.getTodayDate(); // ✅ reuse function
+ cancelRecord(form?: NgForm, index?: number): void {
+  const currentDate = this.getTodayDate();
 
-    if (index !== undefined) {
-      this.forms[index] = {
-        newRecord: {
-          myassetId: '0',
-          myassetCreatedDate: currentDate,
+  if (index !== undefined) {
+    this.forms[index] = {
 
-          myassetCode: '',
-          myassetName: '',
-          myassetType: '',
-          myassetCategory: '',
+      /* ========= PRIMARY ========= */
+      allocationId: '',
+      allocationNumber: '',
 
-          departmentCode: '',
-          departmentName: '',
+      /* ========= EMPLOYEE ========= */
+      employeeId: '',
+      departmentId: '',
+      location: '',
 
-          assetMake: '',
-          assetModel: '',
+      /* ========= ASSET ========= */
+      assetId: '',
 
-          myassetLocation: '',
-          myassetTag: '',
+      /* ========= DATES ========= */
+      allocationDate: currentDate,
+      expectedReturnDate: '',
+      actualReturnDate: '',
 
-          myassetPurchaseDate: currentDate,
+      /* ========= CONDITION ========= */
+      conditionAtIssue: '',
+      conditionAtReturn: '',
 
-          myassetVendorName: '',
-          myassetInvoiceNo: '',
+      /* ========= BUSINESS ========= */
+      purpose: '',
+      approvalBy: '',
+      approvalDate: '',
 
-          // ✅ FIXED
-          myassetStatus: 'PENDING',
-          myassetWorkingStatus: 'Working',
+      /* ========= REMARKS ========= */
+      remarks: '',
 
-          // ✅ REQUIRED FIELD
-          loginId: this.loginId,
-        },
-      };
-    }
+      /* ========= AUDIT (🔥 IMPORTANT) ========= */
+      createdBy: this.loginId,
+      createdDate: currentDate,
+      updatedBy: '',
+      updatedDate: '',
 
-    // ✅ Reset Angular form
-    if (form) {
-      form.resetForm();
-    }
-
-    this.isEditMode = false;
-    this.editIndex = null;
-    this.showErrors = false;
+      /* ========= STATUS ========= */
+      allocationStatus: 'Active'
+    };
   }
+
+  // ✅ Reset Angular form
+  if (form) {
+    form.resetForm();
+  }
+
+  this.isEditMode = false;
+  this.editIndex = null;
+  this.showErrors = false;
+}
   // --------------------------
   // REMOVE FORM
   // --------------------------
@@ -936,192 +1007,201 @@ font-weight:bold;
   // --------------------------
   // SAVE RECORD (SINGLE OR MULTIPLE)
   // --------------------------
-  saveAllRecords(form?: NgForm): void {
-    // ---------------- VALIDATION ----------------
-    const invalid = this.forms.some(
-      (f) =>
-        !f.newRecord.myassetCode?.trim() ||
-        !f.newRecord.myassetName?.trim() ||
-        !f.newRecord.myassetType?.trim() ||
-        !f.newRecord.myassetCategory?.trim() ||
-        !f.newRecord.departmentCode?.trim() ||
-        !f.newRecord.assetMake?.trim() ||
-        !f.newRecord.assetModel?.trim() ||
-        !f.newRecord.myassetLocation?.trim() ||
-        !f.newRecord.myassetTag?.trim(),
-    );
+saveAllRecords(form?: NgForm): void {
 
-    if (invalid) {
-      this.showErrors = true;
-      this.toast.warning('Please fill all required fields!', 'Warning', 4000);
-      return;
-    }
+  // ---------------- VALIDATION ----------------
+  const invalid = this.forms.some((f) =>
+    !f.allocationNumber?.trim() ||
+    !f.employeeId?.trim() ||
+    !f.departmentId?.trim() ||
+    !f.assetId?.trim()
+  );
 
-    // 🔥 Common mapper (reuse)
-    const mapPayload = (data: TableRow) => ({
-      myassetCode: data.myassetCode,
-      myassetName: data.myassetName,
-      myassetType: data.myassetType,
-      myassetCategory: data.myassetCategory,
+  if (invalid) {
+    this.showErrors = true;
+    this.toast.warning('Please fill all required fields!', 'Warning', 4000);
+    return;
+  }
 
-      departmentCode: data.departmentCode,
-      departmentName: data.departmentName,
+  // 🔥 Common mapper
+  const mapPayload = (data: TableRow) => ({
 
-      assetMake: data.assetMake,
-      assetModel: data.assetModel,
+    allocationId: data.allocationId,
+    allocationNumber: data.allocationNumber,
 
-      myassetLocation: data.myassetLocation,
-      myassetTag: data.myassetTag,
+    employeeId: data.employeeId,
+    departmentId: data.departmentId,
+    location: data.location,
 
-      myassetPurchaseDate: data.myassetPurchaseDate,
-      myassetVendorName: data.myassetVendorName,
-      myassetInvoiceNo: data.myassetInvoiceNo,
+    assetId: data.assetId,
 
-      myassetStatus: data.myassetStatus || 'PENDING',
-      myassetWorkingStatus: data.myassetWorkingStatus,
+    allocationDate: data.allocationDate,
+    expectedReturnDate: data.expectedReturnDate,
+    actualReturnDate: data.actualReturnDate,
 
-      loginId: this.loginId, // ✅ important
-    });
+    conditionAtIssue: data.conditionAtIssue,
+    conditionAtReturn: data.conditionAtReturn,
 
-    // ---------------- EDIT MODE ----------------
-    if (this.isEditMode && this.editIndex !== null) {
-      const formData = this.forms[0].newRecord;
+    purpose: data.purpose,
+    approvalBy: data.approvalBy,
+    approvalDate: data.approvalDate,
 
-      const payload = {
-        ...mapPayload(formData),
-        myassetUpdatedDate: this.getTodayDate(),
-      };
+    remarks: data.remarks,
 
-      const myassetId = this.tableData[this.editIndex].myassetId;
+    // 🔥 IMPORTANT
+    createdBy: this.loginId,
+    createdDate: this.getTodayDate(),
 
-      this.commonService.updateMyAsset(myassetId, payload).subscribe({
-        next: () => {
-          this.toast.success('Asset Updated Successfully!', 'Success', 4000);
+    allocationStatus: data.allocationStatus || 'Active'
+  });
 
-          this.resetAfterSave();
-          //this.loadMyAsset();
-        },
-        error: () => {
-          this.toast.danger(
-            'Update failed. Service unavailable!',
-            'Error',
-            4000,
-          );
-        },
-      });
+  // ---------------- EDIT MODE ----------------
+  if (this.isEditMode && this.editIndex !== null) {
 
-      return;
-    }
+    const formData = this.forms[0];
 
-    // ---------------- ADD MODE ----------------
-    const payload = this.forms.map((f) => ({
-      ...mapPayload(f.newRecord),
-      myassetCreatedDate: this.getTodayDate(),
-    }));
+    const payload = {
+      ...mapPayload(formData),
+      updatedBy: this.loginId,
+      updatedDate: this.getTodayDate()
+    };
 
-    this.commonService.submitMyAsset(payload).subscribe({
-      next: (res) => {
-        if (res?.dublicateMessages?.length) {
-          res.dublicateMessages.forEach((msg: string) =>
-            this.toast.warning(msg, 'Warning', 4000),
-          );
-        }
+    const allocationId = this.tableData[this.editIndex].allocationId;
 
-        this.toast.success('Asset Added Successfully!', 'Success', 4000);
-
+    // ✅ FIXED (3 params)
+    this.commonService.updateAssetAllocation(
+      allocationId,
+      this.loginId,
+      payload
+    ).subscribe({
+      next: () => {
+        this.toast.success('Allocation Updated Successfully!', 'Success', 4000);
         this.resetAfterSave();
-        //this.loadMyAsset();
       },
-
       error: () => {
-        this.toast.danger('Save failed. Asset service down!', 'Error', 4000);
+        this.toast.danger('Update failed!', 'Error', 4000);
       },
     });
+
+    return;
   }
-  resetAfterSave(): void {
-    const currentDate = this.getTodayDate();
 
-    this.forms = [
-      {
-        newRecord: {
-          myassetId: '0',
+  // ---------------- ADD MODE ----------------
+  const payload = this.forms.map((f) => ({
+    ...mapPayload(f),
+    createdBy: this.loginId,
+    createdDate: this.getTodayDate(),
+  }));
 
-          myassetCreatedDate: currentDate,
+  // ✅ FIXED METHOD NAME
+  this.commonService.submitAssetAllocation(payload).subscribe({
+    next: () => {
+      this.toast.success('Allocation Added Successfully!', 'Success', 4000);
+      this.resetAfterSave();
+    },
+    error: () => {
+      this.toast.danger('Save failed!', 'Error', 4000);
+    },
+  });
+}
+resetAfterSave(): void {
+  const currentDate = this.getTodayDate();
 
-          myassetCode: '',
-          myassetName: '',
-          myassetType: '',
-          myassetCategory: '',
+  this.forms = [
+    {
+      /* ========= PRIMARY ========= */
+      allocationId: '',
+      allocationNumber: '',
 
-          departmentCode: '',
-          departmentName: '',
+      /* ========= EMPLOYEE ========= */
+      employeeId: '',
+      departmentId: '',
+      location: '',
 
-          assetMake: '',
-          assetModel: '',
+      /* ========= ASSET ========= */
+      assetId: '',
 
-          myassetLocation: '',
-          myassetTag: '',
+      /* ========= DATES ========= */
+      allocationDate: currentDate,
+      expectedReturnDate: '',
+      actualReturnDate: '',
 
-          myassetPurchaseDate: currentDate,
+      /* ========= CONDITION ========= */
+      conditionAtIssue: '',
+      conditionAtReturn: '',
 
-          myassetVendorName: '',
-          myassetInvoiceNo: '',
+      /* ========= BUSINESS ========= */
+      purpose: '',
+      approvalBy: '',
+      approvalDate: '',
 
-          // ✅ FIXED
-          myassetStatus: 'PENDING',
-          myassetWorkingStatus: 'Working',
+      /* ========= REMARKS ========= */
+      remarks: '',
 
-          // ✅ REQUIRED
-          loginId: this.loginId,
-        },
-      },
-    ];
+      /* ========= AUDIT (🔥 IMPORTANT) ========= */
+      createdBy: this.loginId,
+      createdDate: currentDate,
+      updatedBy: '',
+      updatedDate: '',
 
-    this.isEditMode = false;
-    this.editIndex = null;
-    this.activeTab = 'details';
-    this.showErrors = false;
-  }
-  addForm(): void {
-    if (this.isEditMode) {
-      return;
+      /* ========= STATUS ========= */
+      allocationStatus: 'Active'
     }
+  ];
 
-    const currentDate = this.getTodayDate();
-
-    this.forms.push({
-      newRecord: {
-        myassetId: '0',
-        myassetCreatedDate: currentDate,
-
-        myassetCode: '',
-        myassetName: '',
-        myassetType: '',
-        myassetCategory: '',
-
-        departmentCode: '',
-        departmentName: '',
-
-        assetMake: '',
-        assetModel: '',
-
-        myassetLocation: '',
-        myassetTag: '',
-
-        myassetPurchaseDate: currentDate,
-
-        myassetVendorName: '',
-        myassetInvoiceNo: '',
-
-        // ✅ FIXED
-        myassetStatus: 'PENDING',
-        myassetWorkingStatus: 'Working',
-
-        // ✅ REQUIRED
-        loginId: this.loginId,
-      },
-    });
+  this.isEditMode = false;
+  this.editIndex = null;
+  this.activeTab = 'details';
+  this.showErrors = false;
+}
+addForm(): void {
+  if (this.isEditMode) {
+    return;
   }
+
+  const currentDate = this.getTodayDate();
+
+  this.forms.push({
+
+    /* ========= PRIMARY ========= */
+    allocationId: '',
+    allocationNumber: '',
+
+    /* ========= EMPLOYEE ========= */
+    employeeId: '',
+    departmentId: '',
+    location: '',
+
+    /* ========= ASSET ========= */
+    assetId: '',
+
+    /* ========= DATES ========= */
+    allocationDate: currentDate,
+    expectedReturnDate: '',
+    actualReturnDate: '',
+
+    /* ========= CONDITION ========= */
+    conditionAtIssue: '',
+    conditionAtReturn: '',
+
+    /* ========= BUSINESS ========= */
+    purpose: '',
+    approvalBy: '',
+    approvalDate: '',
+
+    /* ========= REMARKS ========= */
+    remarks: '',
+
+    /* ========= AUDIT (🔥 IMPORTANT) ========= */
+    createdBy: this.loginId,
+    createdDate: currentDate,
+    updatedBy: '',
+    updatedDate: '',
+
+    /* ========= STATUS ========= */
+    allocationStatus: 'Active'
+  });
+}
   // --------------------------
   // CANCEL / RESET FORM
   // --------------------------
@@ -1430,72 +1510,7 @@ font-weight:bold;
 
   // ---------------- Excel Parsing ----------------
   // ---------------- Excel Parsing ----------------
-  readExcel(file: File): void {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const workbook = XLSX.read(reader.result, { type: 'binary' });
-
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-
-      const newData: TableRow[] = [];
-
-      json.forEach((obj: any, i: number) => {
-        const row: TableRow = {
-          myassetId:
-            obj['Asset ID'] ||
-            `A-${String(this.tableData.length + i + 1).padStart(3, '0')}`,
-
-          myassetCreatedDate:
-            this.parseExcelDate(obj['Created Date']) || this.getTodayDate(),
-
-          myassetCode: obj['Asset Code'] ?? '',
-          myassetName: obj['Asset Name'] ?? '',
-          myassetType: obj['Asset Type'] ?? '',
-          myassetCategory: obj['Asset Category'] ?? '',
-
-          departmentCode: obj['Department Code'] ?? '',
-          departmentName: obj['Department Name'] ?? '',
-
-          assetMake: obj['Asset Make'] ?? '',
-          assetModel: obj['Asset Model'] ?? '',
-
-          myassetLocation: obj['Location'] ?? '',
-          myassetTag: obj['Asset Tag'] ?? '',
-
-          myassetPurchaseDate:
-            this.parseExcelDate(obj['Purchase Date']) || this.getTodayDate(),
-
-          myassetVendorName: obj['Vendor Name'] ?? '',
-          myassetInvoiceNo: obj['Invoice No'] ?? '',
-
-          // ✅ FIXED STATUS
-          myassetStatus: this.normalizeStatus(obj['Asset Status']),
-
-          myassetWorkingStatus: obj['Working Status'] ?? 'Working',
-
-          // ✅ REQUIRED
-          loginId: this.loginId,
-        };
-
-        newData.push(row);
-      });
-
-      // ✅ merge safely
-      this.tableData = [...this.tableData, ...newData];
-      this.filteredData = [...this.tableData];
-      this.currentPage = 1;
-
-      this.toast.success(
-        `Imported ${newData.length} record(s) successfully!`,
-        'Success',
-        4000,
-      );
-    };
-
-    reader.readAsBinaryString(file);
-  }
+  
 
   // ---------------- TXT Parsing ----------------
   //  readTXT(file: File) {
@@ -1590,179 +1605,179 @@ font-weight:bold;
 
     return `${day}-${month}-${year}`;
   }
-  async readDOCX(file: File): Promise<void> {
-    const arrayBuffer = await file.arrayBuffer();
+  // async readDOCX(file: File): Promise<void> {
+  //   const arrayBuffer = await file.arrayBuffer();
 
-    const result = await mammoth.convertToHtml({ arrayBuffer });
+  //   const result = await mammoth.convertToHtml({ arrayBuffer });
 
-    const doc = new DOMParser().parseFromString(result.value, 'text/html');
+  //   const doc = new DOMParser().parseFromString(result.value, 'text/html');
 
-    const table = doc.querySelector('table');
+  //   const table = doc.querySelector('table');
 
-    if (!table) {
-      this.toast.danger('No table found in DOCX!', 'Error', 4000);
-      return;
-    }
+  //   if (!table) {
+  //     this.toast.danger('No table found in DOCX!', 'Error', 4000);
+  //     return;
+  //   }
 
-    const rows = table.querySelectorAll('tr');
+  //   const rows = table.querySelectorAll('tr');
 
-    const newData: TableRow[] = [];
+  //   const newData: TableRow[] = [];
 
-    rows.forEach((row, i) => {
-      if (i === 0) return; // skip header
+  //   rows.forEach((row, i) => {
+  //     if (i === 0) return; // skip header
 
-      const cells = Array.from(row.querySelectorAll('td')).map(
-        (c) => c.textContent?.trim() || '',
-      );
+  //     const cells = Array.from(row.querySelectorAll('td')).map(
+  //       (c) => c.textContent?.trim() || '',
+  //     );
 
-      while (cells.length < 17) cells.push('');
+  //     while (cells.length < 17) cells.push('');
 
-      const record: TableRow = {
-        myassetId: `A-${String(this.tableData.length + newData.length + 1).padStart(3, '0')}`,
+  //     const record: TableRow = {
+  //       myassetId: `A-${String(this.tableData.length + newData.length + 1).padStart(3, '0')}`,
 
-        myassetCreatedDate:
-          this.parseExcelDate(cells[16]) || this.getTodayDate(),
+  //       myassetCreatedDate:
+  //         this.parseExcelDate(cells[16]) || this.getTodayDate(),
 
-        myassetCode: cells[0] ?? '',
-        myassetName: cells[1] ?? '',
-        myassetType: cells[2] ?? '',
-        myassetCategory: cells[3] ?? '',
+  //       myassetCode: cells[0] ?? '',
+  //       myassetName: cells[1] ?? '',
+  //       myassetType: cells[2] ?? '',
+  //       myassetCategory: cells[3] ?? '',
 
-        departmentCode: cells[4] ?? '',
-        departmentName: cells[5] ?? '',
+  //       departmentCode: cells[4] ?? '',
+  //       departmentName: cells[5] ?? '',
 
-        assetMake: cells[6] ?? '',
-        assetModel: cells[7] ?? '',
+  //       assetMake: cells[6] ?? '',
+  //       assetModel: cells[7] ?? '',
 
-        myassetLocation: cells[8] ?? '',
-        myassetTag: cells[9] ?? '',
+  //       myassetLocation: cells[8] ?? '',
+  //       myassetTag: cells[9] ?? '',
 
-        myassetPurchaseDate:
-          this.parseExcelDate(cells[10]) || this.getTodayDate(),
+  //       myassetPurchaseDate:
+  //         this.parseExcelDate(cells[10]) || this.getTodayDate(),
 
-        myassetVendorName: cells[11] ?? '',
-        myassetInvoiceNo: cells[12] ?? '',
+  //       myassetVendorName: cells[11] ?? '',
+  //       myassetInvoiceNo: cells[12] ?? '',
 
-        // ✅ FIXED STATUS
-        myassetStatus: this.normalizeStatus(cells[13]),
+  //       // ✅ FIXED STATUS
+  //       myassetStatus: this.normalizeStatus(cells[13]),
 
-        myassetWorkingStatus: cells[14] ?? 'Working',
+  //       myassetWorkingStatus: cells[14] ?? 'Working',
 
-        // ✅ REQUIRED
-        loginId: this.loginId,
-      };
+  //       // ✅ REQUIRED
+  //       loginId: this.loginId,
+  //     };
 
-      newData.push(record);
-    });
+  //     newData.push(record);
+  //   });
 
-    // ✅ merge data safely
-    this.tableData = [...this.tableData, ...newData];
-    this.filteredData = [...this.tableData];
+  //   // ✅ merge data safely
+  //   this.tableData = [...this.tableData, ...newData];
+  //   this.filteredData = [...this.tableData];
 
-    this.toast.success(
-      `DOCX imported ${newData.length} record(s) successfully!`,
-      'Success',
-      4000,
-    );
-  }
+  //   this.toast.success(
+  //     `DOCX imported ${newData.length} record(s) successfully!`,
+  //     'Success',
+  //     4000,
+  //   );
+  // }
   // ---------------- CSV Download ----------------
-  downloadSampleCSV(): void {
-    if (!this.tableData || this.tableData.length === 0) {
-      this.toast.warning('No data available to download!', 'Warning', 3000);
-      return;
-    }
+  // downloadSampleCSV(): void {
+  //   if (!this.tableData || this.tableData.length === 0) {
+  //     this.toast.warning('No data available to download!', 'Warning', 3000);
+  //     return;
+  //   }
 
-    const headers = [
-      'Asset ID',
-      'Created Date',
-      'Asset Code',
-      'Asset Name',
-      'Asset Type',
-      'Asset Category',
-      'Department Code',
-      'Department Name',
-      'Asset Make',
-      'Asset Model',
-      'Location',
-      'Asset Tag',
-      'Purchase Date',
-      'Vendor Name',
-      'Invoice No',
-      'Asset Status',
-      'Working Status',
-    ];
+  //   const headers = [
+  //     'Asset ID',
+  //     'Created Date',
+  //     'Asset Code',
+  //     'Asset Name',
+  //     'Asset Type',
+  //     'Asset Category',
+  //     'Department Code',
+  //     'Department Name',
+  //     'Asset Make',
+  //     'Asset Model',
+  //     'Location',
+  //     'Asset Tag',
+  //     'Purchase Date',
+  //     'Vendor Name',
+  //     'Invoice No',
+  //     'Asset Status',
+  //     'Working Status',
+  //   ];
 
-    const csvRows: string[] = [];
+  //   const csvRows: string[] = [];
 
-    // ✅ Add headers
-    csvRows.push(headers.join(','));
+  //   // ✅ Add headers
+  //   csvRows.push(headers.join(','));
 
-    // ✅ Escape function (IMPORTANT 🔥)
-    const escapeCSV = (value: any): string => {
-      if (!value) return '';
+  //   // ✅ Escape function (IMPORTANT 🔥)
+  //   const escapeCSV = (value: any): string => {
+  //     if (!value) return '';
 
-      const str = value.toString();
+  //     const str = value.toString();
 
-      // wrap with "" if contains comma/newline/quote
-      if (str.includes(',') || str.includes('\n') || str.includes('"')) {
-        return `"${str.replace(/"/g, '""')}"`;
-      }
+  //     // wrap with "" if contains comma/newline/quote
+  //     if (str.includes(',') || str.includes('\n') || str.includes('"')) {
+  //       return `"${str.replace(/"/g, '""')}"`;
+  //     }
 
-      return str;
-    };
+  //     return str;
+  //   };
 
-    // ✅ Data rows
-    this.tableData.forEach((row: TableRow) => {
-      const rowData = [
-        row.myassetId,
-        this.formatDate(row.myassetCreatedDate),
+  //   // ✅ Data rows
+  //   this.tableData.forEach((row: TableRow) => {
+  //     const rowData = [
+  //       row.myassetId,
+  //       this.formatDate(row.myassetCreatedDate),
 
-        row.myassetCode,
-        row.myassetName,
-        row.myassetType,
-        row.myassetCategory,
+  //       row.myassetCode,
+  //       row.myassetName,
+  //       row.myassetType,
+  //       row.myassetCategory,
 
-        row.departmentCode,
-        row.departmentName,
+  //       row.departmentCode,
+  //       row.departmentName,
 
-        row.assetMake,
-        row.assetModel,
+  //       row.assetMake,
+  //       row.assetModel,
 
-        row.myassetLocation,
-        row.myassetTag,
+  //       row.myassetLocation,
+  //       row.myassetTag,
 
-        this.formatDate(row.myassetPurchaseDate),
+  //       this.formatDate(row.myassetPurchaseDate),
 
-        row.myassetVendorName,
-        row.myassetInvoiceNo,
+  //       row.myassetVendorName,
+  //       row.myassetInvoiceNo,
 
-        row.myassetStatus,
-        row.myassetWorkingStatus,
-      ].map(escapeCSV);
+  //       row.myassetStatus,
+  //       row.myassetWorkingStatus,
+  //     ].map(escapeCSV);
 
-      csvRows.push(rowData.join(','));
-    });
+  //     csvRows.push(rowData.join(','));
+  //   });
 
-    const csvString = '\ufeff' + csvRows.join('\n'); // ✅ UTF-8 fix
+  //   const csvString = '\ufeff' + csvRows.join('\n'); // ✅ UTF-8 fix
 
-    const blob = new Blob([csvString], {
-      type: 'text/csv;charset=utf-8;',
-    });
+  //   const blob = new Blob([csvString], {
+  //     type: 'text/csv;charset=utf-8;',
+  //   });
 
-    const url = window.URL.createObjectURL(blob);
+  //   const url = window.URL.createObjectURL(blob);
 
-    const a = document.createElement('a');
-    a.href = url;
+  //   const a = document.createElement('a');
+  //   a.href = url;
 
-    // ✅ Dynamic filename
-    a.download = `My_Asset_${this.getTodayDate()}.csv`;
+  //   // ✅ Dynamic filename
+  //   a.download = `My_Asset_${this.getTodayDate()}.csv`;
 
-    a.click();
+  //   a.click();
 
-    window.URL.revokeObjectURL(url);
+  //   window.URL.revokeObjectURL(url);
 
-    this.toast.success('CSV downloaded successfully!', 'Success', 3000);
-  }
+  //   this.toast.success('CSV downloaded successfully!', 'Success', 3000);
+  // }
 
   //bulk export
   // ---------------- Component Variables ----------------
@@ -1797,309 +1812,9 @@ font-weight:bold;
   }
 
   // ---------------- Bulk Export ----------------
-  getFile() {
-    if (!this.tableData || this.tableData.length === 0) {
-      this.showToast('No data available to export!', 'warning');
-      return;
-    }
-
-    if (!this.startDate || !this.endDate) {
-      this.showToast('Please enter both Start Date and End Date!', 'warning');
-      return;
-    }
-
-    const start = this.startDate ? this.parseDDMMYYYY(this.startDate) : null;
-
-    const end = this.endDate ? this.parseDDMMYYYY(this.endDate) : null;
-
-    // Filter based on Created Date
-    const filteredData = this.tableData.filter((row: TableRow) => {
-      if (!row.myassetCreatedDate) return false;
-
-      const rowDate = this.parseDDMMYYYY(row.myassetCreatedDate);
-
-      if (!rowDate) return false;
-
-      const includeStart = start && rowDate.getTime() === start.getTime();
-
-      const includeEnd = end && rowDate.getTime() === end.getTime();
-
-      const inRange = (!start || rowDate >= start) && (!end || rowDate <= end);
-
-      return inRange || includeStart || includeEnd;
-    });
-
-    if (filteredData.length === 0) {
-      this.showToast(
-        'No records found for the selected date range.',
-        'warning',
-      );
-      return;
-    }
-
-    // Export based on selected file type
-    switch (this.fileType) {
-      case 'csv':
-        this.exportCSVfile(filteredData);
-        break;
-
-      case 'xlsx':
-        this.exportExcelfile(filteredData);
-        break;
-
-      case 'pdf':
-        this.exportPDFfile(filteredData);
-        break;
-
-      default:
-        this.showToast('Invalid file type selected!', 'error');
-    }
-  }
-
+ 
   // ---------------- CSV Export ----------------
-  exportCSVfile(data: TableRow[]): void {
-    if (!data || data.length === 0) {
-      this.toast.warning('No data available!', 'Warning', 3000);
-      return;
-    }
 
-    const formattedDate = this.getTodayDate();
-
-    const escapeCSV = (val: any): string => {
-      if (!val) return '';
-      const str = val.toString();
-      return str.includes(',') || str.includes('"') || str.includes('\n')
-        ? `"${str.replace(/"/g, '""')}"`
-        : str;
-    };
-
-    const csvRows: string[] = [];
-
-    csvRows.push(this.headCompanyName || 'Company Name');
-    csvRows.push(`Date:,${formattedDate}`);
-    csvRows.push('');
-
-    const headers = [
-      'Asset ID',
-      'Created Date',
-      'Asset Code',
-      'Asset Name',
-      'Asset Type',
-      'Asset Category',
-      'Department Code',
-      'Department Name',
-      'Asset Make',
-      'Asset Model',
-      'Location',
-      'Asset Tag',
-      'Purchase Date',
-      'Vendor Name',
-      'Invoice No',
-      'Asset Status',
-      'Working Status',
-    ];
-
-    csvRows.push(headers.join(','));
-
-    data.forEach((row: TableRow) => {
-      const rowData = [
-        row.myassetId,
-        this.formatDate(row.myassetCreatedDate),
-
-        row.myassetCode,
-        row.myassetName,
-        row.myassetType,
-        row.myassetCategory,
-
-        row.departmentCode,
-        row.departmentName,
-
-        row.assetMake,
-        row.assetModel,
-
-        row.myassetLocation,
-        row.myassetTag,
-
-        this.formatDate(row.myassetPurchaseDate),
-
-        row.myassetVendorName,
-        row.myassetInvoiceNo,
-
-        row.myassetStatus,
-        row.myassetWorkingStatus,
-      ].map(escapeCSV);
-
-      csvRows.push(rowData.join(','));
-    });
-
-    const blob = new Blob(['\ufeff' + csvRows.join('\n')], {
-      type: 'text/csv;charset=utf-8;',
-    });
-
-    saveAs(blob, `Filtered_My_Asset_${formattedDate}.csv`);
-  }
-
-  // ---------------- Excel Export ----------------
-  exportExcelfile(data: TableRow[]): void {
-    if (!data || data.length === 0) {
-      this.toast.warning('No data available!', 'Warning', 3000);
-      return;
-    }
-
-    const formattedDate = this.getTodayDate();
-
-    const wsData = [
-      [this.headCompanyName || 'Company Name'],
-      ['Date:', formattedDate],
-      [],
-      [
-        'Asset ID',
-        'Created Date',
-        'Asset Code',
-        'Asset Name',
-        'Asset Type',
-        'Asset Category',
-        'Department Code',
-        'Department Name',
-        'Asset Make',
-        'Asset Model',
-        'Location',
-        'Asset Tag',
-        'Purchase Date',
-        'Vendor Name',
-        'Invoice No',
-        'Asset Status',
-        'Working Status',
-      ],
-    ];
-
-    data.forEach((row: TableRow) => {
-      wsData.push([
-        row.myassetId || '',
-        this.formatDate(row.myassetCreatedDate),
-
-        row.myassetCode || '',
-        row.myassetName || '',
-        row.myassetType || '',
-        row.myassetCategory || '',
-
-        row.departmentCode || '',
-        row.departmentName || '',
-
-        row.assetMake || '',
-        row.assetModel || '',
-
-        row.myassetLocation || '',
-        row.myassetTag || '',
-
-        this.formatDate(row.myassetPurchaseDate),
-
-        row.myassetVendorName || '',
-        row.myassetInvoiceNo || '',
-
-        row.myassetStatus || '',
-        row.myassetWorkingStatus || '',
-      ]);
-    });
-
-    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
-
-    worksheet['!cols'] = wsData[3].map((h: any) => ({
-      wch: Math.max(String(h).length + 2, 18),
-    }));
-
-    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Filtered My Assets');
-
-    const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-
-    const blob = new Blob([buffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    });
-
-    saveAs(blob, `Filtered_My_Asset_${formattedDate}.xlsx`);
-  }
-  // ---------------- PDF Export ----------------
-  exportPDFfile(data: TableRow[]): void {
-    if (!data || data.length === 0) {
-      this.toast.warning('No data available!', 'Warning', 3000);
-      return;
-    }
-
-    const doc = new jsPDF('l', 'mm', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    const formattedDate = this.getTodayDate();
-
-    // TITLE
-    doc.setFontSize(14);
-    doc.text('Filtered My Asset Report', pageWidth / 2, 10, {
-      align: 'center',
-    });
-
-    // HEADER
-    doc.setFontSize(9);
-    doc.text(this.headCompanyName || 'Company Name', 10, 10);
-    doc.text(formattedDate, pageWidth - 10, 10, { align: 'right' });
-
-    autoTable(doc, {
-      startY: 16,
-
-      head: [
-        [
-          'ID',
-          'Created',
-          'Code',
-          'Name',
-          'Type',
-          'Category',
-          'Dept Code',
-          'Dept Name',
-          'Make',
-          'Model',
-          'Location',
-          'Tag',
-          'Purchase',
-          'Vendor',
-          'Invoice',
-          'Status',
-          'Working',
-        ],
-      ],
-
-      body: data.map((row) => [
-        row.myassetId || '',
-        this.formatDate(row.myassetCreatedDate),
-
-        row.myassetCode || '',
-        row.myassetName || '',
-        row.myassetType || '',
-        row.myassetCategory || '',
-
-        row.departmentCode || '',
-        row.departmentName || '',
-
-        row.assetMake || '',
-        row.assetModel || '',
-
-        row.myassetLocation || '',
-        row.myassetTag || '',
-
-        this.formatDate(row.myassetPurchaseDate),
-
-        row.myassetVendorName || '',
-        row.myassetInvoiceNo || '',
-
-        row.myassetStatus || '',
-        row.myassetWorkingStatus || '',
-      ]),
-
-      styles: { fontSize: 7, cellPadding: 2 },
-      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-    });
-
-    doc.save(`Filtered_My_Asset_${formattedDate}.pdf`);
-  }
 
   showTimelineModal = false;
 

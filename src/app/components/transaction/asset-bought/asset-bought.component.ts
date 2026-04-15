@@ -65,38 +65,54 @@ import { NgToastService } from 'ng-angular-popup';
 import { AuthService } from '../../../services/auth/auth-service';
 import { CommonService } from '../../../services/common/common-service';
 
-interface TableRow {
-  /* ================= PRIMARY KEY ================= */
-  assetBoughtMiscPurchaseId: string; // PK – Unique Asset ID
-  assetBoughtMiscPurchaseCode: string; // Asset Code / Tag
+export interface TableRow {
 
-  /* ================= ASSET CLASSIFICATION ================= */
-  assetBoughtAssetCategory: 'IT' | 'Non-IT' | 'Electrical' | 'Mechanical';
-  assetBoughtAssetType: string; // Laptop, Printer, UPS, AC, CCTV
-  assetBoughtItemName: string; // Exact Asset Name
+  /* ========= PRIMARY ========= */
+  purchaseId: string;
+  purchaseNumber: string;
 
-  /* ================= OWNERSHIP / LOCATION ================= */
-  assetBoughtDepartment: string; // Department using asset
+  /* ========= PURCHASE ========= */
+  purchaseDate: string;        // YYYY-MM-DD
+  vendorId: string;
+  vendorName: string;
 
-  /* ================= ASSET STATUS ================= */
-  assetBoughtVendor: string;
-  assetBoughtSerialNumber: string;
-  assetBoughtAssetStatus: 'Working' | 'Not Working' | 'Under Repair';
-  assetBoughtPurchaseDate: string; // YYYY-MM-DD
+  invoiceNumber: string;
+  invoiceDate: string;         // YYYY-MM-DD
 
-  /* ================= ADMIN / SYSTEM ================= */
-  assetBoughtPurchasedBy: string; // Employee / User Name
-  assetBoughtRemarks?: string;
+  /* ========= ITEM ========= */
+  itemName: string;
+  itemCategory: string;
+  itemDescription: string;
 
-  /* ================= SYSTEM AUDIT ================= */
-  assetBoughtCreatedDate?: string;
-  assetBoughtUpdatedDate?: string;
+  /* ========= QUANTITY ========= */
+  quantity: number;
+  unitPrice: number;
+  totalAmount: number;
 
-  /* ================= DOCUMENTS ================= */
-  assetBoughtBillInvoiceNo: string;
-  assetBoughtAttachment?: string; // Invoice / Warranty File URL
-  assetBoughtStatus: 'Active' | 'Inactive'; // Record Status
-  loginId: string;
+  /* ========= LOCATION ========= */
+  location: string;
+  departmentId: string;
+
+  /* ========= PURPOSE ========= */
+  purpose: string;
+
+  /* ========= APPROVAL ========= */
+  requestedBy: string;
+  approvedBy: string;
+  approvalDate: string;        // YYYY-MM-DD
+
+  /* ========= STOCK ========= */
+  stockStatus: 'Active' | 'Inactive';  // 🔥 changed
+
+  /* ========= REMARKS ========= */
+  remarks?: string;
+
+  /* ========= AUDIT ========= */
+  createdBy: string;           // 🔥 loginId map
+  createdDate: string;
+
+  updatedBy?: string;
+  updatedDate?: string;
 }
 
 @Component({
@@ -162,94 +178,171 @@ export class AssetBoughtComponent implements OnInit {
     this.loadDepartments();
     this.filteredData = [...this.tableData];
   }
+private initializeForm(): void {
+  this.forms = [
+    {
+      newRecord: {
+        /* ========= PRIMARY ========= */
+        purchaseId: '',                 // ✔ changed from '0'
+        purchaseNumber: '',
 
-  private initializeForm(): void {
-    this.forms = [
-      {
-        /* ================= UI BINDING ================= */
-        assetBoughtMiscPurchaseCode: '',
+        /* ========= PURCHASE ========= */
+        purchaseDate: this.currentDate || '',
+        vendorId: '',
+        vendorName: '',
 
-        assetBoughtAssetCategory: 'IT',
-        assetBoughtAssetType: '',
-        assetBoughtItemName: '',
+        invoiceNumber: '',
+        invoiceDate: this.currentDate || '',
 
-        assetBoughtDepartment: '',
+        /* ========= ITEM ========= */
+        itemName: '',
+        itemCategory: '',
+        itemDescription: '',
 
-        assetBoughtVendor: '',
-        assetBoughtSerialNumber: '',
-        assetBoughtAssetStatus: 'Working',
-        assetBoughtPurchaseDate: this.currentDate || '',
+        /* ========= QUANTITY ========= */
+        quantity: 1,
+        unitPrice: 0,
+        totalAmount: 0,
 
-        assetBoughtBillInvoiceNo: '',
-        assetBoughtAttachment: undefined,
+        /* ========= LOCATION ========= */
+        location: '',
+        departmentId: '',
 
-        assetBoughtPurchasedBy: '',
-        assetBoughtRemarks: '',
+        /* ========= PURPOSE ========= */
+        purpose: '',
 
-        assetBoughtCreatedDate: this.currentDate || '',
-        assetBoughtUpdatedDate: undefined,
+        /* ========= APPROVAL ========= */
+        requestedBy: '',
+        approvedBy: '',
+        approvalDate: this.currentDate || '',
 
-        assetBoughtStatus: 'Active',
-        loginId: this.loginId || '',
+        /* ========= STOCK ========= */
+        stockStatus: 'Active',   // ✔ matches union type
 
-        /* ================= BACKEND ================= */
-        newRecord: {
-          assetBoughtMiscPurchaseId: '0',
-          assetBoughtMiscPurchaseCode: '',
+        /* ========= REMARKS ========= */
+        remarks: undefined,      // ✔ optional
 
-          assetBoughtAssetCategory: 'IT',
-          assetBoughtAssetType: '',
-          assetBoughtItemName: '',
+        /* ========= AUDIT ========= */
+        createdBy: this.loginId || '',
+        createdDate: this.currentDate || '',
 
-          assetBoughtDepartment: '',
-
-          assetBoughtVendor: '',
-          assetBoughtSerialNumber: '',
-          assetBoughtAssetStatus: 'Working',
-          assetBoughtPurchaseDate: this.currentDate || '',
-
-          assetBoughtBillInvoiceNo: '',
-          assetBoughtAttachment: undefined,
-
-          assetBoughtPurchasedBy: '',
-          assetBoughtRemarks: '',
-
-          assetBoughtCreatedDate: this.currentDate || '',
-          assetBoughtUpdatedDate: undefined,
-
-          assetBoughtStatus: 'Active',
-          loginId: this.loginId || '',
-        },
+        updatedBy: undefined,    // ✔ optional
+        updatedDate: undefined,  // ✔ optional
       },
-    ];
-  }
+    },
+  ];
+}
 
   get editHeading(): string {
     if (this.isEditMode && this.editIndex !== null) {
       return (
         'Update Asset Details (ID: ' +
-        this.tableData[this.editIndex].assetBoughtMiscPurchaseId +
+        this.tableData[this.editIndex].purchaseId +
         ')'
       );
     }
     return '';
   }
+loadAssetTypes(): void {
+  if (!this.loginId) return;
 
-  loadAssetBoughts(): void {
-    this.commonService.fetchAllAssetBoughtByLoginId(this.loginId).subscribe({
-      next: (res: TableRow[]) => {
-        this.tableData = res.map((item) => ({
-          ...item,
-          assetBoughtCreatedDate: item.assetBoughtCreatedDate,
+  this.commonService.fetchAssetTypeByLoginId(this.loginId).subscribe({
+    next: (res: any) => {
+      console.log('Asset Type API RESPONSE:', res);
+
+      this.assetTypes = res;   // ✅ FIXED
+    },
+    error: (err) => {
+      console.error('API Error:', err);
+    },
+  });
+}
+loadAssetBoughts(): void {
+
+  if (!this.loginId) {
+    this.toast.danger('Login ID missing!', 'ERROR', 3000);
+    return;
+  }
+
+  const formattedLoginId = this.loginId;
+
+  this.commonService
+    .fetchAllAssetBoughtByLoginId(formattedLoginId)
+    .subscribe({
+
+      next: (res: any) => {   // 🔥 IMPORTANT FIX
+
+        console.log('API RESPONSE:', res);
+
+        // 🔥 Ensure array
+        const data = Array.isArray(res) ? res : [];
+
+        if (data.length === 0) {
+          this.tableData = [];
+          this.filteredData = [];
+          return;
+        }
+
+        this.tableData = data.map((item: any) => ({
+
+          purchaseId: item.purchaseId ?? '',
+          purchaseNumber: item.purchaseNumber ?? '',
+
+          purchaseDate: item.purchaseDate ?? '',
+          vendorId: item.vendorId ?? '',
+          vendorName: item.vendorName ?? '',
+
+          invoiceNumber: item.invoiceNumber ?? '',
+          invoiceDate: item.invoiceDate ?? '',
+
+          itemName: item.itemName ?? '',
+          itemCategory: item.itemCategory ?? '',
+          itemDescription: item.itemDescription ?? '',
+
+          quantity: Number(item.quantity) || 0,
+          unitPrice: Number(item.unitPrice) || 0,
+          totalAmount: Number(item.totalAmount) || 0,
+
+          location: item.location ?? '',
+          departmentId: item.departmentId ?? '',
+
+          purpose: item.purpose ?? '',
+
+          requestedBy: item.requestedBy ?? '',
+          approvedBy: item.approvedBy ?? '',
+          approvalDate: item.approvalDate ?? '',
+
+          stockStatus: item.stockStatus ?? 'Active',
+
+          remarks: item.remarks ?? '',
+
+          createdBy: item.createdBy ?? '',
+          createdDate: item.createdDate ?? '',
+
+          updatedBy: item.updatedBy ?? '',
+          updatedDate: item.updatedDate ?? '',
         }));
 
         this.filteredData = [...this.tableData];
+        this.currentPage = 1;
+
+        this.cdr.detectChanges();
       },
-      error: (err) => {
+
+      error: (err: any) => {
         console.error('API Error:', err);
-      },
+
+        this.tableData = [];
+        this.filteredData = [];
+
+        this.toast.danger(
+          err?.error?.message || 'Failed to load Asset Bought data!',
+          'ERROR',
+          4000
+        );
+      }
     });
-  }
+}
   TableRow: TableRow[] = [];
   itemNameOptions: string[] = [];
   modelOptions: string[] = [];
@@ -305,50 +398,21 @@ export class AssetBoughtComponent implements OnInit {
     }, 3000);
   }
   departments: any[] = [];
-
-  loadDepartments() {
-    this.commonService.fetchAllDepartmentByHeadCompany(this.loginId).subscribe({
-      next: (res: any[]) => {
+ loadDepartments(): void {
+    this.commonService.fetchAllDepartments().subscribe({
+      next: (res: any) => {
+        console.log('Department API Response:', res);
         this.departments = res;
       },
       error: (err) => {
-        console.error('Department Load Error:', err);
+        console.error('Department API Error:', err);
       },
     });
   }
+
   assetTypes: any[] = [];
 
-  loadAssetTypes(): void {
-  if (!this.loginId) return;
 
-  this.commonService.fetchAssetTypeByLoginId(this.loginId).subscribe({
-    next: (res: any) => {
-      console.log('API RESPONSE:', res);
-
-      this.tableData = res.map((item: any) => ({
-        assetTypeId: item.assetTypeId ?? '',
-        assetTypeCode: item.assetTypeCode ?? '',
-        assetTypeName: item.assetTypeName ?? '',
-        assetCategory: item.assetCategory ?? '',
-
-        warrantyApplicable: item.warrantyApplicable ?? '',
-        warrantyDuration: item.warrantyDuration ?? '',
-        warrantyUnit: item.warrantyUnit ?? '',
-
-        createdBy: item.createdBy ?? '',
-        createdDate: item.createdDate ?? '',
-        updatedDate: item.updatedDate ?? '',
-
-        status: item.status ?? 'Active',
-      }));
-
-      this.filteredData = [...this.tableData];
-    },
-    error: (err) => {
-      console.error('API Error:', err);
-    },
-  });
-}
 
   // For modal
   showViewModal: boolean = false;
@@ -425,7 +489,7 @@ export class AssetBoughtComponent implements OnInit {
 
     // 🔥 Collect Asset IDs
     const ids: string[] = this.selectedRows.map(
-      (row) => row.assetBoughtMiscPurchaseId,
+      (row) => row.purchaseId,
     );
 
     // 🔥 Single API call
@@ -433,7 +497,7 @@ export class AssetBoughtComponent implements OnInit {
       next: () => {
         // remove deleted rows from table
         this.tableData = this.tableData.filter(
-          (row) => !ids.includes(row.assetBoughtMiscPurchaseId),
+          (row) => !ids.includes(row.purchaseId),
         );
 
         this.filteredData = [...this.tableData];
@@ -492,68 +556,85 @@ export class AssetBoughtComponent implements OnInit {
     this.filteredData = sorted;
   }
 
-  exportExcel() {
-    const dataToExport: TableRow[] =
-      this.filteredData && this.filteredData.length > 0
-        ? this.filteredData
-        : [];
+exportExcel() {
+  const dataToExport: TableRow[] =
+    this.filteredData && this.filteredData.length > 0
+      ? this.filteredData
+      : [];
 
-    if (dataToExport.length === 0) {
-      this.showToast('No data available to export', 'Warning');
-      return;
-    }
-
-    // ✅ Export data strictly as per TableRow interface
-    const exportData = dataToExport.map((row: TableRow) => ({
-      Asset_ID: row.assetBoughtMiscPurchaseId,
-      Asset_Code: row.assetBoughtMiscPurchaseCode,
-
-      Asset_Category: row.assetBoughtAssetCategory,
-      Asset_Type: row.assetBoughtAssetType,
-
-      Department: row.assetBoughtDepartment,
-
-      Asset_Status: row.assetBoughtAssetStatus,
-
-      Purchase_Date: row.assetBoughtPurchaseDate,
-
-      Bill_Invoice_No: row.assetBoughtBillInvoiceNo,
-
-      Purchased_By: row.assetBoughtPurchasedBy,
-      Record_Status: row.assetBoughtStatus,
-
-      Remarks: row.assetBoughtRemarks ?? '',
-      Created_Date: row.assetBoughtCreatedDate ?? '',
-      Updated_Date: row.assetBoughtUpdatedDate ?? '',
-    }));
-    // 📄 Create worksheet
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-
-    // 📐 Auto column width
-    worksheet['!cols'] = Object.keys(exportData[0]).map(() => ({
-      wch: 24,
-    }));
-
-    // 📘 Create workbook
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'AMC_AssetBought');
-
-    // ⬇ Download Excel (date-wise file name)
-    const today = new Date().toISOString().split('T')[0];
-    XLSX.writeFile(workbook, `AMC_AssetBought${today}.xlsx`);
-
-    this.showToast('Excel exported successfully', 'Success');
+  if (dataToExport.length === 0) {
+    this.showToast('No data available to export', 'Warning');
+    return;
   }
 
-  exportDoc() {
-    if (!this.filteredData || this.filteredData.length === 0) {
-      this.showToast('No data available to export', 'Warning');
-      return;
-    }
+  // ✅ Export data strictly as per TableRow interface
+  const exportData = dataToExport.map((row: TableRow) => ({
+    Purchase_ID: row.purchaseId,
+    Purchase_Number: row.purchaseNumber,
 
-    const currentDate = new Date().toLocaleDateString('en-GB');
+    Purchase_Date: row.purchaseDate,
+    Vendor_ID: row.vendorId,
+    Vendor_Name: row.vendorName,
 
-    let content = `
+    Invoice_Number: row.invoiceNumber,
+    Invoice_Date: row.invoiceDate,
+
+    Item_Name: row.itemName,
+    Item_Category: row.itemCategory,
+    Item_Description: row.itemDescription,
+
+    Quantity: row.quantity,
+    Unit_Price: row.unitPrice,
+    Total_Amount: row.totalAmount,
+
+    Location: row.location,
+    Department_ID: row.departmentId,
+
+    Purpose: row.purpose,
+
+    Requested_By: row.requestedBy,
+    Approved_By: row.approvedBy,
+    Approval_Date: row.approvalDate,
+
+    Stock_Status: row.stockStatus,
+
+    Remarks: row.remarks ?? '',
+
+    Created_By: row.createdBy,
+    Created_Date: row.createdDate,
+
+    Updated_By: row.updatedBy ?? '',
+    Updated_Date: row.updatedDate ?? '',
+  }));
+
+  // 📄 Create worksheet
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+  // 📐 Auto column width
+  worksheet['!cols'] = Object.keys(exportData[0]).map(() => ({
+    wch: 24,
+  }));
+
+  // 📘 Create workbook
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Purchase_Data');
+
+  // ⬇ Download Excel (date-wise file name)
+  const today = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(workbook, `Purchase_Data_${today}.xlsx`);
+
+  this.showToast('Excel exported successfully', 'Success');
+}
+
+exportDoc() {
+  if (!this.filteredData || this.filteredData.length === 0) {
+    this.showToast('No data available to export', 'Warning');
+    return;
+  }
+
+  const currentDate = new Date().toLocaleDateString('en-GB');
+
+  let content = `
 <html xmlns:o="urn:schemas-microsoft-com:office:office"
       xmlns:w="urn:schemas-microsoft-com:office:word"
       xmlns="http://www.w3.org/TR/REC-html40">
@@ -608,137 +689,141 @@ export class AssetBoughtComponent implements OnInit {
         <td>Date: ${currentDate}</td>
       </tr>
       <tr>
-        <td class="title">AMC Asset Bought </td>
+        <td class="title">Purchase Report</td>
       </tr>
     </table>
 
     <table>
       <tr>
-  <th>Asset ID</th>
-  <th>Asset Code</th>
-  <th>Category</th>
-  <th>Type</th>
-  <th>Item Name</th>
-  <th>Department</th>
-  <th>Asset Status</th>
-  <th>Purchase Date</th>
-  <th>Invoice No</th>
-  <th>Purchased By</th>
-  <th>Record Status</th>
-  <th>Remarks</th>
-</tr>
+        <th>Purchase ID</th>
+        <th>Purchase No</th>
+        <th>Vendor</th>
+        <th>Item</th>
+        <th>Category</th>
+        <th>Qty</th>
+        <th>Unit Price</th>
+        <th>Total</th>
+        <th>Location</th>
+        <th>Department</th>
+        <th>Status</th>
+        <th>Purchase Date</th>
+        <th>Remarks</th>
+      </tr>
   `;
 
-    this.filteredData.forEach((row: TableRow) => {
-      content += `
-     <tr>
-  <td>${row.assetBoughtMiscPurchaseId || ''}</td>
-  <td>${row.assetBoughtMiscPurchaseCode || ''}</td>
-  <td>${row.assetBoughtAssetCategory || ''}</td>
-  <td>${row.assetBoughtAssetType || ''}</td>
-  <td>${row.assetBoughtItemName || ''}</td>
-  <td>${row.assetBoughtDepartment || ''}</td>
-  <td>${row.assetBoughtAssetStatus || ''}</td>
-  <td>${row.assetBoughtPurchaseDate || ''}</td>
-  <td>${row.assetBoughtBillInvoiceNo || ''}</td>
-  <td>${row.assetBoughtPurchasedBy || ''}</td>
-  <td>${row.assetBoughtStatus || ''}</td>
-  <td>${row.assetBoughtRemarks ?? ''}</td>
-</tr>
-    `;
-    });
-
+  this.filteredData.forEach((row: TableRow) => {
     content += `
+      <tr>
+        <td>${row.purchaseId || ''}</td>
+        <td>${row.purchaseNumber || ''}</td>
+        <td>${row.vendorName || ''}</td>
+        <td>${row.itemName || ''}</td>
+        <td>${row.itemCategory || ''}</td>
+        <td>${row.quantity ?? 0}</td>
+        <td>${row.unitPrice ?? 0}</td>
+        <td>${row.totalAmount ?? 0}</td>
+        <td>${row.location || ''}</td>
+        <td>${row.departmentId || ''}</td>
+        <td>${row.stockStatus || ''}</td>
+        <td>${row.purchaseDate || ''}</td>
+        <td>${row.remarks ?? ''}</td>
+      </tr>
+    `;
+  });
+
+  content += `
     </table>
   </div>
 </body>
 </html>
 `;
 
-    const blob = new Blob(['\ufeff', content], {
-      type: 'application/msword',
-    });
+  const blob = new Blob(['\ufeff', content], {
+    type: 'application/msword',
+  });
 
-    const today = new Date().toISOString().split('T')[0];
-    saveAs(blob, `AMC_Asset_Bought_${today}.doc`);
+  const today = new Date().toISOString().split('T')[0];
+  saveAs(blob, `Purchase_Report_${today}.doc`);
 
-    this.showToast('Word document exported successfully', 'Success');
-  }
+  this.showToast('Word document exported successfully', 'Success');
+}
 
-  exportPDF() {
-    const doc = new jsPDF('l', 'mm', 'a4'); // Landscape A4
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const currentDate = new Date().toLocaleDateString('en-GB');
+exportPDF() {
+  const doc = new jsPDF('l', 'mm', 'a4'); // Landscape A4
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const currentDate = new Date().toLocaleDateString('en-GB');
 
-    /* ================= HEADER ================= */
-    doc.setFontSize(10);
-    doc.text(`Date: ${currentDate}`, 10, 12);
+  /* ================= HEADER ================= */
+  doc.setFontSize(10);
+  doc.text(`Date: ${currentDate}`, 10, 12);
 
-    doc.setFontSize(18);
-    doc.text('AMC Asset Bought Report', pageWidth / 2, 12, { align: 'center' });
+  doc.setFontSize(18);
+  doc.text('Purchase Report', pageWidth / 2, 12, { align: 'center' });
 
-    /* ================= TABLE ================= */
-    autoTable(doc, {
-      startY: 20,
-      styles: {
-        fontSize: 8,
-        cellPadding: 2,
-        halign: 'left',
-        valign: 'middle',
-        lineColor: [0, 0, 0],
-        lineWidth: 0.2,
-      },
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: '#ffffff',
-        halign: 'center',
-      },
-      tableWidth: 'auto',
+  /* ================= TABLE ================= */
+  autoTable(doc, {
+    startY: 20,
+    styles: {
+      fontSize: 8,
+      cellPadding: 2,
+      halign: 'left',
+      valign: 'middle',
+      lineColor: [0, 0, 0],
+      lineWidth: 0.2,
+    },
+    headStyles: {
+      fillColor: [41, 128, 185],
+      textColor: '#ffffff',
+      halign: 'center',
+    },
+    tableWidth: 'auto',
 
-      head: [
-        [
-          'Asset ID',
-          'Asset Code',
-          'Category',
-          'Type',
-          'Item Name',
-          'Department',
-          'Asset Status',
-          'Purchase Date',
-          'Invoice No',
-          'Purchased By',
-          'Record Status',
-          'Remarks',
-        ],
+    head: [
+      [
+        'Purchase ID',
+        'Purchase No',
+        'Vendor',
+        'Item',
+        'Category',
+        'Qty',
+        'Unit Price',
+        'Total',
+        'Location',
+        'Department',
+        'Status',
+        'Purchase Date',
+        'Remarks',
       ],
+    ],
 
-      body: this.filteredData.map((row: TableRow) => [
-        row.assetBoughtMiscPurchaseId || '',
-        row.assetBoughtMiscPurchaseCode || '',
-        row.assetBoughtAssetCategory || '',
-        row.assetBoughtAssetType || '',
-        row.assetBoughtItemName || '',
-        row.assetBoughtDepartment || '',
-        row.assetBoughtAssetStatus || '',
-        row.assetBoughtPurchaseDate || '',
-        row.assetBoughtBillInvoiceNo || '',
-        row.assetBoughtPurchasedBy || '',
-        row.assetBoughtStatus || '',
-        row.assetBoughtRemarks ?? '',
-      ]),
+    body: this.filteredData.map((row: TableRow) => [
+      row.purchaseId || '',
+      row.purchaseNumber || '',
+      row.vendorName || '',
+      row.itemName || '',
+      row.itemCategory || '',
+      row.quantity ?? 0,
+      row.unitPrice ?? 0,
+      row.totalAmount ?? 0,
+      row.location || '',
+      row.departmentId || '',
+      row.stockStatus || '',
+      row.purchaseDate || '',
+      row.remarks ?? '',
+    ]),
 
-      didDrawCell: (data) => {
-        // 🔲 Strong visible borders
-        doc.setDrawColor(0);
-        doc.setLineWidth(0.3);
-        doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height);
-      },
-    });
+    didDrawCell: (data) => {
+      // 🔲 Strong borders
+      doc.setDrawColor(0);
+      doc.setLineWidth(0.3);
+      doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height);
+    },
+  });
 
-    /* ================= SAVE ================= */
-    const today = new Date().toISOString().split('T')[0];
-    doc.save(`AMC_Asset_Bought_${today}.pdf`);
-  }
+  /* ================= SAVE ================= */
+  const today = new Date().toISOString().split('T')[0];
+  doc.save(`Purchase_Report_${today}.pdf`);
+}
 
   //pagination
   // Pagination Variables
@@ -811,44 +896,54 @@ export class AssetBoughtComponent implements OnInit {
   // --------------------------
   // INITIAL RECORD STRUCTURE
 
-  newRecord: TableRow = {
-    /* ================= PRIMARY KEY ================= */
-    assetBoughtMiscPurchaseId: '',
-    assetBoughtMiscPurchaseCode: '',
+newRecord: TableRow = {
+  /* ========= PRIMARY ========= */
+  purchaseId: '0',
+  purchaseNumber: '',
 
-    /* ================= ASSET CLASSIFICATION ================= */
-    assetBoughtAssetCategory: 'IT',
-    assetBoughtAssetType: '',
-    assetBoughtItemName: '',
+  /* ========= PURCHASE ========= */
+  purchaseDate: this.getTodayDate(),
+  vendorId: '',
+  vendorName: '',
 
-    /* ================= OWNERSHIP ================= */
-    assetBoughtDepartment: '',
+  invoiceNumber: '',
+  invoiceDate: this.getTodayDate(),
 
-    /* ================= ASSET STATUS ================= */
-    assetBoughtVendor: '',
-    assetBoughtSerialNumber: '',
-    assetBoughtAssetStatus: 'Working',
+  /* ========= ITEM ========= */
+  itemName: '',
+  itemCategory: 'IT',
+  itemDescription: '',
 
-    /* ================= PURCHASE ================= */
-    assetBoughtPurchaseDate: this.getTodayDate(),
+  /* ========= QUANTITY ========= */
+  quantity: 1,
+  unitPrice: 0,
+  totalAmount: 0,
 
-    /* ================= DOCUMENTS ================= */
-    assetBoughtBillInvoiceNo: '',
-    assetBoughtAttachment: undefined,
+  /* ========= LOCATION ========= */
+  location: '',
+  departmentId: '',
 
-    /* ================= ADMIN ================= */
-    assetBoughtPurchasedBy: '',
-    assetBoughtStatus: 'Active',
-    assetBoughtRemarks: '',
+  /* ========= PURPOSE ========= */
+  purpose: '',
 
-    /* ================= AUDIT ================= */
-    assetBoughtCreatedDate: this.getTodayDate(),
-    assetBoughtUpdatedDate: undefined,
+  /* ========= APPROVAL ========= */
+  requestedBy: '',
+  approvedBy: '',
+  approvalDate: this.getTodayDate(),
 
-    /* ================= LOGIN ================= */
-    loginId: this.loginId || '',
-  };
+  /* ========= STOCK ========= */
+  stockStatus: 'Active',
 
+  /* ========= REMARKS ========= */
+  remarks: '',
+
+  /* ========= AUDIT ========= */
+  createdBy: this.loginId || '',
+  createdDate: this.getTodayDate(),
+
+  updatedBy: '',
+  updatedDate: ''
+};
   // --------------------------
   // STATE VARIABLES
   // --------------------------
@@ -875,59 +970,67 @@ export class AssetBoughtComponent implements OnInit {
   // --------------------------
   // ADD NEW FORM
   // --------------------------
-  addForm() {
-    if (this.isEditMode) return;
+addForm() {
+  if (this.isEditMode) return;
 
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
 
-    const currentDate = `${yyyy}-${mm}-${dd}`;
+  const currentDate = `${yyyy}-${mm}-${dd}`;
 
-    this.forms.push({
-      newRecord: {
-        /* ================= PRIMARY KEY ================= */
-        assetBoughtMiscPurchaseId: '0',
-        assetBoughtMiscPurchaseCode: '',
+  this.forms.push({
+    newRecord: <TableRow>{
+      /* ========= PRIMARY ========= */
+      purchaseId: '0',
+      purchaseNumber: '',
 
-        /* ================= ASSET CLASSIFICATION ================= */
-        assetBoughtAssetCategory: 'IT',
-        assetBoughtAssetType: '',
-        assetBoughtItemName: '',
+      /* ========= PURCHASE ========= */
+      purchaseDate: currentDate,
+      vendorId: '',
+      vendorName: '',
 
-        /* ================= OWNERSHIP ================= */
-        assetBoughtDepartment: '',
+      invoiceNumber: '',
+      invoiceDate: currentDate,
 
-        /* ================= ASSET STATUS ================= */
-        assetBoughtVendor: '',
-        assetBoughtSerialNumber: '',
-        assetBoughtAssetStatus: 'Working',
+      /* ========= ITEM ========= */
+      itemName: '',
+      itemCategory: 'IT',
+      itemDescription: '',
 
-        /* ================= PURCHASE ================= */
-        assetBoughtPurchaseDate: currentDate,
+      /* ========= QUANTITY ========= */
+      quantity: 1,
+      unitPrice: 0,
+      totalAmount: 0,
 
-        /* ================= DOCUMENTS ================= */
-        assetBoughtBillInvoiceNo: '',
-        assetBoughtAttachment: '',
+      /* ========= LOCATION ========= */
+      location: '',
+      departmentId: '',
 
-        /* ================= ADMIN ================= */
-        assetBoughtPurchasedBy: '',
-        assetBoughtRemarks: '',
+      /* ========= PURPOSE ========= */
+      purpose: '',
 
-        /* ================= AUDIT ================= */
-        assetBoughtCreatedDate: currentDate,
-        assetBoughtUpdatedDate: undefined,
+      /* ========= APPROVAL ========= */
+      requestedBy: '',
+      approvedBy: '',
+      approvalDate: currentDate,
 
-        /* ================= STATUS ================= */
-        assetBoughtStatus: 'Active',
+      /* ========= STOCK ========= */
+      stockStatus: 'Active',
 
-        /* ================= LOGIN ================= */
-        loginId: this.loginId || '',
-      },
-    });
-  }
+      /* ========= REMARKS ========= */
+      remarks: '',
 
+      /* ========= AUDIT ========= */
+      createdBy: this.loginId || '',
+      createdDate: currentDate,
+
+      updatedBy: '',
+      updatedDate: ''
+    }
+  });
+}
   // --------------------------
   // REMOVE FORM
   // --------------------------
@@ -942,136 +1045,153 @@ export class AssetBoughtComponent implements OnInit {
   // --------------------------
   // SAVE RECORD (SINGLE OR MULTIPLE)
   // --------------------------
-  saveAllRecords() {
-    /* ---------------- VALIDATION ---------------- */
-    const invalid = this.forms.some(
-      (f) =>
-        !f.newRecord.assetBoughtMiscPurchaseCode?.trim() ||
-        !f.newRecord.assetBoughtAssetCategory ||
-        !f.newRecord.assetBoughtAssetType?.trim() ||
-        !f.newRecord.assetBoughtItemName?.trim() ||
-        !f.newRecord.assetBoughtDepartment?.trim() ||
-        !f.newRecord.assetBoughtAssetStatus ||
-        !f.newRecord.assetBoughtPurchaseDate ||
-        !f.newRecord.assetBoughtBillInvoiceNo?.trim() ||
-        !f.newRecord.assetBoughtPurchasedBy?.trim() ||
-        !f.newRecord.assetBoughtStatus,
-    );
+saveAllRecords() {
 
-    if (invalid) {
-      this.showErrors = true;
-      this.toast.warning('Please fill all required fields!', 'WARNING', 4000);
-      return;
-    }
+  /* ---------------- VALIDATION ---------------- */
+  const invalid = this.forms.some(
+    (f) =>
+      !f.newRecord.purchaseNumber?.trim() ||
+      !f.newRecord.itemCategory ||
+      !f.newRecord.itemName?.trim() ||
+      !f.newRecord.vendorName?.trim() ||
+      !f.newRecord.departmentId?.trim() ||
+      !f.newRecord.purchaseDate ||
+      !f.newRecord.invoiceNumber?.trim() ||
+      !this.loginId ||   // 🔥 FIX (createdBy remove करून loginId वापर)
+      !f.newRecord.stockStatus
+  );
 
-    /* ---------------- EDIT MODE ---------------- */
-    if (this.isEditMode && this.editIndex !== null) {
-      const form = this.forms[0].newRecord;
-
-      const payload = {
-        assetBoughtMiscPurchaseCode: form.assetBoughtMiscPurchaseCode,
-
-        assetBoughtAssetCategory: form.assetBoughtAssetCategory,
-        assetBoughtAssetType: form.assetBoughtAssetType,
-        assetBoughtItemName: form.assetBoughtItemName,
-
-        assetBoughtDepartment: form.assetBoughtDepartment,
-
-        // 🔥 ADD THIS (IMPORTANT)
-        assetBoughtVendor: form.assetBoughtVendor,
-        assetBoughtSerialNumber: form.assetBoughtSerialNumber,
-
-        assetBoughtAssetStatus: form.assetBoughtAssetStatus,
-        assetBoughtPurchaseDate: form.assetBoughtPurchaseDate,
-
-        assetBoughtBillInvoiceNo: form.assetBoughtBillInvoiceNo,
-        assetBoughtAttachment: form.assetBoughtAttachment,
-
-        assetBoughtPurchasedBy: form.assetBoughtPurchasedBy,
-        assetBoughtRemarks: form.assetBoughtRemarks,
-
-        assetBoughtStatus: form.assetBoughtStatus,
-
-        loginId: this.loginId,
-      };
-
-      const assetId = this.tableData[this.editIndex].assetBoughtMiscPurchaseId;
-
-      this.commonService
-        .updateAssetBought(assetId, this.loginId, payload)
-        .subscribe({
-          next: () => {
-            this.toast.success('Record Updated Successfully!', 'SUCCESS', 4000);
-            this.resetAfterSave();
-            this.loadAssetBoughts();
-          },
-          error: () => {
-            this.toast.danger(
-              'Update failed. Service unavailable!',
-              'ERROR',
-              4000,
-            );
-          },
-        });
-
-      return;
-    }
-
-    /* ---------------- ADD MODE ---------------- */
-
-    const payload = this.forms.map((f) => ({
-      assetBoughtMiscPurchaseCode: f.newRecord.assetBoughtMiscPurchaseCode,
-
-      assetBoughtAssetCategory: f.newRecord.assetBoughtAssetCategory,
-      assetBoughtAssetType: f.newRecord.assetBoughtAssetType,
-      assetBoughtItemName: f.newRecord.assetBoughtItemName,
-
-      assetBoughtDepartment: f.newRecord.assetBoughtDepartment,
-
-      // ✅ ADD THIS
-      assetBoughtVendor: f.newRecord.assetBoughtVendor,
-      assetBoughtSerialNumber: f.newRecord.assetBoughtSerialNumber,
-
-      assetBoughtAssetStatus: f.newRecord.assetBoughtAssetStatus,
-
-      assetBoughtPurchaseDate: f.newRecord.assetBoughtPurchaseDate,
-
-      assetBoughtBillInvoiceNo: f.newRecord.assetBoughtBillInvoiceNo,
-
-      assetBoughtAttachment: f.newRecord.assetBoughtAttachment,
-
-      assetBoughtPurchasedBy: f.newRecord.assetBoughtPurchasedBy,
-      assetBoughtRemarks: f.newRecord.assetBoughtRemarks,
-
-      assetBoughtStatus: f.newRecord.assetBoughtStatus,
-
-      loginId: this.loginId,
-    }));
-
-    this.commonService.submitAssetBought(payload).subscribe({
-      next: (res) => {
-        if (res?.dublicateMessages?.length) {
-          res.dublicateMessages.forEach((msg: string) =>
-            this.toast.warning(msg, 'WARNING', 4000),
-          );
-        }
-
-        this.toast.success('Record Added Successfully!', 'SUCCESS', 4000);
-
-        this.resetAfterSave();
-        this.loadAssetBoughts();
-      },
-
-      error: () => {
-        this.toast.danger(
-          'Save failed. AssetBought service down!',
-          'ERROR',
-          4000,
-        );
-      },
-    });
+  if (invalid) {
+    this.showErrors = true;
+    this.toast.warning('Please fill all required fields!', 'WARNING', 4000);
+    return;
   }
 
+  /* ---------------- EDIT MODE ---------------- */
+  if (this.isEditMode && this.editIndex !== null) {
+
+    const form = this.forms[0].newRecord;
+
+    const payload = {
+      purchaseNumber: form.purchaseNumber,
+
+      purchaseDate: form.purchaseDate,
+      vendorId: form.vendorId,
+      vendorName: form.vendorName,
+
+      invoiceNumber: form.invoiceNumber,
+      invoiceDate: form.invoiceDate,
+
+      itemName: form.itemName,
+      itemCategory: form.itemCategory,
+      itemDescription: form.itemDescription,
+
+      quantity: form.quantity,
+      unitPrice: form.unitPrice,
+      totalAmount: form.quantity * form.unitPrice,
+
+      location: form.location,
+      departmentId: form.departmentId,
+
+      purpose: form.purpose,
+
+      requestedBy: form.requestedBy,
+      approvedBy: form.approvedBy,
+      approvalDate: form.approvalDate,
+
+      stockStatus: form.stockStatus,
+
+      remarks: form.remarks,
+
+      createdBy: this.loginId,
+      updatedBy: this.loginId,
+      updatedDate: new Date().toISOString().split('T')[0],
+    };
+
+    /* 🔥 SAFE FIX (IMPORTANT) */
+    const purchaseId = this.tableData[this.editIndex]?.purchaseId;
+
+    console.log("EDIT purchaseId:", purchaseId);
+
+    if (!purchaseId || !purchaseId.includes('/')) {
+      this.toast.danger("Invalid Purchase ID!", "ERROR", 3000);
+      return;
+    }
+
+
+    this.commonService
+      .updateAssetBought(purchaseId, payload)
+      .subscribe({
+        next: () => {
+          this.toast.success('Record Updated Successfully!', 'SUCCESS', 4000);
+          this.resetAfterSave();
+          this.loadAssetBoughts();
+        },
+        error: () => {
+          this.toast.danger('Update failed. Service unavailable!', 'ERROR', 4000);
+        },
+      });
+
+    return;
+  }
+
+  /* ---------------- ADD MODE ---------------- */
+
+  const payload = this.forms.map((f) => ({
+    purchaseNumber: f.newRecord.purchaseNumber,
+
+    purchaseDate: f.newRecord.purchaseDate,
+    vendorId: f.newRecord.vendorId,
+    vendorName: f.newRecord.vendorName,
+
+    invoiceNumber: f.newRecord.invoiceNumber,
+    invoiceDate: f.newRecord.invoiceDate,
+
+    itemName: f.newRecord.itemName,
+    itemCategory: f.newRecord.itemCategory,
+    itemDescription: f.newRecord.itemDescription,
+
+    quantity: f.newRecord.quantity,
+    unitPrice: f.newRecord.unitPrice,
+    totalAmount: f.newRecord.quantity * f.newRecord.unitPrice,
+
+    location: f.newRecord.location,
+    departmentId: f.newRecord.departmentId,
+
+    purpose: f.newRecord.purpose,
+
+    requestedBy: f.newRecord.requestedBy,
+    approvedBy: f.newRecord.approvedBy,
+    approvalDate: f.newRecord.approvalDate,
+
+    stockStatus: f.newRecord.stockStatus,
+
+    remarks: f.newRecord.remarks,
+
+    createdBy: this.loginId,
+    createdDate: new Date().toISOString().split('T')[0],
+  }));
+
+ this.commonService.saveAllAssetBought(payload).subscribe({
+    next: (res: any) => {
+
+      if (res?.dublicateMessages?.length) {
+        res.dublicateMessages.forEach((msg: string) =>
+          this.toast.warning(msg, 'WARNING', 4000)
+        );
+      }
+
+      this.toast.success('Record Added Successfully!', 'SUCCESS', 4000);
+
+      this.resetAfterSave();
+      this.loadAssetBoughts();
+    },
+
+    error: () => {
+      this.toast.danger('Save failed. Service down!', 'ERROR', 4000);
+    },
+  });
+}
   resetAfterSave() {
     this.initializeForm(); // 🔥 BEST WAY
 
@@ -1116,7 +1236,7 @@ export class AssetBoughtComponent implements OnInit {
       {
         newRecord: {
           ...row,
-          assetBoughtPurchaseDate: row.assetBoughtPurchaseDate?.split('T')[0],
+          assetBoughtPurchaseDate: row.purchaseDate?.split('T')[0],
         },
       },
     ];
@@ -1219,477 +1339,531 @@ export class AssetBoughtComponent implements OnInit {
   csvRecords: any[] = [];
 
   // Convert CSV → JSON and store in tableData
-  parseCSV(csv: string) {
-    const lines = csv
-      .split('\n')
-      .map((l) => l.trim())
-      .filter((l) => l);
+parseCSV(csv: string) {
+  const lines = csv
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l);
 
-    if (lines.length <= 1) {
-      this.showToast('CSV has no data', 'warning');
-      return;
+  if (lines.length <= 1) {
+    this.showToast('CSV has no data', 'warning');
+    return;
+  }
+
+  /* ================= HEADER MAPPING ================= */
+  const mapHeader = (h: string) => {
+    switch (h.toLowerCase()) {
+      case 'purchase id':
+        return 'purchaseId';
+
+      case 'purchase number':
+      case 'purchase no':
+        return 'purchaseNumber';
+
+      case 'vendor':
+      case 'vendor name':
+        return 'vendorName';
+
+      case 'vendor id':
+        return 'vendorId';
+
+      case 'invoice number':
+      case 'invoice no':
+        return 'invoiceNumber';
+
+      case 'invoice date':
+        return 'invoiceDate';
+
+      case 'item name':
+        return 'itemName';
+
+      case 'category':
+        return 'itemCategory';
+
+      case 'description':
+        return 'itemDescription';
+
+      case 'quantity':
+        return 'quantity';
+
+      case 'unit price':
+        return 'unitPrice';
+
+      case 'total':
+      case 'total amount':
+        return 'totalAmount';
+
+      case 'location':
+        return 'location';
+
+      case 'department':
+        return 'departmentId';
+
+      case 'purpose':
+        return 'purpose';
+
+      case 'requested by':
+        return 'requestedBy';
+
+      case 'approved by':
+        return 'approvedBy';
+
+      case 'approval date':
+        return 'approvalDate';
+
+      case 'status':
+      case 'stock status':
+        return 'stockStatus';
+
+      case 'remarks':
+        return 'remarks';
+
+      case 'created by':
+        return 'createdBy';
+
+      case 'created date':
+        return 'createdDate';
+
+      case 'updated by':
+        return 'updatedBy';
+
+      case 'updated date':
+        return 'updatedDate';
+
+      default:
+        return h;
     }
+  };
 
-    /* ================= HEADER MAPPING ================= */
-    const mapHeader = (h: string) => {
-      switch (h.toLowerCase()) {
-        case 'asset id':
-          return 'assetBoughtMiscPurchaseId';
+  const csvHeaders = lines[0].split(',').map((h) => mapHeader(h.trim()));
+  const results: TableRow[] = [];
 
-        case 'asset code':
-          return 'assetBoughtMiscPurchaseCode';
+  /* ================= ROW PARSING ================= */
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(',');
+    const obj: any = {};
 
-        case 'asset category':
-          return 'assetBoughtAssetCategory';
+    csvHeaders.forEach((h, idx) => {
+      obj[h] = values[idx] ? values[idx].trim() : '';
+    });
 
-        case 'asset type':
-          return 'assetBoughtAssetType';
+    const newId =
+      obj['purchaseId'] ||
+      `PUR-${String(this.tableData.length + results.length + 1).padStart(3, '0')}`;
 
-        case 'item name':
-          return 'assetBoughtItemName';
+    const quantity = Number(obj['quantity'] || 0);
+    const unitPrice = Number(obj['unitPrice'] || 0);
 
-        case 'department':
-          return 'assetBoughtDepartment';
+    const newRecord: TableRow = {
+      /* ========= PRIMARY ========= */
+      purchaseId: newId,
+      purchaseNumber: obj['purchaseNumber'] || '',
 
-        case 'asset status':
-          return 'assetBoughtAssetStatus';
+      /* ========= PURCHASE ========= */
+      purchaseDate: obj['purchaseDate'] || this.getTodayDate(),
+      vendorId: obj['vendorId'] || '',
+      vendorName: obj['vendorName'] || '',
 
-        case 'purchase date':
-          return 'assetBoughtPurchaseDate';
+      invoiceNumber: obj['invoiceNumber'] || '',
+      invoiceDate: obj['invoiceDate'] || this.getTodayDate(),
 
-        case 'bill invoice no':
-        case 'invoice no':
-          return 'assetBoughtBillInvoiceNo';
+      /* ========= ITEM ========= */
+      itemName: obj['itemName'] || '',
+      itemCategory: obj['itemCategory'] || 'IT',
+      itemDescription: obj['itemDescription'] || '',
 
-        case 'purchased by':
-          return 'assetBoughtPurchasedBy';
+      /* ========= QUANTITY ========= */
+      quantity: quantity,
+      unitPrice: unitPrice,
+      totalAmount: quantity * unitPrice, // 🔥 auto calc
 
-        case 'record status':
-          return 'assetBoughtStatus';
+      /* ========= LOCATION ========= */
+      location: obj['location'] || '',
+      departmentId: obj['departmentId'] || '',
 
-        case 'remarks':
-          return 'assetBoughtRemarks';
+      /* ========= PURPOSE ========= */
+      purpose: obj['purpose'] || '',
 
-        case 'created date':
-          return 'assetBoughtCreatedDate';
+      /* ========= APPROVAL ========= */
+      requestedBy: obj['requestedBy'] || '',
+      approvedBy: obj['approvedBy'] || '',
+      approvalDate: obj['approvalDate'] || this.getTodayDate(),
 
-        case 'updated date':
-          return 'assetBoughtUpdatedDate';
+      /* ========= STOCK ========= */
+      stockStatus:
+        (obj['stockStatus'] as 'Active' | 'Inactive') || 'Active',
 
-        default:
-          return h;
-      }
+      /* ========= REMARKS ========= */
+      remarks: obj['remarks'] || '',
+
+      /* ========= AUDIT ========= */
+      createdBy: obj['createdBy'] || this.loginId || '',
+      createdDate: obj['createdDate'] || this.getTodayDate(),
+
+      updatedBy: obj['updatedBy'] || '',
+      updatedDate: obj['updatedDate'] || '',
     };
 
-    const csvHeaders = lines[0].split(',').map((h) => mapHeader(h.trim()));
-    const results: TableRow[] = [];
+    results.push(newRecord);
+  }
 
-    /* ================= ROW PARSING ================= */
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',');
-      const obj: any = {};
+  /* ================= MERGE DATA ================= */
+  this.tableData = [...this.tableData, ...results];
+  this.filteredData = [...this.tableData];
+  this.currentPage = 1;
 
-      csvHeaders.forEach((h, idx) => {
-        obj[h] = values[idx] ? values[idx].trim() : '';
-      });
+  this.cdr.detectChanges();
+  this.showToast('Purchase CSV imported successfully!', 'success');
+}
 
-      const newAssetId =
-        obj['miscPurchaseId'] ||
-        `AST-${String(this.TableRow.length + results.length + 1).padStart(3, '0')}`;
+  // ---------------- Excel Parsing ----------------
+readExcel(file: File) {
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    const workbook = XLSX.read(reader.result, { type: 'binary' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+
+    const json = XLSX.utils.sheet_to_json<any>(sheet);
+
+    json.forEach((obj, i) => {
+      const newId =
+        obj['Purchase ID'] ||
+        `PUR-${String(this.tableData.length + i + 1).padStart(3, '0')}`;
+
+      const quantity = Number(obj['Quantity'] || 0);
+      const unitPrice = Number(obj['Unit Price'] || 0);
 
       const newRecord: TableRow = {
-        assetBoughtMiscPurchaseId: newAssetId,
-        assetBoughtMiscPurchaseCode: obj['assetBoughtMiscPurchaseCode'] || '',
+        /* ========= PRIMARY ========= */
+        purchaseId: newId,
+        purchaseNumber: obj['Purchase Number'] || '',
 
-        assetBoughtAssetCategory:
-          (obj['assetBoughtAssetCategory'] as any) || 'IT',
+        /* ========= PURCHASE ========= */
+        purchaseDate: obj['Purchase Date'] || this.getTodayDate(),
+        vendorId: obj['Vendor ID'] || '',
+        vendorName: obj['Vendor Name'] || '',
 
-        assetBoughtAssetType: obj['assetBoughtAssetType'] || '',
-        assetBoughtItemName: obj['assetBoughtItemName'] || '',
+        invoiceNumber: obj['Invoice Number'] || '',
+        invoiceDate: obj['Invoice Date'] || this.getTodayDate(),
 
-        assetBoughtDepartment: obj['assetBoughtDepartment'] || '',
+        /* ========= ITEM ========= */
+        itemName: obj['Item Name'] || '',
+        itemCategory: obj['Category'] || 'IT',
+        itemDescription: obj['Description'] || '',
 
-        /* ================= VENDOR / SERIAL ================= */
-        assetBoughtVendor: obj['assetBoughtVendor'] || '',
-        assetBoughtSerialNumber: obj['assetBoughtSerialNumber'] || '',
+        /* ========= QUANTITY ========= */
+        quantity: quantity,
+        unitPrice: unitPrice,
+        totalAmount: quantity * unitPrice, // 🔥 auto calc
 
-        /* ================= STATUS ================= */
-        assetBoughtAssetStatus:
-          (obj['assetBoughtAssetStatus'] as any) || 'Working',
+        /* ========= LOCATION ========= */
+        location: obj['Location'] || '',
+        departmentId: obj['Department'] || '',
 
-        assetBoughtPurchaseDate:
-          obj['assetBoughtPurchaseDate'] || this.getTodayDate(),
+        /* ========= PURPOSE ========= */
+        purpose: obj['Purpose'] || '',
 
-        /* ================= DOCUMENT ================= */
-        assetBoughtBillInvoiceNo: obj['assetBoughtBillInvoiceNo'] || '',
-        assetBoughtAttachment: undefined,
+        /* ========= APPROVAL ========= */
+        requestedBy: obj['Requested By'] || '',
+        approvedBy: obj['Approved By'] || '',
+        approvalDate: obj['Approval Date'] || this.getTodayDate(),
 
-        /* ================= ADMIN ================= */
-        assetBoughtPurchasedBy: obj['assetBoughtPurchasedBy'] || '',
+        /* ========= STOCK ========= */
+        stockStatus:
+          (obj['Stock Status'] as 'Active' | 'Inactive') || 'Active',
 
-        assetBoughtStatus:
-          (obj['assetBoughtStatus'] as 'Active' | 'Inactive') || 'Active',
+        /* ========= REMARKS ========= */
+        remarks: obj['Remarks'] || '',
 
-        assetBoughtRemarks: obj['assetBoughtRemarks'] || '',
+        /* ========= AUDIT ========= */
+        createdBy: obj['Created By'] || this.loginId || '',
+        createdDate: obj['Created Date'] || this.getTodayDate(),
 
-        /* ================= AUDIT ================= */
-        assetBoughtCreatedDate:
-          obj['assetBoughtCreatedDate'] || this.getTodayDate(),
-
-        assetBoughtUpdatedDate: obj['assetBoughtUpdatedDate'] || undefined,
-
-        /* ================= LOGIN ================= */
-        loginId: this.loginId || '',
+        updatedBy: obj['Updated By'] || '',
+        updatedDate: obj['Updated Date'] || '',
       };
 
-      results.push(newRecord);
-    }
+      this.tableData.push(newRecord);
+    });
 
-    /* ================= MERGE DATA ================= */
-    this.TableRow = [...this.TableRow, ...results];
-    this.filteredData = [...this.TableRow];
+    /* ================= REFRESH VIEW ================= */
+    this.filteredData = [...this.tableData];
     this.currentPage = 1;
 
     this.cdr.detectChanges();
-    this.showToast('AMC Asset CSV imported successfully!', 'success');
-  }
+    this.showToast('Purchase Excel imported successfully!', 'success');
+  };
 
-  // ---------------- Excel Parsing ----------------
-  readExcel(file: File) {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const workbook = XLSX.read(reader.result, { type: 'binary' });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-
-      const json = XLSX.utils.sheet_to_json<any>(sheet);
-
-      json.forEach((obj, i) => {
-        const newAssetId =
-          obj['Asset ID'] ||
-          `AST-${String(this.TableRow.length + i + 1).padStart(3, '0')}`;
-
-        const newRecord: TableRow = {
-          assetBoughtMiscPurchaseId: newAssetId,
-          assetBoughtMiscPurchaseCode: obj['assetBoughtMiscPurchaseCode'] || '',
-
-          assetBoughtAssetCategory:
-            (obj['assetBoughtAssetCategory'] as any) || 'IT',
-
-          assetBoughtAssetType: obj['assetBoughtAssetType'] || '',
-          assetBoughtItemName: obj['assetBoughtItemName'] || '',
-
-          assetBoughtDepartment: obj['assetBoughtDepartment'] || '',
-
-          /* ===== MISSING FIELDS ADDED ===== */
-          assetBoughtVendor: obj['assetBoughtVendor'] || '',
-          assetBoughtSerialNumber: obj['assetBoughtSerialNumber'] || '',
-
-          assetBoughtAssetStatus:
-            (obj['assetBoughtAssetStatus'] as any) || 'Working',
-
-          assetBoughtPurchaseDate:
-            obj['assetBoughtPurchaseDate'] || this.getTodayDate(),
-
-          assetBoughtBillInvoiceNo: obj['assetBoughtBillInvoiceNo'] || '',
-          assetBoughtAttachment: undefined,
-
-          assetBoughtPurchasedBy: obj['assetBoughtPurchasedBy'] || '',
-
-          assetBoughtStatus:
-            (obj['assetBoughtStatus'] as 'Active' | 'Inactive') || 'Active',
-
-          assetBoughtRemarks: obj['assetBoughtRemarks'] || '',
-
-          assetBoughtCreatedDate:
-            obj['assetBoughtCreatedDate'] || this.getTodayDate(),
-
-          assetBoughtUpdatedDate: obj['assetBoughtUpdatedDate'] || undefined,
-
-          /* ===== LOGIN FIELD ===== */
-          loginId: this.loginId || '',
-        };
-        this.TableRow.push(newRecord);
-      });
-
-      /* ================= REFRESH VIEW ================= */
-      this.filteredData = [...this.TableRow];
-      this.currentPage = 1;
-
-      this.cdr.detectChanges();
-      this.showToast('AMC Asset Excel imported successfully!', 'success');
-    };
-
-    reader.readAsBinaryString(file);
-  }
-
+  reader.readAsBinaryString(file);
+}
   // ---------------- TXT Parsing ----------------
-  readTXT(file: File) {
-    const reader = new FileReader();
+ readTXT(file: File) {
+  const reader = new FileReader();
 
-    reader.onload = () => {
-      const text = reader.result as string;
+  reader.onload = () => {
+    const text = reader.result as string;
 
-      const lines = text
-        .split(/\r?\n/)
-        .map((line) => line.trim())
-        .filter((line) => line !== '');
+    const lines = text
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line !== '');
 
-      lines.forEach((line, idx) => {
-        const cols = line.split(',').map((c) => c.trim());
+    lines.forEach((line, idx) => {
+      const cols = line.split(',').map((c) => c.trim());
 
-        // Ensure minimum columns (18)
-        while (cols.length < 18) cols.push('');
+      // Ensure minimum columns (15)
+      while (cols.length < 15) cols.push('');
 
-        const newAssetId =
-          cols[0] ||
-          `AST-${String(this.TableRow.length + idx + 1).padStart(3, '0')}`;
+      const newId =
+        cols[0] ||
+        `PUR-${String(this.tableData.length + idx + 1).padStart(3, '0')}`;
 
-        const newRecord: TableRow = {
-          /* ================= PRIMARY KEY ================= */
-          assetBoughtMiscPurchaseId: newAssetId,
-          assetBoughtMiscPurchaseCode: cols[1] || '',
+      const quantity = Number(cols[5] || 0);
+      const unitPrice = Number(cols[6] || 0);
 
-          /* ================= ASSET CLASSIFICATION ================= */
-          assetBoughtAssetCategory: ([
-            'IT',
-            'Non-IT',
-            'Electrical',
-            'Mechanical',
-          ].includes(cols[2])
-            ? cols[2]
-            : 'IT') as 'IT' | 'Non-IT' | 'Electrical' | 'Mechanical',
+      const newRecord: TableRow = {
+        /* ========= PRIMARY ========= */
+        purchaseId: newId,
+        purchaseNumber: cols[1] || '',
 
-          assetBoughtAssetType: cols[3] || '',
-          assetBoughtItemName: cols[4] || '',
+        /* ========= PURCHASE ========= */
+        purchaseDate: cols[2] || this.getTodayDate(),
+        vendorId: cols[3] || '',
+        vendorName: cols[4] || '',
 
-          /* ================= OWNERSHIP ================= */
-          assetBoughtDepartment: cols[7] || '',
+        invoiceNumber: cols[7] || '',
+        invoiceDate: cols[8] || this.getTodayDate(),
 
-          /* ================= VENDOR / SERIAL ================= */
-          assetBoughtVendor: cols[5] || '',
-          assetBoughtSerialNumber: cols[6] || '',
+        /* ========= ITEM ========= */
+        itemName: cols[9] || '',
+        itemCategory: cols[10] || 'IT',
+        itemDescription: cols[11] || '',
 
-          /* ================= ASSET STATUS ================= */
-          assetBoughtAssetStatus: ([
-            'Working',
-            'Not Working',
-            'Under Repair',
-          ].includes(cols[9])
-            ? cols[9]
-            : 'Working') as 'Working' | 'Not Working' | 'Under Repair',
+        /* ========= QUANTITY ========= */
+        quantity: quantity,
+        unitPrice: unitPrice,
+        totalAmount: quantity * unitPrice, // 🔥 auto calc
 
-          /* ================= PURCHASE ================= */
-          assetBoughtPurchaseDate: cols[12] || this.getTodayDate(),
+        /* ========= LOCATION ========= */
+        location: cols[12] || '',
+        departmentId: cols[13] || '',
 
-          /* ================= DOCUMENTS ================= */
-          assetBoughtBillInvoiceNo: cols[14] || '',
-          assetBoughtAttachment: undefined,
+        /* ========= PURPOSE ========= */
+        purpose: cols[14] || '',
 
-          /* ================= ADMIN ================= */
-          assetBoughtPurchasedBy: cols[15] || '',
+        /* ========= APPROVAL ========= */
+        requestedBy: '',
+        approvedBy: '',
+        approvalDate: this.getTodayDate(),
 
-          assetBoughtStatus: (cols[16] === 'Inactive'
-            ? 'Inactive'
-            : 'Active') as 'Active' | 'Inactive',
+        /* ========= STOCK ========= */
+        stockStatus:
+          (cols[15] === 'Inactive' ? 'Inactive' : 'Active') as
+            | 'Active'
+            | 'Inactive',
 
-          assetBoughtRemarks: cols[17] || '',
+        /* ========= REMARKS ========= */
+        remarks: cols[16] || '',
 
-          /* ================= SYSTEM AUDIT ================= */
-          assetBoughtCreatedDate: this.getTodayDate(),
-          assetBoughtUpdatedDate: undefined,
+        /* ========= AUDIT ========= */
+        createdBy: this.loginId || '',
+        createdDate: this.getTodayDate(),
 
-          /* ================= LOGIN ================= */
-          loginId: this.loginId || '',
-        };
+        updatedBy: '',
+        updatedDate: '',
+      };
 
-        this.TableRow.push(newRecord);
-      });
+      this.tableData.push(newRecord);
+    });
 
-      this.filteredData = [...this.TableRow];
-      this.currentPage = 1;
+    this.filteredData = [...this.tableData];
+    this.currentPage = 1;
 
-      this.cdr.detectChanges();
-      this.showToast('AMC Asset TXT imported successfully!', 'success');
-    };
+    this.cdr.detectChanges();
+    this.showToast('Purchase TXT imported successfully!', 'success');
+  };
 
-    reader.readAsText(file);
-  }
-
+  reader.readAsText(file);
+}
   // ---------------- DOCX Parsing (mammoth.js) ----------------
-  async readDOCX(file: File) {
-    const reader = new FileReader();
+async readDOCX(file: File) {
+  const reader = new FileReader();
 
-    reader.onload = async () => {
-      const arrayBuffer = reader.result as ArrayBuffer;
+  reader.onload = async () => {
+    const arrayBuffer = reader.result as ArrayBuffer;
 
-      // DOCX → HTML
-      const result = await mammoth.convertToHtml({ arrayBuffer });
-      const html = result.value;
+    // DOCX → HTML
+    const result = await mammoth.convertToHtml({ arrayBuffer });
+    const html = result.value;
 
-      // Parse HTML
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const table = doc.querySelector('table');
+    // Parse HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const table = doc.querySelector('table');
 
-      if (!table) {
-        this.showToast('No table found in DOCX!', 'warning');
-        return;
-      }
+    if (!table) {
+      this.showToast('No table found in DOCX!', 'warning');
+      return;
+    }
 
-      const rows = table.querySelectorAll('tr');
+    const rows = table.querySelectorAll('tr');
 
-      rows.forEach((row, rowIndex) => {
-        if (rowIndex === 0) return; // skip header
+    rows.forEach((row, rowIndex) => {
+      if (rowIndex === 0) return; // skip header
 
-        const cells = Array.from(row.querySelectorAll('td')).map(
-          (cell) => cell.textContent?.trim() || '',
-        );
+      const cells = Array.from(row.querySelectorAll('td')).map(
+        (cell) => cell.textContent?.trim() || ''
+      );
 
-        // Ensure minimum columns (18)
-        while (cells.length < 18) cells.push('');
+      // Ensure minimum columns (15)
+      while (cells.length < 15) cells.push('');
 
-        const newAssetId =
-          cells[0] ||
-          `AST-${String(this.TableRow.length + rowIndex).padStart(3, '0')}`;
+      const newId =
+        cells[0] ||
+        `PUR-${String(this.tableData.length + rowIndex).padStart(3, '0')}`;
 
-        const newRecord: TableRow = {
-          /* ================= PRIMARY KEY ================= */
-          assetBoughtMiscPurchaseId: newAssetId,
-          assetBoughtMiscPurchaseCode: cells[1] || '',
+      const quantity = Number(cells[5] || 0);
+      const unitPrice = Number(cells[6] || 0);
 
-          /* ================= ASSET CLASSIFICATION ================= */
-          assetBoughtAssetCategory: ([
-            'IT',
-            'Non-IT',
-            'Electrical',
-            'Mechanical',
-          ].includes(cells[2])
-            ? cells[2]
-            : 'IT') as 'IT' | 'Non-IT' | 'Electrical' | 'Mechanical',
+      const newRecord: TableRow = {
+        /* ========= PRIMARY ========= */
+        purchaseId: newId,
+        purchaseNumber: cells[1] || '',
 
-          assetBoughtAssetType: cells[3] || '',
-          assetBoughtItemName: cells[4] || '',
+        /* ========= PURCHASE ========= */
+        purchaseDate: cells[2] || this.getTodayDate(),
+        vendorId: cells[3] || '',
+        vendorName: cells[4] || '',
 
-          /* ================= OWNERSHIP ================= */
-          assetBoughtDepartment: cells[7] || '',
+        invoiceNumber: cells[7] || '',
+        invoiceDate: cells[8] || this.getTodayDate(),
 
-          /* ================= VENDOR / SERIAL ================= */
-          assetBoughtVendor: cells[5] || '',
-          assetBoughtSerialNumber: cells[6] || '',
+        /* ========= ITEM ========= */
+        itemName: cells[9] || '',
+        itemCategory: cells[10] || 'IT',
+        itemDescription: cells[11] || '',
 
-          /* ================= ASSET STATUS ================= */
-          assetBoughtAssetStatus: ([
-            'Working',
-            'Not Working',
-            'Under Repair',
-          ].includes(cells[9])
-            ? cells[9]
-            : 'Working') as 'Working' | 'Not Working' | 'Under Repair',
+        /* ========= QUANTITY ========= */
+        quantity: quantity,
+        unitPrice: unitPrice,
+        totalAmount: quantity * unitPrice, // 🔥 auto calc
 
-          /* ================= PURCHASE ================= */
-          assetBoughtPurchaseDate: cells[12] || this.getTodayDate(),
+        /* ========= LOCATION ========= */
+        location: cells[12] || '',
+        departmentId: cells[13] || '',
 
-          /* ================= DOCUMENTS ================= */
-          assetBoughtBillInvoiceNo: cells[14] || '',
-          assetBoughtAttachment: undefined,
+        /* ========= PURPOSE ========= */
+        purpose: cells[14] || '',
 
-          /* ================= ADMIN ================= */
-          assetBoughtPurchasedBy: cells[15] || '',
+        /* ========= APPROVAL ========= */
+        requestedBy: '',
+        approvedBy: '',
+        approvalDate: this.getTodayDate(),
 
-          assetBoughtStatus: (cells[16] === 'Inactive'
-            ? 'Inactive'
-            : 'Active') as 'Active' | 'Inactive',
+        /* ========= STOCK ========= */
+        stockStatus:
+          (cells[15] === 'Inactive' ? 'Inactive' : 'Active') as
+            | 'Active'
+            | 'Inactive',
 
-          assetBoughtRemarks: cells[17] || '',
+        /* ========= REMARKS ========= */
+        remarks: cells[16] || '',
 
-          /* ================= SYSTEM AUDIT ================= */
-          assetBoughtCreatedDate: this.getTodayDate(),
-          assetBoughtUpdatedDate: undefined,
+        /* ========= AUDIT ========= */
+        createdBy: this.loginId || '',
+        createdDate: this.getTodayDate(),
 
-          /* ================= LOGIN ================= */
-          loginId: this.loginId || '',
-        };
+        updatedBy: '',
+        updatedDate: '',
+      };
 
-        this.TableRow.push(newRecord);
-      });
+      this.tableData.push(newRecord);
+    });
 
-      this.filteredData = [...this.TableRow];
-      this.currentPage = 1;
+    this.filteredData = [...this.tableData];
+    this.currentPage = 1;
 
-      this.cdr.detectChanges();
-      this.showToast('AMC Asset DOCX imported successfully!', 'success');
-    };
+    this.cdr.detectChanges();
+    this.showToast('Purchase DOCX imported successfully!', 'success');
+  };
 
-    reader.readAsArrayBuffer(file);
-  }
+  reader.readAsArrayBuffer(file);
+}
 
   //onAssetTypeChange(type: string) {
   //  if (!this.form.newRecord.itemName) {
   //    this.form.newRecord.itemName = type;
   //  }
   //}
+downloadSampleCSV() {
+  /* ================= CSV HEADERS ================= */
+  const headers = [
+    'Purchase ID',
+    'Purchase Number',
+    'Purchase Date',
+    'Vendor ID',
+    'Vendor Name',
+    'Quantity',
+    'Unit Price',
+    'Invoice Number',
+    'Invoice Date',
+    'Item Name',
+    'Category',
+    'Description',
+    'Location',
+    'Department',
+    'Purpose',
+    'Stock Status',
+    'Remarks',
+  ];
 
-  downloadSampleCSV() {
-    /* ================= CSV HEADERS ================= */
-    const headers = [
-      'Asset ID',
-      'Asset Code',
-      'Asset Category',
-      'Asset Type',
-      'Item Name',
-      'Department',
-      'Asset Status',
-      'Purchase Date',
-      'Bill / Invoice No',
-      'Purchased By',
-      'Record Status',
-      'Remarks',
-      'Created Date',
-    ];
+  const csvRows: string[] = [];
 
-    const csvRows: string[] = [];
+  // Header row
+  csvRows.push(headers.join(','));
 
-    // Header row
-    csvRows.push(headers.join(','));
+  /* ================= SAMPLE DATA ROW ================= */
+  const sampleRow = [
+    'PUR-001',
+    'PUR-IT-001',
+    this.getTodayDate(),
+    'V001',
+    'Dell Supplier',
+    '2',
+    '55000',
+    'INV-001',
+    this.getTodayDate(),
+    'Dell Laptop',
+    'IT',
+    'Business Laptop',
+    'Pune Office',
+    'IT',
+    'Office Use',
+    'Active',
+    'Sample purchase record',
+  ];
 
-    /* ================= SAMPLE DATA ROW ================= */
-    const sampleRow = [
-      'AST-001',
-      'ASSET-IT-001',
-      'IT',
-      'Laptop',
-      'Dell Latitude 5420',
-      'IT',
-      'Working',
-      '2024-10-01',
-      'INV-DEL-001',
-      'IT Admin',
-      'Active',
-      'Sample asset record',
-      this.getTodayDate(),
-    ];
+  csvRows.push(
+    sampleRow.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(',')
+  );
 
-    csvRows.push(
-      sampleRow.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(','),
-    );
+  /* ================= DOWNLOAD ================= */
+  const csvString = csvRows.join('\n');
+  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
 
-    /* ================= DOWNLOAD ================= */
-    const csvString = csvRows.join('\n');
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+  const url = window.URL.createObjectURL(blob);
 
-    const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Purchase_Sample.csv';
+  a.click();
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Asset_Bought_Sample.csv';
-    a.click();
+  window.URL.revokeObjectURL(url);
 
-    window.URL.revokeObjectURL(url);
-
-    this.showToast('Sample CSV downloaded successfully', 'success');
-  }
+  this.showToast('Sample CSV downloaded successfully', 'success');
+}
   //bulk export
   // ---------------- Component Variables ----------------
   startDate: string = '';
@@ -1761,9 +1935,9 @@ export class AssetBoughtComponent implements OnInit {
 
     /* ================= FILTER BY DATE RANGE ================= */
     const filteredData: TableRow[] = this.TableRow.filter((row) => {
-      if (!row.assetBoughtCreatedDate) return false;
+      if (!row.createdDate) return false;
 
-      const rowDate = this.parseDDMMYYYY(row.assetBoughtCreatedDate);
+      const rowDate = this.parseDDMMYYYY(row.createdDate);
       if (!rowDate) return false;
 
       return rowDate >= start && rowDate <= end;
@@ -1794,277 +1968,316 @@ export class AssetBoughtComponent implements OnInit {
   }
 
   // ---------------- CSV Export ----------------
-  exportCSVfile(data: TableRow[]) {
-    const today = new Date();
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+exportCSVfile(data: TableRow[]) {
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
 
-    const csvRows: string[] = [];
+  const csvRows: string[] = [];
 
-    /* ================= HEADER ================= */
-    csvRows.push(this.companyName || 'AMC Asset Master');
-    csvRows.push(`Date:,${formattedDate}`);
-    csvRows.push('');
+  /* ================= HEADER ================= */
+  csvRows.push(this.companyName || 'Purchase Report');
+  csvRows.push(`Date:,${formattedDate}`);
+  csvRows.push('');
 
-    /* ================= CSV COLUMNS ================= */
-    const headers = [
-      'Asset ID',
-      'Asset Code',
-      'Asset Category',
-      'Asset Type',
-      'Item Name',
-      'Department',
-      'Asset Status',
-      'Purchase Date',
-      'Bill / Invoice No',
-      'Purchased By',
-      'Record Status',
-      'Remarks',
-      'Created Date',
-      'Updated Date',
+  /* ================= CSV COLUMNS ================= */
+  const headers = [
+    'Purchase ID',
+    'Purchase Number',
+    'Purchase Date',
+    'Vendor ID',
+    'Vendor Name',
+    'Quantity',
+    'Unit Price',
+    'Total Amount',
+    'Invoice Number',
+    'Invoice Date',
+    'Item Name',
+    'Category',
+    'Description',
+    'Location',
+    'Department',
+    'Purpose',
+    'Stock Status',
+    'Remarks',
+    'Created By',
+    'Created Date',
+    'Updated By',
+    'Updated Date',
+  ];
+
+  csvRows.push(headers.join(','));
+
+  /* ================= DATA ROWS ================= */
+  data.forEach((row: TableRow) => {
+    const rowData = [
+      row.purchaseId || '',
+      row.purchaseNumber || '',
+
+      row.purchaseDate || '',
+      row.vendorId || '',
+      row.vendorName || '',
+
+      row.quantity ?? 0,
+      row.unitPrice ?? 0,
+      row.totalAmount ?? 0,
+
+      row.invoiceNumber || '',
+      row.invoiceDate || '',
+
+      row.itemName || '',
+      row.itemCategory || '',
+      row.itemDescription || '',
+
+      row.location || '',
+      row.departmentId || '',
+
+      row.purpose || '',
+
+      row.stockStatus || '',
+      row.remarks ?? '',
+
+      row.createdBy || '',
+      row.createdDate || '',
+
+      row.updatedBy ?? '',
+      row.updatedDate ?? '',
     ];
 
-    csvRows.push(headers.join(','));
-
-    /* ================= DATA ROWS ================= */
-    data.forEach((row: TableRow) => {
-      const rowData = [
-        row.assetBoughtMiscPurchaseId || '',
-        row.assetBoughtMiscPurchaseCode || '',
-
-        row.assetBoughtAssetCategory || '',
-        row.assetBoughtAssetType || '',
-        row.assetBoughtItemName || '',
-
-        row.assetBoughtDepartment || '',
-
-        row.assetBoughtAssetStatus || '',
-
-        row.assetBoughtPurchaseDate || '',
-
-        row.assetBoughtBillInvoiceNo || '',
-        row.assetBoughtPurchasedBy || '',
-
-        row.assetBoughtStatus || '',
-        row.assetBoughtRemarks || '',
-
-        row.assetBoughtCreatedDate || '',
-        row.assetBoughtUpdatedDate || '',
-      ];
-
-      csvRows.push(
-        rowData.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(','),
-      );
-    });
-
-    /* ================= DOWNLOAD ================= */
-    const blob = new Blob([csvRows.join('\n')], {
-      type: 'text/csv;charset=utf-8;',
-    });
-
-    saveAs(blob, 'Asset_Bought_Report.csv');
-  }
-  // ---------------- Excel Export ----------------
-  exportExcelfile(data: TableRow[]) {
-    const today = new Date();
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
-
-    /* ================= EXCEL ROW DATA ================= */
-    const wsData: any[][] = [
-      [this.companyName || 'AMC Asset Master'],
-      this.companyEmail ? ['Email:', this.companyEmail] : [],
-      ['Date:', formattedDate],
-      [],
-      [
-        'Asset ID',
-        'Asset Code',
-        'Asset Category',
-        'Asset Type',
-        'Item Name',
-        'Department',
-        'Asset Status',
-        'Purchase Date',
-        'Bill / Invoice No',
-        'Purchased By',
-        'Record Status',
-        'Remarks',
-        'Created Date',
-        'Updated Date',
-      ],
-    ];
-
-    /* ================= DATA ROWS ================= */
-    data.forEach((row: TableRow) => {
-      wsData.push([
-        row.assetBoughtMiscPurchaseId || '',
-        row.assetBoughtMiscPurchaseCode || '',
-
-        row.assetBoughtAssetCategory || '',
-        row.assetBoughtAssetType || '',
-        row.assetBoughtItemName || '',
-
-        row.assetBoughtDepartment || '',
-
-        row.assetBoughtAssetStatus || '',
-
-        row.assetBoughtPurchaseDate || '',
-
-        row.assetBoughtBillInvoiceNo || '',
-        row.assetBoughtPurchasedBy || '',
-
-        row.assetBoughtStatus || '',
-        row.assetBoughtRemarks || '',
-
-        row.assetBoughtCreatedDate || '',
-        row.assetBoughtUpdatedDate || '',
-      ]);
-    });
-
-    /* ================= CREATE WORKSHEET ================= */
-    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
-
-    /* ================= COLUMN WIDTH ================= */
-    worksheet['!cols'] = [
-      { wch: 14 }, // Asset ID
-      { wch: 18 }, // Asset Code
-      { wch: 18 }, // Asset Category
-      { wch: 18 }, // Asset Type
-      { wch: 24 }, // Item Name
-      { wch: 20 }, // Department
-      { wch: 18 }, // Asset Status
-      { wch: 18 }, // Purchase Date
-      { wch: 22 }, // Bill / Invoice No
-      { wch: 18 }, // Purchased By
-      { wch: 18 }, // Record Status
-      { wch: 26 }, // Remarks
-      { wch: 18 }, // Created Date
-      { wch: 18 }, // Updated Date
-    ];
-
-    /* ================= CREATE WORKBOOK ================= */
-    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Asset_Bought_Master');
-
-    /* ================= DOWNLOAD ================= */
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
-    });
-
-    const blob = new Blob([excelBuffer], {
-      type: 'application/octet-stream',
-    });
-
-    saveAs(blob, 'Asset_Bought_Report.xlsx');
-  }
-  // ---------------- PDF Export ----------------
-  exportPDFfile(data: TableRow[]) {
-    if (!data || data.length === 0) {
-      this.showToast('No data available to export!', 'warning');
-      return;
-    }
-
-    const doc = new jsPDF('l', 'pt', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    /* ================= HEADER TITLE ================= */
-    const title = 'Asset Bought Master Report';
-
-    doc.setFontSize(20);
-    doc.setTextColor(0, 70, 140);
-    doc.text(title, pageWidth / 2, 40, { align: 'center' });
-
-    doc.setDrawColor(0, 70, 140);
-    doc.setLineWidth(1);
-    doc.line(
-      pageWidth / 2 - doc.getTextWidth(title) / 2,
-      45,
-      pageWidth / 2 + doc.getTextWidth(title) / 2,
-      45,
+    csvRows.push(
+      rowData.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(',')
     );
+  });
 
-    /* ================= SUB HEADER ================= */
-    const topY = 70;
+  /* ================= DOWNLOAD ================= */
+  const blob = new Blob([csvRows.join('\n')], {
+    type: 'text/csv;charset=utf-8;',
+  });
 
-    doc.setFontSize(11);
-    doc.setTextColor(0, 0, 0);
+  saveAs(blob, 'Purchase_Report.csv');
+}
+  // ---------------- Excel Export ----------------
+exportExcelfile(data: TableRow[]) {
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
 
-    doc.text(this.companyName || 'Asset Management', 40, topY);
+  /* ================= EXCEL ROW DATA ================= */
+  const wsData: any[][] = [
+    [this.companyName || 'Purchase Report'],
+    this.companyEmail ? ['Email:', this.companyEmail] : [],
+    ['Date:', formattedDate],
+    [],
+    [
+      'Purchase ID',
+      'Purchase Number',
+      'Purchase Date',
+      'Vendor ID',
+      'Vendor Name',
+      'Quantity',
+      'Unit Price',
+      'Total Amount',
+      'Invoice Number',
+      'Invoice Date',
+      'Item Name',
+      'Category',
+      'Description',
+      'Location',
+      'Department',
+      'Purpose',
+      'Stock Status',
+      'Remarks',
+      'Created By',
+      'Created Date',
+      'Updated By',
+      'Updated Date',
+    ],
+  ];
 
-    if (this.companyEmail) {
-      doc.text(this.companyEmail, 40, topY + 14);
-    }
+  /* ================= DATA ROWS ================= */
+  data.forEach((row: TableRow) => {
+    wsData.push([
+      row.purchaseId || '',
+      row.purchaseNumber || '',
 
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 40, topY, {
-      align: 'right',
-    });
+      row.purchaseDate || '',
+      row.vendorId || '',
+      row.vendorName || '',
 
-    /* ================= TABLE ================= */
+      row.quantity ?? 0,
+      row.unitPrice ?? 0,
+      row.totalAmount ?? 0,
 
-    autoTable(doc, {
-      startY: topY + 30,
+      row.invoiceNumber || '',
+      row.invoiceDate || '',
 
-      head: [
-        [
-          'Asset ID',
-          'Asset Code',
-          'Category',
-          'Type',
-          'Item Name',
-          'Department',
-          'Asset Status',
-          'Purchase Date',
-          'Invoice No',
-          'Purchased By',
-          'Record Status',
-          'Created Date',
-        ],
-      ],
+      row.itemName || '',
+      row.itemCategory || '',
+      row.itemDescription || '',
 
-      body: data.map((row: TableRow) => [
-        row.assetBoughtMiscPurchaseId || '',
-        row.assetBoughtMiscPurchaseCode || '',
+      row.location || '',
+      row.departmentId || '',
 
-        row.assetBoughtAssetCategory || '',
-        row.assetBoughtAssetType || '',
-        row.assetBoughtItemName || '',
+      row.purpose || '',
 
-        row.assetBoughtDepartment || '',
+      row.stockStatus || '',
+      row.remarks ?? '',
 
-        row.assetBoughtAssetStatus || '',
+      row.createdBy || '',
+      row.createdDate || '',
 
-        row.assetBoughtPurchaseDate || '',
+      row.updatedBy ?? '',
+      row.updatedDate ?? '',
+    ]);
+  });
 
-        row.assetBoughtBillInvoiceNo || '',
+  /* ================= CREATE WORKSHEET ================= */
+  const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
 
-        row.assetBoughtPurchasedBy || '',
+  /* ================= COLUMN WIDTH ================= */
+  worksheet['!cols'] = [
+    { wch: 14 }, // Purchase ID
+    { wch: 18 }, // Purchase Number
+    { wch: 18 }, // Purchase Date
+    { wch: 14 }, // Vendor ID
+    { wch: 22 }, // Vendor Name
+    { wch: 10 }, // Quantity
+    { wch: 12 }, // Unit Price
+    { wch: 14 }, // Total Amount
+    { wch: 18 }, // Invoice Number
+    { wch: 18 }, // Invoice Date
+    { wch: 24 }, // Item Name
+    { wch: 18 }, // Category
+    { wch: 26 }, // Description
+    { wch: 18 }, // Location
+    { wch: 18 }, // Department
+    { wch: 18 }, // Purpose
+    { wch: 14 }, // Stock Status
+    { wch: 26 }, // Remarks
+    { wch: 18 }, // Created By
+    { wch: 18 }, // Created Date
+    { wch: 18 }, // Updated By
+    { wch: 18 }, // Updated Date
+  ];
 
-        row.assetBoughtStatus || '',
+  /* ================= CREATE WORKBOOK ================= */
+  const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Purchase_Master');
 
-        row.assetBoughtCreatedDate || '',
-      ]),
+  /* ================= DOWNLOAD ================= */
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
 
-      theme: 'grid',
-      tableWidth: 'auto',
+  const blob = new Blob([excelBuffer], {
+    type: 'application/octet-stream',
+  });
 
-      styles: {
-        fontSize: 8,
-        cellPadding: 3,
-        halign: 'center',
-        valign: 'middle',
-      },
-
-      headStyles: {
-        fillColor: [0, 92, 179],
-        textColor: 255,
-        fontStyle: 'bold',
-      },
-
-      margin: { left: 20, right: 20 },
-      pageBreak: 'auto',
-    });
-
-    /* ================= SAVE ================= */
-
-    doc.save('Asset_Bought_Report.pdf');
+  saveAs(blob, 'Purchase_Report.xlsx');
+}
+  // ---------------- PDF Export ----------------
+exportPDFfile(data: TableRow[]) {
+  if (!data || data.length === 0) {
+    this.showToast('No data available to export!', 'warning');
+    return;
   }
+
+  const doc = new jsPDF('l', 'pt', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  /* ================= HEADER TITLE ================= */
+  const title = 'Purchase Report';
+
+  doc.setFontSize(20);
+  doc.setTextColor(0, 70, 140);
+  doc.text(title, pageWidth / 2, 40, { align: 'center' });
+
+  doc.setDrawColor(0, 70, 140);
+  doc.setLineWidth(1);
+  doc.line(
+    pageWidth / 2 - doc.getTextWidth(title) / 2,
+    45,
+    pageWidth / 2 + doc.getTextWidth(title) / 2,
+    45
+  );
+
+  /* ================= SUB HEADER ================= */
+  const topY = 70;
+
+  doc.setFontSize(11);
+  doc.setTextColor(0, 0, 0);
+
+  doc.text(this.companyName || 'Purchase Management', 40, topY);
+
+  if (this.companyEmail) {
+    doc.text(this.companyEmail, 40, topY + 14);
+  }
+
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 40, topY, {
+    align: 'right',
+  });
+
+  /* ================= TABLE ================= */
+
+  autoTable(doc, {
+    startY: topY + 30,
+
+    head: [
+      [
+        'Purchase ID',
+        'Purchase No',
+        'Vendor',
+        'Item',
+        'Category',
+        'Qty',
+        'Unit Price',
+        'Total',
+        'Department',
+        'Status',
+        'Purchase Date',
+        'Created Date',
+      ],
+    ],
+
+    body: data.map((row: TableRow) => [
+      row.purchaseId || '',
+      row.purchaseNumber || '',
+
+      row.vendorName || '',
+      row.itemName || '',
+      row.itemCategory || '',
+
+      row.quantity ?? 0,
+      row.unitPrice ?? 0,
+      row.totalAmount ?? 0,
+
+      row.departmentId || '',
+      row.stockStatus || '',
+
+      row.purchaseDate || '',
+      row.createdDate || '',
+    ]),
+
+    theme: 'grid',
+    tableWidth: 'auto',
+
+    styles: {
+      fontSize: 8,
+      cellPadding: 3,
+      halign: 'center',
+      valign: 'middle',
+    },
+
+    headStyles: {
+      fillColor: [0, 92, 179],
+      textColor: 255,
+      fontStyle: 'bold',
+    },
+
+    margin: { left: 20, right: 20 },
+    pageBreak: 'auto',
+  });
+
+  /* ================= SAVE ================= */
+  doc.save('Purchase_Report.pdf');
+}
 }

@@ -68,46 +68,44 @@ import { CommonService } from '../../../services/common/common-service';
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 export interface TableRow {
-  /* ===== Allocation Basic Info ===== */
-  assetallocationId: string;
-  assetallocationCode: string;
-  assetallocationDate?: string;
-  assetallocationType: string;
 
-  assetallocationRequestedBy?: string;
-  assetallocationApprovedBy?: string;
+  /* ========= PRIMARY ========= */
+  allocationId: string;
+  allocationNumber: string;
 
-  /* ===== Asset Info ===== */
-  assetallocationAssetId: string;
-  assetallocationAssetName: string;
-  assetallocationAssetType: string;
-  assetallocationAssetMake?: string;
-  assetallocationModel?: string;
-  assetallocationSerialNumber?: string;
+  /* ========= EMPLOYEE ========= */
+  employeeId: string;
+  departmentId: string;
+  location?: string;
 
-  /* ===== Employee Info ===== */
-  assetallocationAllocateTo: string;
-  assetallocationEmployeeName: string;
-  assetallocationDepartment: string;
-  assetallocationLocation?: string;
+  /* ========= ASSET ========= */
+  assetId: string;
 
-  /* ===== Allocation Period ===== */
-  assetallocationStartDate: string;
-  assetallocationExpectedReturnDate?: string;
+  /* ========= DATES ========= */
+  allocationDate?: string;
+  expectedReturnDate?: string;
+  actualReturnDate?: string;
 
-  /* ===== Asset Condition ===== */
-  assetallocationCondition?: string;
-  assetallocationAcknowledgedBy?: string;
-  assetallocationAcknowledgementDate?: string;
+  /* ========= CONDITION ========= */
+  conditionAtIssue?: string;
+  conditionAtReturn?: string;
 
-  /* ===== Extra ===== */
-  assetallocationRemarks?: string;
+  /* ========= BUSINESS ========= */
+  purpose?: string;
+  approvalBy?: string;
+  approvalDate?: string;
 
-  /* ===== Status ===== */
-  assetallocationStatus: 'Active' | 'Inactive';
-  loginId: string;
+  /* ========= REMARKS ========= */
+  remarks?: string;
+
+  /* ========= AUDIT ========= */
+  createdBy: string;
   createdDate: string;
-  updatedDate: string;
+  updatedBy?: string;
+  updatedDate?: string;
+
+  /* ========= STATUS ========= */
+  allocationStatus: 'Active' | 'Inactive';
 }
 
 @Component({
@@ -207,33 +205,31 @@ export class AssetAllocationComponent implements OnInit {
       this.forms[i].assetallocationAssetType = asset.assetType;
     }
   }
-  loadDepartments() {
-    if (!this.loginId) return;
-
-    this.commonService.fetchAllDepartmentByCompany(this.loginId).subscribe({
+   loadDepartments(): void {
+    this.commonService.fetchAllDepartments().subscribe({
       next: (res: any) => {
-        this.departments = res?.data || res || [];
-        console.log('Departments:', this.departments);
+        console.log('Department API Response:', res);
+        this.departments = res;
       },
       error: (err) => {
-        console.error('Department load error', err);
+        console.error('Department API Error:', err);
       },
     });
   }
-  loadEmployees(): void {
-    if (!this.loginId) return;
 
-    this.commonService.fetchAllEmployeeByLoginId(this.loginId).subscribe({
-      next: (res: any) => {
-        this.employees = res || []; // ✅ direct list
-        console.log('Employees:', this.employees);
+loadEmployees(): void {
+  this.commonService.fetchAllEmployee()
+    .subscribe({
+      next: (res: any[]) => {
+        console.log('Employee API Response:', res);
+
+        this.employees = res;   // ✅ CORRECT
       },
       error: (err) => {
         console.error('Employee API Error:', err);
-        this.employees = [];
-      },
+      }
     });
-  }
+}
   loadAssetTypes(): void {
     if (!this.loginId) {
       console.error('Company ID missing!');
@@ -256,83 +252,75 @@ export class AssetAllocationComponent implements OnInit {
     this.showViewModal = false;
     this.selectedRow = null;
   }
-  private initializeForm(): void {
-    this.forms = [
-      {
-        /* ===== UI Binding ===== */
-        assetallocationCode: '',
-        assetallocationDate: this.currentDate || '',
-        assetallocationType: '',
+private initializeForm(): void {
+  this.forms = [
+    {
+      /* ===== UI Binding ===== */
+      allocationNumber: '',
+      allocationDate: this.currentDate || '',
 
-        assetallocationRequestedBy: this.userName || '',
-        assetallocationApprovedBy: '',
+      employeeId: '',
+      departmentId: '',
+      location: '',
 
-        assetallocationAssetId: '',
-        assetallocationAssetName: '',
-        assetallocationAssetType: '',
-        assetallocationAssetMake: '',
-        assetallocationModel: '',
-        assetallocationSerialNumber: '',
+      assetId: '',
 
-        assetallocationAllocateTo: '',
-        assetallocationEmployeeName: '',
-        assetallocationDepartment: '',
-        assetallocationLocation: '',
+      expectedReturnDate: '',
+      actualReturnDate: '',
 
-        assetallocationStartDate: '',
-        assetallocationExpectedReturnDate: '',
+      conditionAtIssue: '',
+      conditionAtReturn: '',
 
-        assetallocationCondition: '',
-        assetallocationAcknowledgedBy: '',
-        assetallocationAcknowledgementDate: '',
+      purpose: '',
+      approvalBy: '',
+      approvalDate: '',
 
-        assetallocationRemarks: '',
+      remarks: '',
 
-        assetallocationStatus: 'Active',
+      allocationStatus: 'Active',
 
-        loginId: this.loginId,
+      createdBy: this.userName || '',
+      createdDate: this.currentDate || '',
+
+      updatedBy: '',
+      updatedDate: '',
+
+      /* ===== Backend Object ===== */
+      newRecord: {
+        allocationId: '0',
+        allocationNumber: '',
+
+        employeeId: '',
+        departmentId: '',
+        location: '',
+
+        assetId: '',
+
+        allocationDate: this.currentDate || '',
+        expectedReturnDate: '',
+        actualReturnDate: '',
+
+        conditionAtIssue: '',
+        conditionAtReturn: '',
+
+        purpose: '',
+
+        approvalBy: '',
+        approvalDate: '',
+
+        remarks: '',
+
+        createdBy: this.userName || '',
         createdDate: this.currentDate || '',
 
-        /* ===== Backend Object (same as designation) ===== */
-        newRecord: {
-          assetallocationId: '0',
-          assetallocationCode: '',
-          assetallocationDate: this.currentDate || '',
-          assetallocationType: '',
+        updatedBy: '',
+        updatedDate: '',
 
-          assetallocationRequestedBy: this.userName || '',
-          assetallocationApprovedBy: '',
-
-          assetallocationAssetId: '',
-          assetallocationAssetName: '',
-          assetallocationAssetType: '',
-          assetallocationAssetMake: '',
-          assetallocationModel: '',
-          assetallocationSerialNumber: '',
-
-          assetallocationAllocateTo: '',
-          assetallocationEmployeeName: '',
-          assetallocationDepartment: '',
-          assetallocationLocation: '',
-
-          assetallocationStartDate: '',
-          assetallocationExpectedReturnDate: '',
-
-          assetallocationCondition: '',
-          assetallocationAcknowledgedBy: '',
-          assetallocationAcknowledgementDate: '',
-
-          assetallocationRemarks: '',
-
-          assetallocationStatus: 'Active',
-
-          loginId: this.loginId,
-          createdDate: this.currentDate || '',
-          updatedDate: '',
-        },
+        allocationStatus: 'Active',
       },
-    ];
-  }
+    },
+  ];
+}
   loadAssetMakes(): void {
     if (!this.loginId) return;
 
@@ -385,23 +373,30 @@ export class AssetAllocationComponent implements OnInit {
   //        },
   //      });
   //  }
-  loadAssetAllocations() {
-    this.commonService
-      .fetchAllAssetAllocationsByCompany(this.loginId)
-      .subscribe({
-        next: (res) => {
-          console.log('API Response:', res);
+loadAssetAllocations(): void {
+  if (!this.loginId) return;
 
-          this.tableData = res || [];
+  this.commonService
+    .fetchAllAssetAllocationsByCompany(this.loginId)
+    .subscribe({
+      next: (res: any[]) => {
+        console.log('API Response:', res);
 
-          // 🔥 MOST IMPORTANT LINE
-          this.filteredData = [...this.tableData];
-        },
-        error: (err) => {
-          console.error('API Error', err);
-        },
-      });
-  }
+        // ✅ DIRECT ARRAY
+        this.tableData = Array.isArray(res) ? res : [];
+
+        // ✅ COPY FOR FILTER
+        this.filteredData = [...this.tableData];
+      },
+
+      error: (err) => {
+        console.error('API Error', err);
+
+        this.tableData = [];
+        this.filteredData = [];
+      },
+    });
+}
   onEmployeeChange(i: number) {
     const emp = this.employees.find(
       (e: any) => e.employeeId === this.forms[i].assetallocationAllocateTo,
@@ -453,47 +448,50 @@ export class AssetAllocationComponent implements OnInit {
 
   // Delete all selected rows
   // Delete all selected rows
-  deleteSelectedRows(): void {
-    if (!this.selectedRows.length) {
-      this.toast.danger('No records selected to delete!', '', 4000);
-      return;
-    }
-
-    const confirmed = confirm(
-      `Are you sure you want to delete ${this.selectedRows.length} record(s)?`,
-    );
-
-    if (!confirmed) return;
-
-    // Collect Allocation IDs
-    const ids: string[] = this.selectedRows.map((row) => row.assetallocationId);
-
-    this.commonService.deleteMultipleAssetAllocation(ids).subscribe({
-      next: () => {
-        // remove deleted rows from table
-        this.tableData = this.tableData.filter(
-          (row) => !ids.includes(row.assetallocationId),
-        );
-
-        this.filteredData = [...this.tableData];
-        this.selectedRows = [];
-        this.currentPage = 1;
-
-        // reload list
-        this.loadAssetAllocations();
-
-        this.toast.success(
-          'Selected records deleted successfully!',
-          'SUCCESS',
-          4000,
-        );
-      },
-
-      error: () => {
-        this.toast.danger('Failed to delete records!', 'ERROR', 4000);
-      },
-    });
+ deleteSelectedRows(): void {
+  if (!this.selectedRows.length) {
+    this.toast.danger('No records selected to delete!', '', 4000);
+    return;
   }
+
+  const confirmed = confirm(
+    `Are you sure you want to delete ${this.selectedRows.length} record(s)?`,
+  );
+
+  if (!confirmed) return;
+
+  // ✅ Correct ID mapping
+  const ids: string[] = this.selectedRows.map(
+    (row) => row.allocationId
+  );
+
+  this.commonService.deleteMultipleAssetAllocation(ids).subscribe({
+    next: () => {
+
+      // ✅ Remove deleted rows from table
+      this.tableData = this.tableData.filter(
+        (row) => !ids.includes(row.allocationId)
+      );
+
+      this.filteredData = [...this.tableData];
+      this.selectedRows = [];
+      this.currentPage = 1;
+
+      // reload list
+      this.loadAssetAllocations();
+
+      this.toast.success(
+        'Selected records deleted successfully!',
+        'SUCCESS',
+        4000,
+      );
+    },
+
+    error: () => {
+      this.toast.danger('Failed to delete records!', 'ERROR', 4000);
+    },
+  });
+}
 
   // Toggle select all rows
   toggleAll(event: any) {
@@ -537,94 +535,98 @@ export class AssetAllocationComponent implements OnInit {
     });
   }
 
-  exportExcel() {
-    const wsData: any[] = [];
+ exportExcel() {
+  const wsData: any[] = [];
 
-    // ⭐ Row 1 → Company Name
-    wsData.push([this.headCompanyName || 'Company Name']);
+  // ⭐ Row 1 → Company Name
+  wsData.push([this.headCompanyName || 'Company Name']);
 
-    // ⭐ Row 2 → Date (FIXED)
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString('en-GB'); // DD/MM/YYYY
-    wsData.push(['Date:', formattedDate]);
+  // ⭐ Row 2 → Date
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('en-GB'); // DD/MM/YYYY
+  wsData.push(['Date:', formattedDate]);
 
-    // Empty Row
-    wsData.push([]);
+  // Empty Row
+  wsData.push([]);
 
-    // ⭐ Header (UPDATED - Added more useful fields)
+  // ⭐ Header (UPDATED as per entity)
+  wsData.push([
+    'Allocation ID',
+    'Allocation Number',
+    'Allocation Date',
+    'Employee ID',
+    'Department ID',
+    'Location',
+    'Asset ID',
+    'Expected Return Date',
+    'Actual Return Date',
+    'Condition At Issue',
+    'Condition At Return',
+    'Purpose',
+    'Approval By',
+    'Approval Date',
+    'Remarks',
+    'Created By',
+    'Created Date',
+    'Updated By',
+    'Updated Date',
+    'Status',
+  ]);
+
+  // ⭐ Rows (Correct Mapping)
+  this.tableData.forEach((row) => {
     wsData.push([
-      'Allocation ID',
-      'Allocation Code',
-      'Allocation Date',
-      'Allocation Type',
-      'Asset ID',
-      'Asset Name',
-      'Asset Type',
-      'Make',
-      'Model',
-      'Serial Number',
-      'Employee Name',
-      'Department',
-      'Location',
-      'Start Date',
-      'Expected Return Date',
-      'Condition',
-      'Status',
-      'Login ID',
+      row.allocationId || '',
+      row.allocationNumber || '',
+      row.allocationDate || '',
+      row.employeeId || '',
+      row.departmentId || '',
+      row.location || '',
+      row.assetId || '',
+      row.expectedReturnDate || '',
+      row.actualReturnDate || '',
+      row.conditionAtIssue || '',
+      row.conditionAtReturn || '',
+      row.purpose || '',
+      row.approvalBy || '',
+      row.approvalDate || '',
+      row.remarks || '',
+      row.createdBy || '',
+      row.createdDate || '',
+      row.updatedBy || '',
+      row.updatedDate || '',
+      row.allocationStatus || '',
     ]);
+  });
 
-    // ⭐ Rows (SAFE MAPPING)
-    this.tableData.forEach((row) => {
-      wsData.push([
-        row.assetallocationId || '',
-        row.assetallocationCode || '',
-        row.assetallocationDate || '',
-        row.assetallocationType || '',
-        row.assetallocationAssetId || '',
-        row.assetallocationAssetName || '',
-        row.assetallocationAssetType || '',
-        row.assetallocationAssetMake || '',
-        row.assetallocationModel || '',
-        row.assetallocationSerialNumber || '',
-        row.assetallocationEmployeeName || '',
-        row.assetallocationDepartment || '',
-        row.assetallocationLocation || '',
-        row.assetallocationStartDate || '',
-        row.assetallocationExpectedReturnDate || '',
-        row.assetallocationCondition || '',
-        row.assetallocationStatus || '',
-        row.loginId || '',
-      ]);
-    });
+  // Create worksheet
+  const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
 
-    // Create worksheet
-    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
+  // Auto column width
+  const colWidths = wsData[3].map(() => ({ wch: 20 }));
+  worksheet['!cols'] = colWidths;
 
-    // Auto column width (🔥 improvement)
-    const colWidths = wsData[3].map((col: any) => ({ wch: 20 }));
-    worksheet['!cols'] = colWidths;
+  // Create workbook
+  const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Asset Allocation');
 
-    // Create workbook
-    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Asset Allocation');
+  // Export
+  const excelBuffer: any = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
 
-    // Export
-    const excelBuffer: any = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
-    });
+  const blob = new Blob([excelBuffer], {
+    type: 'application/octet-stream',
+  });
 
-    const blob = new Blob([excelBuffer], {
-      type: 'application/octet-stream',
-    });
+  saveAs(blob, 'Asset_Allocation_Report.xlsx');
+}
+ exportDoc() {
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('en-GB'); // DD/MM/YYYY
 
-    saveAs(blob, 'Asset_Allocation_Report.xlsx');
-  }
-  exportDoc() {
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString('en-GB'); // DD/MM/YYYY
-
-    let content = `
+  let content = `
 <html>
 <head>
 
@@ -683,7 +685,6 @@ td{
   color:red;
   font-weight:bold;
 }
-
 </style>
 
 </head>
@@ -701,197 +702,187 @@ td{
 
 <tr>
 <th>Allocation ID</th>
-<th>Code</th>
-<th>Date</th>
-<th>Type</th>
-<th>Asset ID</th>
-<th>Asset Name</th>
-<th>Type</th>
-<th>Make</th>
-<th>Model</th>
-<th>Serial No</th>
-<th>Employee</th>
-<th>Department</th>
+<th>Allocation Number</th>
+<th>Allocation Date</th>
+<th>Employee ID</th>
+<th>Department ID</th>
 <th>Location</th>
-<th>Start Date</th>
-<th>Return Date</th>
-<th>Condition</th>
+<th>Asset ID</th>
+<th>Expected Return Date</th>
+<th>Actual Return Date</th>
+<th>Condition Issue</th>
+<th>Condition Return</th>
+<th>Purpose</th>
+<th>Approval By</th>
 <th>Status</th>
-<th>Login ID</th>
+<th>Created By</th>
 </tr>
 `;
 
-    this.tableData.forEach((row) => {
-      const statusClass =
-        row.assetallocationStatus === 'Active'
-          ? 'status-active'
-          : 'status-inactive';
+  this.tableData.forEach((row) => {
+    const statusClass =
+      row.allocationStatus === 'Active'
+        ? 'status-active'
+        : 'status-inactive';
 
-      const statusIcon = row.assetallocationStatus === 'Active' ? '✔️' : '❌';
-
-      content += `
-<tr>
-
-<td>${row.assetallocationId || ''}</td>
-<td>${row.assetallocationCode || ''}</td>
-<td>${row.assetallocationDate || ''}</td>
-<td>${row.assetallocationType || ''}</td>
-
-<td>${row.assetallocationAssetId || ''}</td>
-<td>${row.assetallocationAssetName || ''}</td>
-<td>${row.assetallocationAssetType || ''}</td>
-<td>${row.assetallocationAssetMake || ''}</td>
-<td>${row.assetallocationModel || ''}</td>
-<td>${row.assetallocationSerialNumber || ''}</td>
-
-<td>${row.assetallocationEmployeeName || ''}</td>
-<td>${row.assetallocationDepartment || ''}</td>
-<td>${row.assetallocationLocation || ''}</td>
-
-<td>${row.assetallocationStartDate || ''}</td>
-<td>${row.assetallocationExpectedReturnDate || '-'}</td>
-
-<td>${row.assetallocationCondition || ''}</td>
-
-<td class="${statusClass}">
-  ${statusIcon} ${row.assetallocationStatus || ''}
-</td>
-
-<td>${row.loginId || ''}</td>
-
-</tr>
-`;
-    });
+    const statusIcon =
+      row.allocationStatus === 'Active' ? '✔️' : '❌';
 
     content += `
+<tr>
+
+<td>${row.allocationId || ''}</td>
+<td>${row.allocationNumber || ''}</td>
+<td>${row.allocationDate || ''}</td>
+
+<td>${row.employeeId || ''}</td>
+<td>${row.departmentId || ''}</td>
+<td>${row.location || ''}</td>
+
+<td>${row.assetId || ''}</td>
+
+<td>${row.expectedReturnDate || '-'}</td>
+<td>${row.actualReturnDate || '-'}</td>
+
+<td>${row.conditionAtIssue || ''}</td>
+<td>${row.conditionAtReturn || ''}</td>
+
+<td>${row.purpose || ''}</td>
+<td>${row.approvalBy || ''}</td>
+
+<td class="${statusClass}">
+  ${statusIcon} ${row.allocationStatus || ''}
+</td>
+
+<td>${row.createdBy || ''}</td>
+
+</tr>
+`;
+  });
+
+  content += `
 </table>
 
 </body>
 </html>
 `;
 
-    const blob = new Blob(['\ufeff', content], {
-      type: 'application/msword',
-    });
+  const blob = new Blob(['\ufeff', content], {
+    type: 'application/msword',
+  });
 
-    saveAs(blob, 'Asset_Allocation_Report.doc');
-  }
+  saveAs(blob, 'Asset_Allocation_Report.doc');
+}
 
   exportPDF() {
-    const doc = new jsPDF('l', 'pt', 'a4'); // 🔥 landscape for more columns
+  const doc = new jsPDF('l', 'pt', 'a4'); // landscape
 
-    // ⭐ TITLE
-    doc.setFontSize(22);
-    doc.setTextColor(0, 70, 140);
+  // ⭐ TITLE
+  doc.setFontSize(22);
+  doc.setTextColor(0, 70, 140);
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const titleX = pageWidth / 2;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const titleX = pageWidth / 2;
 
-    doc.text('Asset Allocation Records', titleX, 50, { align: 'center' });
+  doc.text('Asset Allocation Records', titleX, 50, { align: 'center' });
 
-    // Underline
-    const titleWidth = doc.getTextWidth('Asset Allocation Records');
-    doc.line(titleX - titleWidth / 2, 55, titleX + titleWidth / 2, 55);
+  // Underline
+  const titleWidth = doc.getTextWidth('Asset Allocation Records');
+  doc.line(titleX - titleWidth / 2, 55, titleX + titleWidth / 2, 55);
 
-    // ⭐ Company + Date
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
+  // ⭐ Company + Date
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
 
-    const company = this.headCompanyName || 'Company Name';
-    const dateStr = new Date().toLocaleDateString('en-GB');
+  const company = this.headCompanyName || 'Company Name';
+  const dateStr = new Date().toLocaleDateString('en-GB');
 
-    doc.text(company, 40, 80);
-    doc.text(dateStr, pageWidth - 40, 80, { align: 'right' });
+  doc.text(company, 40, 80);
+  doc.text(dateStr, pageWidth - 40, 80, { align: 'right' });
 
-    // ⭐ TABLE
-    autoTable(doc, {
-      startY: 100,
+  // ⭐ TABLE
+  autoTable(doc, {
+    startY: 100,
 
-      head: [
-        [
-          'Alloc ID',
-          'Code',
-          'Date',
-          'Type',
-          'Asset ID',
-          'Asset Name',
-          'Type',
-          'Make',
-          'Model',
-          'Serial',
-          'Employee',
-          'Dept',
-          'Location',
-          'Start',
-          'Return',
-          'Condition',
-          'Status',
-          'Login',
-        ],
+    head: [
+      [
+        'Alloc ID',
+        'Number',
+        'Date',
+        'Employee ID',
+        'Dept ID',
+        'Location',
+        'Asset ID',
+        'Expected Return',
+        'Actual Return',
+        'Cond Issue',
+        'Cond Return',
+        'Purpose',
+        'Approval By',
+        'Status',
+        'Created By',
       ],
+    ],
 
-      body: this.tableData.map((row) => [
-        row.assetallocationId || '',
-        row.assetallocationCode || '',
-        row.assetallocationDate || '',
-        row.assetallocationType || '',
+    body: this.tableData.map((row) => [
+      row.allocationId || '',
+      row.allocationNumber || '',
+      row.allocationDate || '',
 
-        row.assetallocationAssetId || '',
-        row.assetallocationAssetName || '',
-        row.assetallocationAssetType || '',
-        row.assetallocationAssetMake || '',
-        row.assetallocationModel || '',
-        row.assetallocationSerialNumber || '',
+      row.employeeId || '',
+      row.departmentId || '',
+      row.location || '',
 
-        row.assetallocationEmployeeName || '',
-        row.assetallocationDepartment || '',
-        row.assetallocationLocation || '',
+      row.assetId || '',
 
-        row.assetallocationStartDate || '',
-        row.assetallocationExpectedReturnDate || '-',
+      row.expectedReturnDate || '-',
+      row.actualReturnDate || '-',
 
-        row.assetallocationCondition || '',
+      row.conditionAtIssue || '',
+      row.conditionAtReturn || '',
 
-        row.assetallocationStatus || '',
-        row.loginId || '',
-      ]),
+      row.purpose || '',
+      row.approvalBy || '',
 
-      theme: 'grid',
+      row.allocationStatus || '',
+      row.createdBy || '',
+    ]),
 
-      headStyles: {
-        fillColor: [0, 92, 179],
-        textColor: [255, 255, 255],
-        halign: 'center',
-        fontSize: 10,
-      },
+    theme: 'grid',
 
-      bodyStyles: {
-        fontSize: 9,
-        halign: 'center',
-        textColor: [0, 0, 0],
-      },
+    headStyles: {
+      fillColor: [0, 92, 179],
+      textColor: [255, 255, 255],
+      halign: 'center',
+      fontSize: 10,
+    },
 
-      styles: {
-        lineWidth: 0.5,
-        lineColor: [0, 0, 0],
-        valign: 'middle',
-      },
+    bodyStyles: {
+      fontSize: 9,
+      halign: 'center',
+      textColor: [0, 0, 0],
+    },
 
-      // 🔥 Conditional styling (Status color)
-      didParseCell: function (data: any) {
-        if (data.column.index === 16) {
-          // Status column
-          if (data.cell.raw === 'Active') {
-            data.cell.styles.textColor = [0, 128, 0];
-          } else {
-            data.cell.styles.textColor = [255, 0, 0];
-          }
+    styles: {
+      lineWidth: 0.5,
+      lineColor: [0, 0, 0],
+      valign: 'middle',
+    },
+
+    // 🔥 Status Color
+    didParseCell: function (data: any) {
+      if (data.column.index === 13) { // Status column index updated
+        if (data.cell.raw === 'Active') {
+          data.cell.styles.textColor = [0, 128, 0];
+        } else {
+          data.cell.styles.textColor = [255, 0, 0];
         }
-      },
-    });
+      }
+    },
+  });
 
-    doc.save('Asset_Allocation_Report.pdf');
-  }
+  doc.save('Asset_Allocation_Report.pdf');
+}
   //pagination
   // Pagination Variables
   itemsPerPage: number = 5; // default 5
@@ -941,473 +932,481 @@ td{
 
   //New record
   // New record
-  newRecord: TableRow = {
-    assetallocationId: '0',
-    assetallocationCode: '',
-    assetallocationDate: this.currentDate || '',
-    assetallocationType: '',
+newRecord: TableRow = {
 
-    assetallocationRequestedBy: this.userName || '',
-    assetallocationApprovedBy: '',
+  /* ========= PRIMARY ========= */
+  allocationId: '0',
+  allocationNumber: '',
 
-    /* ===== Asset Info ===== */
-    assetallocationAssetId: '',
-    assetallocationAssetName: '',
-    assetallocationAssetType: '',
-    assetallocationAssetMake: '',
-    assetallocationModel: '',
-    assetallocationSerialNumber: '',
+  /* ========= EMPLOYEE ========= */
+  employeeId: '',
+  departmentId: '',
+  location: '',
 
-    /* ===== Employee Info ===== */
-    assetallocationAllocateTo: '',
-    assetallocationEmployeeName: '',
-    assetallocationDepartment: '',
-    assetallocationLocation: '',
+  /* ========= ASSET ========= */
+  assetId: '',
 
-    /* ===== Allocation Period ===== */
-    assetallocationStartDate: '',
-    assetallocationExpectedReturnDate: '',
+  /* ========= DATES ========= */
+  allocationDate: this.currentDate || '',
+  expectedReturnDate: '',
+  actualReturnDate: '',
 
-    /* ===== Asset Condition ===== */
-    assetallocationCondition: '',
-    assetallocationAcknowledgedBy: '',
-    assetallocationAcknowledgementDate: '',
+  /* ========= CONDITION ========= */
+  conditionAtIssue: '',
+  conditionAtReturn: '',
 
-    /* ===== Extra ===== */
-    assetallocationRemarks: '',
+  /* ========= BUSINESS ========= */
+  purpose: '',
+  approvalBy: '',
+  approvalDate: '',
 
-    /* ===== Status ===== */
-    assetallocationStatus: 'Active',
+  /* ========= REMARKS ========= */
+  remarks: '',
 
-    /* ===== Audit Fields (FIX ADDED) ===== */
-    loginId: this.loginId || '',
-    createdDate: '',
-    updatedDate: '',
-  };
+  /* ========= AUDIT ========= */
+  createdBy: this.userName || '',
+  createdDate: this.currentDate || '',
+  updatedBy: '',
+  updatedDate: '',
+
+  /* ========= STATUS ========= */
+  allocationStatus: 'Active',
+};
   isEditMode: boolean = false;
   editIndex: number | null = null;
-  onEdit(row: TableRow, index: number) {
-    this.activeTab = 'newRecord';
-    this.isEditMode = true;
-    this.editIndex = index;
+onEdit(row: TableRow, index: number) {
+  this.activeTab = 'newRecord';
+  this.isEditMode = true;
+  this.editIndex = index;
 
-    this.forms = [
-      {
-        assetallocationId: row.assetallocationId || '0',
-        assetallocationCode: row.assetallocationCode || '',
-        assetallocationDate: row.assetallocationDate || '',
-        assetallocationType: row.assetallocationType || '',
+  this.forms = [
+    {
+      /* ========= PRIMARY ========= */
+      allocationId: row.allocationId || '0',
+      allocationNumber: row.allocationNumber || '',
 
-        assetallocationRequestedBy: row.assetallocationRequestedBy || '',
-        assetallocationApprovedBy: row.assetallocationApprovedBy || '',
+      /* ========= EMPLOYEE ========= */
+      employeeId: row.employeeId || '',
+      departmentId: row.departmentId || '',
+      location: row.location || '',
 
-        /* ===== Asset Info ===== */
-        assetallocationAssetId: row.assetallocationAssetId || '',
-        assetallocationAssetName: row.assetallocationAssetName || '',
-        assetallocationAssetType: row.assetallocationAssetType || '',
-        assetallocationAssetMake: row.assetallocationAssetMake || '',
-        assetallocationModel: row.assetallocationModel || '',
-        assetallocationSerialNumber: row.assetallocationSerialNumber || '',
+      /* ========= ASSET ========= */
+      assetId: row.assetId || '',
 
-        /* ===== Employee Info ===== */
-        assetallocationAllocateTo: row.assetallocationAllocateTo || '',
-        assetallocationEmployeeName: row.assetallocationEmployeeName || '',
-        assetallocationDepartment: row.assetallocationDepartment || '',
-        assetallocationLocation: row.assetallocationLocation || '',
+      /* ========= DATES ========= */
+      allocationDate: row.allocationDate || '',
+      expectedReturnDate: row.expectedReturnDate || '',
+      actualReturnDate: row.actualReturnDate || '',
 
-        /* ===== Allocation Period ===== */
-        assetallocationStartDate: row.assetallocationStartDate || '',
-        assetallocationExpectedReturnDate:
-          row.assetallocationExpectedReturnDate || '',
+      /* ========= CONDITION ========= */
+      conditionAtIssue: row.conditionAtIssue || '',
+      conditionAtReturn: row.conditionAtReturn || '',
 
-        /* ===== Condition ===== */
-        assetallocationCondition: row.assetallocationCondition || '',
-        assetallocationAcknowledgedBy: row.assetallocationAcknowledgedBy || '',
-        assetallocationAcknowledgementDate:
-          row.assetallocationAcknowledgementDate || '',
+      /* ========= BUSINESS ========= */
+      purpose: row.purpose || '',
+      approvalBy: row.approvalBy || '',
+      approvalDate: row.approvalDate || '',
 
-        /* ===== Extra ===== */
-        assetallocationRemarks: row.assetallocationRemarks || '',
+      /* ========= REMARKS ========= */
+      remarks: row.remarks || '',
 
-        /* ===== Status ===== */
-        assetallocationStatus: row.assetallocationStatus || 'Active',
+      /* ========= STATUS ========= */
+      allocationStatus: row.allocationStatus || 'Active',
 
-        /* ===== Audit Fields ===== */
-        loginId: row.loginId || this.loginId || '',
+      /* ========= AUDIT ========= */
+      createdBy: row.createdBy || this.userName || '',
+      createdDate: row.createdDate || '',
+      updatedBy: this.userName || '',
+      updatedDate: this.currentDate || '',
+
+      /* ========= Backend Object ========= */
+      newRecord: {
+        allocationId: row.allocationId || '0',
+        allocationNumber: row.allocationNumber || '',
+
+        employeeId: row.employeeId || '',
+        departmentId: row.departmentId || '',
+        location: row.location || '',
+
+        assetId: row.assetId || '',
+
+        allocationDate: row.allocationDate || '',
+        expectedReturnDate: row.expectedReturnDate || '',
+        actualReturnDate: row.actualReturnDate || '',
+
+        conditionAtIssue: row.conditionAtIssue || '',
+        conditionAtReturn: row.conditionAtReturn || '',
+
+        purpose: row.purpose || '',
+
+        approvalBy: row.approvalBy || '',
+        approvalDate: row.approvalDate || '',
+
+        remarks: row.remarks || '',
+
+        createdBy: row.createdBy || this.userName || '',
         createdDate: row.createdDate || '',
-        updatedDate: row.updatedDate || '',
+
+        updatedBy: this.userName || '',
+        updatedDate: this.currentDate || '',
+
+        allocationStatus: row.allocationStatus || 'Active',
       },
-    ];
+    },
+  ];
+}
+saveAllRecords(form?: NgForm) {
+
+  // 🔥 Auto sync
+  this.forms.forEach((f, i) => {
+    this.onAssetChange(i);
+    this.onEmployeeChange(i);
+  });
+
+  // ---------------- VALIDATION ----------------
+  const invalid = this.forms.some(
+    (f) =>
+      !f.allocationNumber?.trim() ||
+      !f.assetId?.trim() ||
+      !f.employeeId?.trim() ||
+      !f.departmentId?.trim() ||
+      !f.allocationDate?.trim()
+  );
+
+  if (invalid) {
+    this.showErrors = true;
+    this.toast.warning('Please fill all required fields!', 'error', 4000);
+    return;
   }
-  saveAllRecords(form?: NgForm) {
-    //   🔥 auto fill sync
-    this.forms.forEach((f, i) => {
-      this.onAssetChange(i);
-      this.onEmployeeChange(i);
-    });
-    // ---------------- VALIDATION ----------------
-    const invalid = this.forms.some(
-      (f) =>
-        !f.assetallocationCode?.trim() ||
-        !f.assetallocationAssetId?.trim() ||
-        !f.assetallocationAllocateTo?.trim() ||
-        !f.assetallocationDepartment?.trim() ||
-        !f.assetallocationStartDate?.trim(),
-    );
-    if (invalid) {
-      this.showErrors = true;
-      this.toast.warning('Please fill all required fields!', 'error', 4000);
-      return;
-    }
 
-    // ---------------- EDIT MODE (UPDATE) ----------------
-    if (this.isEditMode && this.editIndex !== null) {
-      const f = this.forms[0];
+  // ---------------- EDIT MODE (UPDATE) ----------------
+// ---------------- EDIT MODE (UPDATE) ----------------
+if (this.isEditMode && this.editIndex !== null) {
 
-      const payload = {
-        assetallocationCode: f.assetallocationCode,
-        assetallocationDate: f.assetallocationDate,
-        assetallocationType: f.assetallocationType,
+  const f = this.forms[0];
 
-        assetallocationRequestedBy: f.assetallocationRequestedBy,
-        assetallocationApprovedBy: f.assetallocationApprovedBy,
+  // 🔥 FIX LOGIN ID FORMAT (MOST IMPORTANT)
+  const formattedLoginId = this.commonService.formatLoginId(this.loginId);
 
-        assetallocationAssetId: f.assetallocationAssetId,
-        assetallocationAssetName: f.assetallocationAssetName,
-        assetallocationAssetType: f.assetallocationAssetType,
-        assetallocationAssetMake: f.assetallocationAssetMake,
-        assetallocationModel: f.assetallocationModel,
-        assetallocationSerialNumber: f.assetallocationSerialNumber,
+  console.log("ALLOCATION ID:", this.tableData[this.editIndex].allocationId);
+  console.log("LOGIN ID:", formattedLoginId);
 
-        assetallocationAllocateTo: f.assetallocationAllocateTo,
-        assetallocationEmployeeName: f.assetallocationEmployeeName,
-        assetallocationDepartment: f.assetallocationDepartment,
-        assetallocationLocation: f.assetallocationLocation,
+  const payload = {
+    allocationNumber: f.allocationNumber,
+    allocationDate: f.allocationDate,
 
-        assetallocationStartDate: f.assetallocationStartDate,
-        assetallocationExpectedReturnDate: f.assetallocationExpectedReturnDate,
+    employeeId: f.employeeId,
+    departmentId: f.departmentId,
+    location: f.location,
 
-        assetallocationCondition: f.assetallocationCondition,
-        assetallocationAcknowledgedBy: f.assetallocationAcknowledgedBy,
-        assetallocationAcknowledgementDate:
-          f.assetallocationAcknowledgementDate,
+    assetId: f.assetId,
 
-        assetallocationRemarks: f.assetallocationRemarks,
-        assetallocationStatus: f.assetallocationStatus,
+    expectedReturnDate: f.expectedReturnDate,
+    actualReturnDate: f.actualReturnDate,
 
-        loginId: f.loginId || this.loginId,
-        createdDate: f.createdDate,
-        updatedDate: new Date().toISOString().split('T')[0],
-      };
+    conditionAtIssue: f.conditionAtIssue,
+    conditionAtReturn: f.conditionAtReturn,
 
-      const assetallocationId =
-        this.tableData[this.editIndex].assetallocationId;
+    purpose: f.purpose,
+    approvalBy: f.approvalBy,
+    approvalDate: f.approvalDate,
 
-      this.commonService
-        .updateAssetAllocation(assetallocationId, this.loginId, payload)
-        .subscribe({
-          next: () => {
-            this.toast.success('Record Updated Successfully!', 'success', 4000);
-            this.resetAfterSave();
-            this.loadAssetAllocations();
-          },
-          error: () => {
-            this.toast.danger(
-              'Update failed. Service unavailable!',
-              'error',
-              4000,
-            );
-          },
-        });
+    remarks: f.remarks,
 
-      return;
-    }
+    allocationStatus: f.allocationStatus,
 
-    // ---------------- ADD MODE (SAVE) ----------------
-    const payload = this.forms.map((f) => ({
-      assetallocationCode: f.assetallocationCode,
-      assetallocationDate: f.assetallocationDate,
-      assetallocationType: f.assetallocationType,
+    createdBy: f.createdBy,
+    createdDate: f.createdDate,
 
-      assetallocationRequestedBy: f.assetallocationRequestedBy,
-      assetallocationApprovedBy: f.assetallocationApprovedBy,
+    // 🔥 IMPORTANT
+    updatedBy: formattedLoginId,
+    updatedDate: new Date().toISOString().split('T')[0],
+  };
 
-      // ✅ Asset Info
-      assetallocationAssetId: f.assetallocationAssetId,
-      assetallocationAssetName: f.assetallocationAssetName,
-      assetallocationAssetType: f.assetallocationAssetType,
-      assetallocationAssetMake: f.assetallocationAssetMake,
-      assetallocationModel: f.assetallocationModel,
-      assetallocationSerialNumber: f.assetallocationSerialNumber,
+  const allocationId = this.tableData[this.editIndex].allocationId;
 
-      // ✅ Employee Info
-      assetallocationAllocateTo: f.assetallocationAllocateTo,
-      assetallocationEmployeeName: f.assetallocationEmployeeName,
-      assetallocationDepartment: f.assetallocationDepartment,
-      assetallocationLocation: f.assetallocationLocation,
-
-      // ✅ Allocation Period
-      assetallocationStartDate: f.assetallocationStartDate,
-      assetallocationExpectedReturnDate: f.assetallocationExpectedReturnDate,
-
-      // ✅ Condition
-      assetallocationCondition: f.assetallocationCondition,
-      assetallocationAcknowledgedBy: f.assetallocationAcknowledgedBy,
-      assetallocationAcknowledgementDate: f.assetallocationAcknowledgementDate,
-
-      // ✅ Extra
-      assetallocationRemarks: f.assetallocationRemarks,
-
-      // ✅ Status
-      assetallocationStatus: f.assetallocationStatus,
-
-      // ✅ Audit
-      loginId: f.loginId || this.loginId,
-      createdDate: f.createdDate || new Date().toISOString().split('T')[0],
-    }));
-    this.commonService.submitAssetAllocation(payload).subscribe({
-      next: (res) => {
-        if (res?.dublicateMessages?.length) {
-          res.dublicateMessages.forEach((msg: string) =>
-            this.toast.warning(msg, 'warning', 4000),
-          );
-        }
-
-        this.toast.success('Record Added Successfully!', 'success', 4000);
-
+  this.commonService
+    .updateAssetAllocation(allocationId, formattedLoginId, payload)
+    .subscribe({
+      next: () => {
+        this.toast.success('Record Updated Successfully!', 'success', 4000);
         this.resetAfterSave();
         this.loadAssetAllocations();
       },
-
-      error: () => {
+      error: (err) => {
+        console.error("UPDATE ERROR:", err);
         this.toast.danger(
-          'Save failed. Asset Allocation service down!',
+          'Update failed. Service unavailable!',
           'error',
           4000,
         );
       },
     });
-  }
-  resetAfterSave() {
-    this.forms = [
-      {
-        assetallocationId: '0',
-        assetallocationCode: '',
-        assetallocationDate: this.currentDate || '',
-        assetallocationType: '',
 
-        assetallocationRequestedBy: this.userName || '',
-        assetallocationApprovedBy: '',
+  return;
+}
 
-        assetallocationAssetId: '',
-        assetallocationAssetName: '',
-        assetallocationAssetType: '',
-        assetallocationAssetMake: '',
-        assetallocationModel: '',
-        assetallocationSerialNumber: '',
+  // ---------------- ADD MODE (SAVE) ----------------
+  const payload = this.forms.map((f) => ({
+    allocationNumber: f.allocationNumber,
+    allocationDate: f.allocationDate,
 
-        assetallocationAllocateTo: '',
-        assetallocationEmployeeName: '',
-        assetallocationDepartment: '',
-        assetallocationLocation: '',
+    employeeId: f.employeeId,
+    departmentId: f.departmentId,
+    location: f.location,
 
-        assetallocationStartDate: '',
-        assetallocationExpectedReturnDate: '',
+    assetId: f.assetId,
 
-        assetallocationCondition: '',
-        assetallocationAcknowledgedBy: '',
-        assetallocationAcknowledgementDate: '',
+    expectedReturnDate: f.expectedReturnDate,
+    actualReturnDate: f.actualReturnDate,
 
-        assetallocationRemarks: '',
+    conditionAtIssue: f.conditionAtIssue,
+    conditionAtReturn: f.conditionAtReturn,
 
-        assetallocationStatus: 'Active',
+    purpose: f.purpose,
 
-        loginId: this.loginId || '',
-        createdDate: '',
+    approvalBy: f.approvalBy,
+    approvalDate: f.approvalDate,
+
+    remarks: f.remarks,
+
+    allocationStatus: f.allocationStatus,
+
+    createdBy: f.createdBy || this.userName,
+    createdDate:
+      f.createdDate || new Date().toISOString().split('T')[0],
+  }));
+
+  this.commonService.submitAssetAllocation(payload).subscribe({
+    next: (res) => {
+
+      if (res?.dublicateMessages?.length) {
+        res.dublicateMessages.forEach((msg: string) =>
+          this.toast.warning(msg, 'warning', 4000),
+        );
+      }
+
+      this.toast.success('Record Added Successfully!', 'success', 4000);
+
+      this.resetAfterSave();
+      this.loadAssetAllocations();
+    },
+
+    error: () => {
+      this.toast.danger(
+        'Save failed. Asset Allocation service down!',
+        'error',
+        4000,
+      );
+    },
+  });
+}
+ resetAfterSave() {
+  this.forms = [
+    {
+      /* ========= PRIMARY ========= */
+      allocationId: '0',
+      allocationNumber: '',
+
+      /* ========= EMPLOYEE ========= */
+      employeeId: '',
+      departmentId: '',
+      location: '',
+
+      /* ========= ASSET ========= */
+      assetId: '',
+
+      /* ========= DATES ========= */
+      allocationDate: this.currentDate || '',
+      expectedReturnDate: '',
+      actualReturnDate: '',
+
+      /* ========= CONDITION ========= */
+      conditionAtIssue: '',
+      conditionAtReturn: '',
+
+      /* ========= BUSINESS ========= */
+      purpose: '',
+      approvalBy: '',
+      approvalDate: '',
+
+      /* ========= REMARKS ========= */
+      remarks: '',
+
+      /* ========= STATUS ========= */
+      allocationStatus: 'Active',
+
+      /* ========= AUDIT ========= */
+      createdBy: this.userName || '',
+      createdDate: this.currentDate || '',
+      updatedBy: '',
+      updatedDate: '',
+
+      /* ========= Backend Object ========= */
+      newRecord: {
+        allocationId: '0',
+        allocationNumber: '',
+
+        employeeId: '',
+        departmentId: '',
+        location: '',
+
+        assetId: '',
+
+        allocationDate: this.currentDate || '',
+        expectedReturnDate: '',
+        actualReturnDate: '',
+
+        conditionAtIssue: '',
+        conditionAtReturn: '',
+
+        purpose: '',
+
+        approvalBy: '',
+        approvalDate: '',
+
+        remarks: '',
+
+        createdBy: this.userName || '',
+        createdDate: this.currentDate || '',
+
+        updatedBy: '',
         updatedDate: '',
 
-        newRecord: {
-          assetallocationId: '0',
-          assetallocationCode: '',
-          assetallocationDate: this.currentDate || '',
-          assetallocationType: '',
-
-          assetallocationRequestedBy: this.userName || '',
-          assetallocationApprovedBy: '',
-
-          /* ===== Asset Info ===== */
-          assetallocationAssetId: '',
-          assetallocationAssetName: '',
-          assetallocationAssetType: '',
-          assetallocationAssetMake: '',
-          assetallocationModel: '',
-          assetallocationSerialNumber: '',
-
-          /* ===== Employee Info ===== */
-          assetallocationAllocateTo: '',
-          assetallocationEmployeeName: '',
-          assetallocationDepartment: '',
-          assetallocationLocation: '',
-
-          /* ===== Allocation Period ===== */
-          assetallocationStartDate: '',
-          assetallocationExpectedReturnDate: '',
-
-          /* ===== Condition ===== */
-          assetallocationCondition: '',
-          assetallocationAcknowledgedBy: '',
-          assetallocationAcknowledgementDate: '',
-
-          /* ===== Extra ===== */
-          assetallocationRemarks: '',
-
-          /* ===== Status ===== */
-          assetallocationStatus: 'Active',
-
-          /* ===== Audit Fields (FIX ADDED) ===== */
-          loginId: this.loginId || '',
-          createdDate: '',
-          updatedDate: '',
-        },
+        allocationStatus: 'Active',
       },
-    ];
+    },
+  ];
 
-    this.isEditMode = false;
-    this.editIndex = null;
-    this.activeTab = 'details';
-    this.showErrors = false;
-  }
+  this.isEditMode = false;
+  this.editIndex = null;
+  this.activeTab = 'details';
+  this.showErrors = false;
+}
   forms: any[] = [{ newRecord: {} }];
   showErrors = false; // optional: to show validation on submit
-  addForm() {
-    if (this.isEditMode) {
-      return;
-    }
+addForm() {
+  if (this.isEditMode) {
+    return;
+  }
 
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
 
-    const currentDate = `${yyyy}-${mm}-${dd}`;
+  const currentDate = `${yyyy}-${mm}-${dd}`;
 
-    const emptyRecord = {
-      assetallocationId: '0',
-      assetallocationCode: '',
-      assetallocationDate: currentDate,
-      assetallocationType: '',
+  const emptyRecord = {
+    /* ========= PRIMARY ========= */
+    allocationId: '0',
+    allocationNumber: '',
 
-      assetallocationRequestedBy: this.userName || '',
-      assetallocationApprovedBy: '',
+    /* ========= EMPLOYEE ========= */
+    employeeId: '',
+    departmentId: '',
+    location: '',
 
-      /* ===== Asset Info ===== */
-      assetallocationAssetId: '',
-      assetallocationAssetName: '',
-      assetallocationAssetType: '',
-      assetallocationAssetMake: '',
-      assetallocationModel: '',
-      assetallocationSerialNumber: '',
+    /* ========= ASSET ========= */
+    assetId: '',
 
-      /* ===== Employee Info ===== */
-      assetallocationAllocateTo: '',
-      assetallocationEmployeeName: '',
-      assetallocationDepartment: '',
-      assetallocationLocation: '',
+    /* ========= DATES ========= */
+    allocationDate: currentDate,
+    expectedReturnDate: '',
+    actualReturnDate: '',
 
-      /* ===== Allocation Period ===== */
-      assetallocationStartDate: '',
-      assetallocationExpectedReturnDate: '',
+    /* ========= CONDITION ========= */
+    conditionAtIssue: '',
+    conditionAtReturn: '',
 
-      /* ===== Condition ===== */
-      assetallocationCondition: '',
-      assetallocationAcknowledgedBy: '',
-      assetallocationAcknowledgementDate: '',
+    /* ========= BUSINESS ========= */
+    purpose: '',
+    approvalBy: '',
+    approvalDate: '',
 
-      /* ===== Extra ===== */
-      assetallocationRemarks: '',
+    /* ========= REMARKS ========= */
+    remarks: '',
 
-      /* ===== Status ===== */
-      assetallocationStatus: 'Active',
+    /* ========= STATUS ========= */
+    allocationStatus: 'Active',
 
-      /* ===== Audit Fields (FIX ADDED) ===== */
-      loginId: this.loginId || '',
-      createdDate: '',
-      updatedDate: '',
-    };
+    /* ========= AUDIT ========= */
+    createdBy: this.userName || '',
+    createdDate: currentDate,
+    updatedBy: '',
+    updatedDate: '',
+  };
 
-    this.forms.push({
+  this.forms.push({
+    ...emptyRecord,
+    newRecord: { ...emptyRecord },
+  });
+}
+cancelRecord(form?: NgForm, index?: number) {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+
+  const currentDate = `${yyyy}-${mm}-${dd}`;
+
+  const emptyRecord = {
+    /* ========= PRIMARY ========= */
+    allocationId: '0',
+    allocationNumber: '',
+
+    /* ========= EMPLOYEE ========= */
+    employeeId: '',
+    departmentId: '',
+    location: '',
+
+    /* ========= ASSET ========= */
+    assetId: '',
+
+    /* ========= DATES ========= */
+    allocationDate: currentDate,
+    expectedReturnDate: '',
+    actualReturnDate: '',
+
+    /* ========= CONDITION ========= */
+    conditionAtIssue: '',
+    conditionAtReturn: '',
+
+    /* ========= BUSINESS ========= */
+    purpose: '',
+    approvalBy: '',
+    approvalDate: '',
+
+    /* ========= REMARKS ========= */
+    remarks: '',
+
+    /* ========= STATUS ========= */
+    allocationStatus: 'Active',
+
+    /* ========= AUDIT ========= */
+    createdBy: this.userName || '',
+    createdDate: currentDate,
+    updatedBy: '',
+    updatedDate: '',
+  };
+
+  // Reset specific row
+  if (index !== undefined && this.forms[index]) {
+    this.forms[index] = {
       ...emptyRecord,
       newRecord: { ...emptyRecord },
-    });
-  }
-  cancelRecord(form?: NgForm, index?: number) {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-
-    const currentDate = `${yyyy}-${mm}-${dd}`;
-
-    const emptyRecord = {
-      assetallocationId: '0',
-      assetallocationCode: '',
-      assetallocationDate: currentDate,
-      assetallocationType: '',
-
-      assetallocationRequestedBy: this.userName || '',
-      assetallocationApprovedBy: '',
-
-      /* ===== Asset Info ===== */
-      assetallocationAssetId: '',
-      assetallocationAssetName: '',
-      assetallocationAssetType: '',
-      assetallocationAssetMake: '',
-      assetallocationModel: '',
-      assetallocationSerialNumber: '',
-
-      /* ===== Employee Info ===== */
-      assetallocationAllocateTo: '',
-      assetallocationEmployeeName: '',
-      assetallocationDepartment: '',
-      assetallocationLocation: '',
-
-      /* ===== Allocation Period ===== */
-      assetallocationStartDate: '',
-      assetallocationExpectedReturnDate: '',
-
-      /* ===== Condition ===== */
-      assetallocationCondition: '',
-      assetallocationAcknowledgedBy: '',
-      assetallocationAcknowledgementDate: '',
-
-      /* ===== Extra ===== */
-      assetallocationRemarks: '',
-
-      /* ===== Status ===== */
-      assetallocationStatus: 'Active',
-
-      /* ===== Audit Fields (FIX ADDED) ===== */
-      loginId: this.loginId || '',
-      createdDate: '',
-      updatedDate: '',
     };
-
-    if (index !== undefined && this.forms[index]) {
-      this.forms[index] = {
-        ...emptyRecord,
-        newRecord: { ...emptyRecord },
-      };
-    }
-
-    if (form) {
-      form.resetForm();
-    }
-
-    this.isEditMode = false;
-    this.editIndex = null;
-    this.showErrors = false;
   }
 
+  // Reset Angular form
+  if (form) {
+    form.resetForm();
+  }
+
+  this.isEditMode = false;
+  this.editIndex = null;
+  this.showErrors = false;
+}
   removeForm(index: number) {
     this.forms.splice(index, 1);
   }
@@ -1533,30 +1532,30 @@ td{
 
     return null;
   }
-  filterByDate() {
-    if (!this.startDate || !this.endDate) {
-      this.filteredData = [...this.tableData];
-      return;
-    }
-
-    const start = this.parseDate(this.startDate);
-    const end = this.parseDate(this.endDate);
-
-    // ✅ NULL SAFETY CHECK
-    if (!start || !end) {
-      this.filteredData = [...this.tableData];
-      return;
-    }
-
-    this.filteredData = this.tableData.filter((item: TableRow) => {
-      if (!item.assetallocationDate) return false;
-
-      const itemDate = this.parseDate(item.assetallocationDate);
-      if (!itemDate) return false;
-
-      return itemDate >= start && itemDate <= end;
-    });
+ filterByDate() {
+  if (!this.startDate || !this.endDate) {
+    this.filteredData = [...this.tableData];
+    return;
   }
+
+  const start = this.parseDate(this.startDate);
+  const end = this.parseDate(this.endDate);
+
+  // ✅ NULL SAFETY CHECK
+  if (!start || !end) {
+    this.filteredData = [...this.tableData];
+    return;
+  }
+
+  this.filteredData = this.tableData.filter((item: TableRow) => {
+    if (!item.allocationDate) return false;
+
+    const itemDate = this.parseDate(item.allocationDate);
+    if (!itemDate) return false;
+
+    return itemDate >= start && itemDate <= end;
+  });
+}
   convertToDate(dateStr: string): Date {
     if (!dateStr) return new Date(0); // fallback
 
@@ -1753,463 +1752,439 @@ td{
   // }
 
   // ---------------- Excel Parsing ----------------
-  readExcel(file: File) {
-    const reader = new FileReader();
+readExcel(file: File) {
+  const reader = new FileReader();
 
-    reader.onload = () => {
-      const workbook = XLSX.read(reader.result, { type: 'binary' });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  reader.onload = () => {
+    const workbook = XLSX.read(reader.result, { type: 'binary' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-      const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-
-      // Clear existing data
-      this.tableData = [];
-
-      json.forEach((obj: any) => {
-        // 🔥 Date formatter (handles Excel date / string)
-        const formatDate = (val: any) => {
-          if (!val) return '';
-          if (typeof val === 'number') {
-            const date = XLSX.SSF.parse_date_code(val);
-            return `${date.y}-${String(date.m).padStart(2, '0')}-${String(date.d).padStart(2, '0')}`;
-          }
-          return val.toString().trim();
-        };
-
-        const row: TableRow = {
-          assetallocationId: obj['Allocation ID']?.toString().trim() || '',
-          assetallocationCode: obj['Allocation Code']?.toString().trim() || '',
-          assetallocationDate: formatDate(obj['Allocation Date']),
-          assetallocationType: obj['Allocation Type']?.toString().trim() || '',
-
-          assetallocationRequestedBy:
-            obj['Requested By']?.toString().trim() || '',
-          assetallocationApprovedBy:
-            obj['Approved By']?.toString().trim() || '',
-
-          /* ===== Asset Info ===== */
-          assetallocationAssetId: obj['Asset ID']?.toString().trim() || '',
-          assetallocationAssetName: obj['Asset Name']?.toString().trim() || '',
-          assetallocationAssetType: obj['Asset Type']?.toString().trim() || '',
-          assetallocationAssetMake: obj['Asset Make']?.toString().trim() || '',
-          assetallocationModel: obj['Model']?.toString().trim() || '',
-          assetallocationSerialNumber:
-            obj['Serial Number']?.toString().trim() || '',
-
-          /* ===== Employee Info ===== */
-          assetallocationAllocateTo:
-            obj['Employee ID']?.toString().trim() || '',
-          assetallocationEmployeeName:
-            obj['Employee Name']?.toString().trim() || '',
-          assetallocationDepartment: obj['Department']?.toString().trim() || '',
-          assetallocationLocation: obj['Location']?.toString().trim() || '',
-
-          /* ===== Allocation Period ===== */
-          assetallocationStartDate: formatDate(obj['Start Date']),
-          assetallocationExpectedReturnDate: formatDate(obj['Return Date']),
-
-          /* ===== Condition ===== */
-          assetallocationCondition: obj['Condition']?.toString().trim() || '',
-          assetallocationAcknowledgedBy:
-            obj['Acknowledged By']?.toString().trim() || '',
-          assetallocationAcknowledgementDate: formatDate(
-            obj['Acknowledgement Date'],
-          ),
-
-          /* ===== Extra ===== */
-          assetallocationRemarks: obj['Remarks']?.toString().trim() || '',
-
-          /* ===== Status ===== */
-          assetallocationStatus:
-            obj['Status'] === 'Inactive' ? 'Inactive' : 'Active',
-
-          /* ===== Audit Fields (FIX ADDED) ===== */
-          loginId: this.loginId || '',
-          createdDate: '',
-          updatedDate: '',
-        };
-
-        this.tableData.push(row);
-      });
-
-      this.filteredData = [...this.tableData];
-
-      this.toast.success('Excel imported successfully!', 'success', 4000);
-    };
-
-    reader.readAsBinaryString(file);
-  }
-  // ---------------- TXT Parsing ----------------
-
-  readTXT(file: File) {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      let text = reader.result as string;
-
-      // 🔥 Remove header (more flexible)
-      text = text.replace(/Allocation.*Status/i, '').trim();
-
-      // 🔥 Split rows
-      const rows = text
-        .split('\n')
-        .map((r) => r.trim())
-        .filter((r) => r !== '');
-
-      // Clear existing data
-      this.tableData = [];
-
-      rows.forEach((r) => {
-        // 🔥 Better split (handles multiple spaces)
-        const parts = r.split(/\s+/).map((p) => p.trim());
-
-        if (parts.length < 23) {
-          console.warn('Invalid row skipped:', r);
-          return;
-        }
-
-        const row: TableRow = {
-          assetallocationId: parts[0] || '',
-          assetallocationCode: parts[1] || '',
-          assetallocationDate: parts[2] || '',
-          assetallocationType: parts[3] || '',
-
-          assetallocationRequestedBy: parts[4] || '',
-          assetallocationApprovedBy: parts[5] || '',
-
-          /* ===== Asset Info ===== */
-          assetallocationAssetId: parts[6] || '',
-          assetallocationAssetName: parts[7] || '',
-          assetallocationAssetType: parts[8] || '',
-          assetallocationAssetMake: parts[9] || '',
-          assetallocationModel: parts[10] || '',
-          assetallocationSerialNumber: parts[11] || '',
-
-          /* ===== Employee Info ===== */
-          assetallocationAllocateTo: parts[12] || '',
-          assetallocationEmployeeName: parts[13] || '',
-          assetallocationDepartment: parts[14] || '',
-          assetallocationLocation: parts[15] || '',
-
-          /* ===== Allocation Period ===== */
-          assetallocationStartDate: parts[16] || '',
-          assetallocationExpectedReturnDate: parts[17] || '',
-
-          /* ===== Condition ===== */
-          assetallocationCondition: parts[18] || '',
-          assetallocationAcknowledgedBy: parts[19] || '',
-          assetallocationAcknowledgementDate: parts[20] || '',
-
-          /* ===== Extra ===== */
-          assetallocationRemarks: parts[21] || '',
-
-          /* ===== Status ===== */
-          assetallocationStatus:
-            parts[22] === 'Inactive' ? 'Inactive' : 'Active',
-
-          /* ===== Audit Fields (FIX ADDED) ===== */
-          loginId: this.loginId || '',
-          createdDate: '',
-          updatedDate: '',
-        };
-
-        this.tableData.push(row);
-      });
-
-      this.filteredData = [...this.tableData];
-
-      this.toast.success('TXT imported successfully!', 'success', 4000);
-    };
-
-    reader.readAsText(file);
-  }
-  // ---------------- DOCX Parsing ----------------
-  async readDOCX(file: File) {
-    const arrayBuffer = await file.arrayBuffer();
-
-    const result = await mammoth.convertToHtml({ arrayBuffer });
-
-    const doc = new DOMParser().parseFromString(result.value, 'text/html');
-
-    const table = doc.querySelector('table');
-
-    if (!table) {
-      this.toast.danger('No table found in DOCX!', 'error', 4000);
-      return; // 🔥 FIX
-    }
-
-    const rows = table.querySelectorAll('tr');
+    const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
     // Clear existing data
     this.tableData = [];
 
-    rows.forEach((row, i) => {
-      if (i === 0) return; // skip header
+    json.forEach((obj: any) => {
 
-      const cells = Array.from(row.querySelectorAll('td')).map(
-        (c) => c.textContent?.trim() || '',
-      );
+      // 🔥 Date formatter
+      const formatDate = (val: any) => {
+        if (!val) return '';
+        if (typeof val === 'number') {
+          const date = XLSX.SSF.parse_date_code(val);
+          return `${date.y}-${String(date.m).padStart(2, '0')}-${String(date.d).padStart(2, '0')}`;
+        }
+        return val.toString().trim();
+      };
 
-      // 🔥 Row validation
-      if (cells.length < 23) {
-        console.warn('Invalid row skipped:', cells);
-        return;
-      }
+      const row: TableRow = {
+        /* ========= PRIMARY ========= */
+        allocationId: obj['Allocation ID']?.toString().trim() || '',
+        allocationNumber: obj['Allocation Number']?.toString().trim() || '',
 
-      const newRecord: TableRow = {
-        assetallocationId: cells[0] || '',
-        assetallocationCode: cells[1] || '',
-        assetallocationDate: cells[2] || '',
-        assetallocationType: cells[3] || '',
+        /* ========= EMPLOYEE ========= */
+        employeeId: obj['Employee ID']?.toString().trim() || '',
+        departmentId: obj['Department ID']?.toString().trim() || '',
+        location: obj['Location']?.toString().trim() || '',
 
-        assetallocationRequestedBy: cells[4] || '',
-        assetallocationApprovedBy: cells[5] || '',
+        /* ========= ASSET ========= */
+        assetId: obj['Asset ID']?.toString().trim() || '',
 
-        /* ===== Asset Info ===== */
-        assetallocationAssetId: cells[6] || '',
-        assetallocationAssetName: cells[7] || '',
-        assetallocationAssetType: cells[8] || '',
-        assetallocationAssetMake: cells[9] || '',
-        assetallocationModel: cells[10] || '',
-        assetallocationSerialNumber: cells[11] || '',
+        /* ========= DATES ========= */
+        allocationDate: formatDate(obj['Allocation Date']),
+        expectedReturnDate: formatDate(obj['Expected Return Date']),
+        actualReturnDate: formatDate(obj['Actual Return Date']),
 
-        /* ===== Employee Info ===== */
-        assetallocationAllocateTo: cells[12] || '',
-        assetallocationEmployeeName: cells[13] || '',
-        assetallocationDepartment: cells[14] || '',
-        assetallocationLocation: cells[15] || '',
+        /* ========= CONDITION ========= */
+        conditionAtIssue: obj['Condition At Issue']?.toString().trim() || '',
+        conditionAtReturn: obj['Condition At Return']?.toString().trim() || '',
 
-        /* ===== Allocation Period ===== */
-        assetallocationStartDate: cells[16] || '',
-        assetallocationExpectedReturnDate: cells[17] || '',
+        /* ========= BUSINESS ========= */
+        purpose: obj['Purpose']?.toString().trim() || '',
+        approvalBy: obj['Approval By']?.toString().trim() || '',
+        approvalDate: formatDate(obj['Approval Date']),
 
-        /* ===== Condition ===== */
-        assetallocationCondition: cells[18] || '',
-        assetallocationAcknowledgedBy: cells[19] || '',
-        assetallocationAcknowledgementDate: cells[20] || '',
+        /* ========= REMARKS ========= */
+        remarks: obj['Remarks']?.toString().trim() || '',
 
-        /* ===== Extra ===== */
-        assetallocationRemarks: cells[21] || '',
+        /* ========= STATUS ========= */
+        allocationStatus:
+          obj['Status'] === 'Inactive' ? 'Inactive' : 'Active',
 
-        /* ===== Status ===== */
-        assetallocationStatus: cells[22] === 'Inactive' ? 'Inactive' : 'Active',
-
-        /* ===== Audit Fields (FIX ADDED) ===== */
-        loginId: this.loginId || '',
+        /* ========= AUDIT ========= */
+        createdBy: this.userName || '',
         createdDate: '',
+        updatedBy: '',
         updatedDate: '',
       };
 
-      this.tableData.push(newRecord);
+      this.tableData.push(row);
     });
 
     this.filteredData = [...this.tableData];
 
-    this.toast.success('DOCX table imported successfully!', 'success', 4000);
+    this.toast.success('Excel imported successfully!', 'success', 4000);
+  };
+
+  reader.readAsBinaryString(file);
+}
+  // ---------------- TXT Parsing ----------------
+
+readTXT(file: File) {
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    let text = reader.result as string;
+
+    // 🔥 Remove header
+    text = text.replace(/Allocation.*Status/i, '').trim();
+
+    // 🔥 Split rows
+    const rows = text
+      .split('\n')
+      .map((r) => r.trim())
+      .filter((r) => r !== '');
+
+    // Clear existing data
+    this.tableData = [];
+
+    rows.forEach((r) => {
+      const parts = r.split(/\s+/).map((p) => p.trim());
+
+      // ⚠️ Updated minimum columns based on new structure
+      if (parts.length < 15) {
+        console.warn('Invalid row skipped:', r);
+        return;
+      }
+
+      const row: TableRow = {
+        /* ========= PRIMARY ========= */
+        allocationId: parts[0] || '',
+        allocationNumber: parts[1] || '',
+
+        /* ========= DATES ========= */
+        allocationDate: parts[2] || '',
+
+        /* ========= EMPLOYEE ========= */
+        employeeId: parts[3] || '',
+        departmentId: parts[4] || '',
+        location: parts[5] || '',
+
+        /* ========= ASSET ========= */
+        assetId: parts[6] || '',
+
+        /* ========= RETURN ========= */
+        expectedReturnDate: parts[7] || '',
+        actualReturnDate: parts[8] || '',
+
+        /* ========= CONDITION ========= */
+        conditionAtIssue: parts[9] || '',
+        conditionAtReturn: parts[10] || '',
+
+        /* ========= BUSINESS ========= */
+        purpose: parts[11] || '',
+        approvalBy: parts[12] || '',
+
+        /* ========= STATUS ========= */
+        allocationStatus:
+          parts[13] === 'Inactive' ? 'Inactive' : 'Active',
+
+        /* ========= AUDIT ========= */
+        createdBy: this.userName || '',
+        createdDate: '',
+        updatedBy: '',
+        updatedDate: '',
+      };
+
+      this.tableData.push(row);
+    });
+
+    this.filteredData = [...this.tableData];
+
+    this.toast.success('TXT imported successfully!', 'success', 4000);
+  };
+
+  reader.readAsText(file);
+}
+  // ---------------- DOCX Parsing ----------------
+async readDOCX(file: File) {
+  const arrayBuffer = await file.arrayBuffer();
+
+  const result = await mammoth.convertToHtml({ arrayBuffer });
+
+  const doc = new DOMParser().parseFromString(result.value, 'text/html');
+
+  const table = doc.querySelector('table');
+
+  if (!table) {
+    this.toast.danger('No table found in DOCX!', 'error', 4000);
+    return;
   }
+
+  const rows = table.querySelectorAll('tr');
+
+  // Clear existing data
+  this.tableData = [];
+
+  rows.forEach((row, i) => {
+    if (i === 0) return; // skip header
+
+    const cells = Array.from(row.querySelectorAll('td')).map(
+      (c) => c.textContent?.trim() || '',
+    );
+
+    // 🔥 Updated validation (new structure)
+    if (cells.length < 15) {
+      console.warn('Invalid row skipped:', cells);
+      return;
+    }
+
+    const newRecord: TableRow = {
+      /* ========= PRIMARY ========= */
+      allocationId: cells[0] || '',
+      allocationNumber: cells[1] || '',
+
+      /* ========= DATES ========= */
+      allocationDate: cells[2] || '',
+
+      /* ========= EMPLOYEE ========= */
+      employeeId: cells[3] || '',
+      departmentId: cells[4] || '',
+      location: cells[5] || '',
+
+      /* ========= ASSET ========= */
+      assetId: cells[6] || '',
+
+      /* ========= RETURN ========= */
+      expectedReturnDate: cells[7] || '',
+      actualReturnDate: cells[8] || '',
+
+      /* ========= CONDITION ========= */
+      conditionAtIssue: cells[9] || '',
+      conditionAtReturn: cells[10] || '',
+
+      /* ========= BUSINESS ========= */
+      purpose: cells[11] || '',
+      approvalBy: cells[12] || '',
+      approvalDate: cells[13] || '',
+
+      /* ========= STATUS ========= */
+      allocationStatus:
+        cells[14] === 'Inactive' ? 'Inactive' : 'Active',
+
+      /* ========= AUDIT ========= */
+      createdBy: this.userName || '',
+      createdDate: '',
+      updatedBy: '',
+      updatedDate: '',
+    };
+
+    this.tableData.push(newRecord);
+  });
+
+  this.filteredData = [...this.tableData];
+
+  this.toast.success('DOCX table imported successfully!', 'success', 4000);
+}
 
   // ---------------- PDF Parsing ----------------
   extract(text: string, regex: RegExp) {
     const m = text.match(regex);
     return m ? m[1].trim() : '';
   }
-  async readPDF(file: File) {
-    const arrayBuffer = await file.arrayBuffer();
+async readPDF(file: File) {
+  const arrayBuffer = await file.arrayBuffer();
 
-    const pdf = await pdfjsLib.getDocument({
-      data: new Uint8Array(arrayBuffer),
-    }).promise;
+  const pdf = await pdfjsLib.getDocument({
+    data: new Uint8Array(arrayBuffer),
+  }).promise;
 
-    let fullText = '';
+  let fullText = '';
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
 
-      fullText += content.items.map((item: any) => item.str).join(' ') + ' ';
-    }
-
-    console.log('RAW:', fullText);
-
-    // 🔥 Fix corrupted status text
-    fullText = fullText.replace(/A[cç][^\s]*ve/gi, 'Active');
-    fullText = fullText.replace(/In[cç][^\s]*ve/gi, 'Inactive');
-
-    // 🔥 Remove header
-    fullText = fullText.replace(/Allocation\s+ID[\s\S]*?Status/i, '');
-
-    // 🔥 Clean spaces
-    fullText = fullText.replace(/\s+/g, ' ').trim();
-
-    console.log('CLEANED:', fullText);
-
-    // 🔥 Clear old data
-    this.tableData = [];
-
-    // 🔥 Improved regex (more flexible)
-    const rowRegex =
-      /(\S+)\s+(\S+)\s+([\d-]+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+?)\s+(.+?)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+?)\s+(\S+)\s+([\d-]+)\s*([\d-]*)\s+(\S+)\s+(\S+)\s*([\d-]*)\s+(.+?)\s+(Active|Inactive)/g;
-
-    let match;
-    let count = 0;
-
-    while ((match = rowRegex.exec(fullText)) !== null) {
-      const row: TableRow = {
-        assetallocationId: match[1] || '',
-        assetallocationCode: match[2] || '',
-        assetallocationDate: match[3] || '',
-        assetallocationType: match[4] || '',
-
-        assetallocationRequestedBy: match[5] || '',
-        assetallocationApprovedBy: match[6] || '',
-
-        /* ===== Asset Info ===== */
-        assetallocationAssetId: match[7] || '',
-        assetallocationAssetName: match[8]?.trim() || '',
-        assetallocationAssetType: match[9]?.trim() || '',
-        assetallocationAssetMake: match[10] || '',
-        assetallocationModel: match[11] || '',
-        assetallocationSerialNumber: match[12] || '',
-
-        /* ===== Employee Info ===== */
-        assetallocationAllocateTo: match[13] || '',
-        assetallocationEmployeeName: match[14]?.trim() || '',
-        assetallocationDepartment: match[15] || '',
-        assetallocationLocation: match[16] || '',
-
-        /* ===== Allocation Period ===== */
-        assetallocationStartDate: match[17] || '',
-        assetallocationExpectedReturnDate: match[18] || '',
-
-        /* ===== Condition ===== */
-        assetallocationCondition: match[19] || '',
-        assetallocationAcknowledgedBy: match[20] || '',
-        assetallocationAcknowledgementDate: match[21] || '',
-
-        /* ===== Extra ===== */
-        assetallocationRemarks: match[22]?.trim() || '',
-
-        /* ===== Status ===== */
-        assetallocationStatus: match[23] === 'Inactive' ? 'Inactive' : 'Active',
-
-        /* ===== Audit Fields (FIX ADDED) ===== */
-        loginId: this.loginId || '',
-        createdDate: '',
-        updatedDate: '',
-      };
-
-      this.tableData.push(row);
-      count++;
-    }
-
-    this.filteredData = [...this.tableData];
-
-    if (count === 0) {
-      this.toast.warning('No valid records found in PDF!', 'warning', 4000);
-    } else {
-      this.toast.success('PDF imported successfully!', 'success', 4000);
-    }
-
-    console.log('FINAL ROWS:', this.tableData);
+    fullText += content.items.map((item: any) => item.str).join(' ') + ' ';
   }
-  // ---------------- Download Sample CSV ----------------
-  downloadSampleCSV() {
-    if (!this.tableData.length) {
-      this.toast.danger('No data to download!', 'error', 4000);
-      return;
-    }
 
-    // 🔥 Helper to escape CSV values
-    const escapeCSV = (value: any) => {
-      if (value == null) return '';
-      const str = value.toString();
-      return `"${str.replace(/"/g, '""')}"`; // handle quotes
+  console.log('RAW:', fullText);
+
+  // 🔥 Fix corrupted status text
+  fullText = fullText.replace(/A[cç][^\s]*ve/gi, 'Active');
+  fullText = fullText.replace(/In[cç][^\s]*ve/gi, 'Inactive');
+
+  // 🔥 Remove header
+  fullText = fullText.replace(/Allocation\s+ID[\s\S]*?Status/i, '');
+
+  // 🔥 Clean spaces
+  fullText = fullText.replace(/\s+/g, ' ').trim();
+
+  console.log('CLEANED:', fullText);
+
+  // 🔥 Clear old data
+  this.tableData = [];
+
+  /**
+   * ✅ NEW STRUCTURE REGEX (15 fields)
+   * Order:
+   * ID | Number | Date | EmpId | DeptId | Location | AssetId |
+   * ExpReturn | ActReturn | CondIssue | CondReturn |
+   * Purpose | ApprovalBy | ApprovalDate | Status
+   */
+  const rowRegex =
+    /(\S+)\s+(\S+)\s+([\d-]+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+([\d-]*)\s+([\d-]*)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+([\d-]*)\s+(Active|Inactive)/g;
+
+  let match;
+  let count = 0;
+
+  while ((match = rowRegex.exec(fullText)) !== null) {
+    const row: TableRow = {
+      /* ========= PRIMARY ========= */
+      allocationId: match[1] || '',
+      allocationNumber: match[2] || '',
+
+      /* ========= DATES ========= */
+      allocationDate: match[3] || '',
+
+      /* ========= EMPLOYEE ========= */
+      employeeId: match[4] || '',
+      departmentId: match[5] || '',
+      location: match[6] || '',
+
+      /* ========= ASSET ========= */
+      assetId: match[7] || '',
+
+      /* ========= RETURN ========= */
+      expectedReturnDate: match[8] || '',
+      actualReturnDate: match[9] || '',
+
+      /* ========= CONDITION ========= */
+      conditionAtIssue: match[10] || '',
+      conditionAtReturn: match[11] || '',
+
+      /* ========= BUSINESS ========= */
+      purpose: match[12] || '',
+      approvalBy: match[13] || '',
+      approvalDate: match[14] || '',
+
+      /* ========= STATUS ========= */
+      allocationStatus:
+        match[15] === 'Inactive' ? 'Inactive' : 'Active',
+
+      /* ========= AUDIT ========= */
+      createdBy: this.userName || '',
+      createdDate: '',
+      updatedBy: '',
+      updatedDate: '',
     };
 
-    // 🔥 Full headers (interface aligned)
-    const headers = [
-      'Allocation ID',
-      'Allocation Code',
-      'Allocation Date',
-      'Allocation Type',
-      'Requested By',
-      'Approved By',
+    this.tableData.push(row);
+    count++;
+  }
 
-      'Asset ID',
-      'Asset Name',
-      'Asset Type',
-      'Asset Make',
-      'Model',
-      'Serial Number',
+  this.filteredData = [...this.tableData];
 
-      'Employee ID',
-      'Employee Name',
-      'Department',
-      'Location',
+  if (count === 0) {
+    this.toast.warning('No valid records found in PDF!', 'warning', 4000);
+  } else {
+    this.toast.success('PDF imported successfully!', 'success', 4000);
+  }
 
-      'Start Date',
-      'Return Date',
+  console.log('FINAL ROWS:', this.tableData);
+}
+  // ---------------- Download Sample CSV ----------------
+downloadSampleCSV() {
+  if (!this.tableData.length) {
+    this.toast.danger('No data to download!', 'error', 4000);
+    return;
+  }
 
-      'Condition',
-      'Acknowledged By',
-      'Acknowledgement Date',
+  // 🔥 Helper to escape CSV values
+  const escapeCSV = (value: any) => {
+    if (value == null) return '';
+    const str = value.toString();
+    return `"${str.replace(/"/g, '""')}"`;
+  };
 
-      'Remarks',
-      'Status',
-      'Login ID',
+  // ✅ Updated headers (NEW ENTITY)
+  const headers = [
+    'Allocation ID',
+    'Allocation Number',
+    'Allocation Date',
+
+    'Employee ID',
+    'Department ID',
+    'Location',
+
+    'Asset ID',
+
+    'Expected Return Date',
+    'Actual Return Date',
+
+    'Condition At Issue',
+    'Condition At Return',
+
+    'Purpose',
+    'Approval By',
+    'Approval Date',
+
+    'Remarks',
+    'Status',
+
+    'Created By',
+    'Created Date',
+    'Updated By',
+    'Updated Date',
+  ];
+
+  const csvRows = [headers.map(escapeCSV).join(',')];
+
+  // ✅ Data rows
+  this.tableData.forEach((row: TableRow) => {
+    const rowData = [
+      row.allocationId,
+      row.allocationNumber,
+      row.allocationDate,
+
+      row.employeeId,
+      row.departmentId,
+      row.location,
+
+      row.assetId,
+
+      row.expectedReturnDate || '',
+      row.actualReturnDate || '',
+
+      row.conditionAtIssue,
+      row.conditionAtReturn,
+
+      row.purpose,
+      row.approvalBy,
+      row.approvalDate,
+
+      row.remarks,
+      row.allocationStatus,
+
+      row.createdBy,
+      row.createdDate,
+      row.updatedBy,
+      row.updatedDate,
     ];
 
-    const csvRows = [headers.map(escapeCSV).join(',')];
+    csvRows.push(rowData.map(escapeCSV).join(','));
+  });
 
-    // 🔥 Data rows
-    this.tableData.forEach((row: TableRow) => {
-      const rowData = [
-        row.assetallocationId,
-        row.assetallocationCode,
-        row.assetallocationDate,
-        row.assetallocationType,
+  const blob = new Blob([csvRows.join('\n')], {
+    type: 'text/csv;charset=utf-8;',
+  });
 
-        row.assetallocationRequestedBy,
-        row.assetallocationApprovedBy,
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'asset_allocation_data.csv';
+  a.click();
 
-        row.assetallocationAssetId,
-        row.assetallocationAssetName,
-        row.assetallocationAssetType,
-        row.assetallocationAssetMake,
-        row.assetallocationModel,
-        row.assetallocationSerialNumber,
-
-        row.assetallocationAllocateTo,
-        row.assetallocationEmployeeName,
-        row.assetallocationDepartment,
-        row.assetallocationLocation,
-
-        row.assetallocationStartDate,
-        row.assetallocationExpectedReturnDate || '',
-
-        row.assetallocationCondition,
-        row.assetallocationAcknowledgedBy,
-        row.assetallocationAcknowledgementDate,
-
-        row.assetallocationRemarks,
-        row.assetallocationStatus,
-        row.loginId,
-      ];
-
-      csvRows.push(rowData.map(escapeCSV).join(','));
-    });
-
-    const blob = new Blob([csvRows.join('\n')], {
-      type: 'text/csv;charset=utf-8;',
-    });
-
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'asset_allocation_data.csv';
-    a.click();
-
-    URL.revokeObjectURL(a.href);
-  }
+  URL.revokeObjectURL(a.href);
+}
   //bulk export buttons function
 
   // Reset all filters
@@ -2218,358 +2193,333 @@ td{
   //endDate: string = '';
   //fileType: string = 'csv';
   // Get File (export logic)
-  exportFilteredCSV(data: TableRow[]) {
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString('en-GB'); // DD/MM/YYYY
+ exportFilteredCSV(data: TableRow[]) {
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('en-GB'); // DD/MM/YYYY
 
-    const csvRows: string[] = [];
+  const csvRows: string[] = [];
 
-    // 🔥 CSV escape helper
-    const escapeCSV = (value: any) => {
-      if (value == null) return '';
-      const str = value.toString();
-      return `"${str.replace(/"/g, '""')}"`;
-    };
+  // 🔥 CSV escape helper
+  const escapeCSV = (value: any) => {
+    if (value == null) return '';
+    const str = value.toString();
+    return `"${str.replace(/"/g, '""')}"`;
+  };
 
-    // ⭐ Row 1 → Company Name
-    csvRows.push(escapeCSV(this.headCompanyName || 'Company Name'));
+  // ⭐ Row 1 → Company Name
+  csvRows.push(escapeCSV(this.headCompanyName || 'Company Name'));
 
-    // ⭐ Row 2 → Date
-    csvRows.push(`${escapeCSV('Date:')},${escapeCSV(formattedDate)}`);
+  // ⭐ Row 2 → Date
+  csvRows.push(`${escapeCSV('Date:')},${escapeCSV(formattedDate)}`);
 
-    // Empty row
-    csvRows.push('');
+  // Empty row
+  csvRows.push('');
 
-    // ⭐ Header (FULL interface aligned)
-    const headers = [
-      'Allocation ID',
-      'Allocation Code',
-      'Allocation Date',
-      'Allocation Type',
+  // ✅ Updated Headers
+  const headers = [
+    'Allocation ID',
+    'Allocation Number',
+    'Allocation Date',
 
-      'Requested By',
-      'Approved By',
+    'Employee ID',
+    'Department ID',
+    'Location',
 
-      'Asset ID',
-      'Asset Name',
-      'Asset Type',
-      'Asset Make',
-      'Model',
-      'Serial Number',
+    'Asset ID',
 
-      'Allocate To',
-      'Employee Name',
-      'Department',
-      'Location',
+    'Expected Return Date',
+    'Actual Return Date',
 
-      'Start Date',
-      'Expected Return Date',
+    'Condition At Issue',
+    'Condition At Return',
 
-      'Condition',
-      'Acknowledged By',
-      'Acknowledgement Date',
+    'Purpose',
+    'Approval By',
+    'Approval Date',
 
-      'Remarks',
+    'Remarks',
 
-      'Status',
-      'Login ID', // 🔥 added
+    'Status',
+
+    'Created By',
+    'Created Date',
+    'Updated By',
+    'Updated Date',
+  ];
+
+  csvRows.push(headers.map(escapeCSV).join(','));
+
+  // ✅ Data rows
+  data.forEach((row) => {
+    const rowData = [
+      row.allocationId || '',
+      row.allocationNumber || '',
+      row.allocationDate || '',
+
+      row.employeeId || '',
+      row.departmentId || '',
+      row.location || '',
+
+      row.assetId || '',
+
+      row.expectedReturnDate || '',
+      row.actualReturnDate || '',
+
+      row.conditionAtIssue || '',
+      row.conditionAtReturn || '',
+
+      row.purpose || '',
+      row.approvalBy || '',
+      row.approvalDate || '',
+
+      row.remarks || '',
+
+      row.allocationStatus || '',
+
+      row.createdBy || '',
+      row.createdDate || '',
+      row.updatedBy || '',
+      row.updatedDate || '',
     ];
 
-    csvRows.push(headers.map(escapeCSV).join(','));
+    csvRows.push(rowData.map(escapeCSV).join(','));
+  });
 
-    // ⭐ Data rows
-    data.forEach((row) => {
-      const rowData = [
-        row.assetallocationId || '',
-        row.assetallocationCode || '',
-        row.assetallocationDate || '',
-        row.assetallocationType || '',
+  const csvData = csvRows.join('\n');
 
-        row.assetallocationRequestedBy || '',
-        row.assetallocationApprovedBy || '',
+  const blob = new Blob([csvData], {
+    type: 'text/csv;charset=utf-8;',
+  });
 
-        row.assetallocationAssetId || '',
-        row.assetallocationAssetName || '',
-        row.assetallocationAssetType || '',
-        row.assetallocationAssetMake || '',
-        row.assetallocationModel || '',
-        row.assetallocationSerialNumber || '',
+  saveAs(blob, 'Filtered_Asset_Allocation_Report.csv');
+}
+exportFilteredExcel(data: TableRow[]) {
+  const wsData: any[] = [];
 
-        row.assetallocationAllocateTo || '',
-        row.assetallocationEmployeeName || '',
-        row.assetallocationDepartment || '',
-        row.assetallocationLocation || '',
+  // ⭐ Company Name
+  wsData.push([this.headCompanyName || 'Company Name']);
 
-        row.assetallocationStartDate || '',
-        row.assetallocationExpectedReturnDate || '',
+  // ⭐ Date
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('en-GB'); // DD/MM/YYYY
+  wsData.push(['Date:', formattedDate]);
 
-        row.assetallocationCondition || '',
-        row.assetallocationAcknowledgedBy || '',
-        row.assetallocationAcknowledgementDate || '',
+  // Empty row
+  wsData.push([]);
 
-        row.assetallocationRemarks || '',
+  // ✅ Updated Headers
+  const headers = [
+    'Allocation ID',
+    'Allocation Number',
+    'Allocation Date',
 
-        row.assetallocationStatus || '',
-        row.loginId || '', // 🔥 added
-      ];
+    'Employee ID',
+    'Department ID',
+    'Location',
 
-      csvRows.push(rowData.map(escapeCSV).join(','));
-    });
+    'Asset ID',
 
-    const csvData = csvRows.join('\n');
+    'Expected Return Date',
+    'Actual Return Date',
 
-    const blob = new Blob([csvData], {
-      type: 'text/csv;charset=utf-8;',
-    });
+    'Condition At Issue',
+    'Condition At Return',
 
-    saveAs(blob, 'Filtered_Asset_Allocation_Report.csv');
-  }
-  exportFilteredExcel(data: TableRow[]) {
-    const wsData: any[] = [];
+    'Purpose',
+    'Approval By',
+    'Approval Date',
 
-    // ⭐ Company Name
-    wsData.push([this.headCompanyName || 'Company Name']);
+    'Remarks',
 
-    // ⭐ Date (Improved)
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString('en-GB'); // DD/MM/YYYY
-    wsData.push(['Date:', formattedDate]);
+    'Status',
 
-    // Empty row
-    wsData.push([]);
+    'Created By',
+    'Created Date',
+    'Updated By',
+    'Updated Date',
+  ];
 
-    // ⭐ Header (FULL interface aligned)
-    const headers = [
-      'Allocation ID',
-      'Allocation Code',
-      'Allocation Date',
-      'Allocation Type',
+  wsData.push(headers);
 
-      'Requested By',
-      'Approved By',
+  // ✅ Data rows
+  data.forEach((row) => {
+    wsData.push([
+      row.allocationId || '',
+      row.allocationNumber || '',
+      row.allocationDate || '',
 
-      'Asset ID',
-      'Asset Name',
-      'Asset Type',
-      'Asset Make',
-      'Model',
-      'Serial Number',
+      row.employeeId || '',
+      row.departmentId || '',
+      row.location || '',
 
-      'Allocate To',
-      'Employee Name',
-      'Department',
-      'Location',
+      row.assetId || '',
 
-      'Start Date',
-      'Expected Return Date',
+      row.expectedReturnDate || '',
+      row.actualReturnDate || '',
 
-      'Condition',
-      'Acknowledged By',
-      'Acknowledgement Date',
+      row.conditionAtIssue || '',
+      row.conditionAtReturn || '',
 
-      'Remarks',
+      row.purpose || '',
+      row.approvalBy || '',
+      row.approvalDate || '',
 
-      'Status',
-      'Login ID', // 🔥 added
-    ];
+      row.remarks || '',
 
-    wsData.push(headers);
+      row.allocationStatus || '',
 
-    // ⭐ Data rows (null safe)
-    data.forEach((row) => {
-      wsData.push([
-        row.assetallocationId || '',
-        row.assetallocationCode || '',
-        row.assetallocationDate || '',
-        row.assetallocationType || '',
+      row.createdBy || '',
+      row.createdDate || '',
+      row.updatedBy || '',
+      row.updatedDate || '',
+    ]);
+  });
 
-        row.assetallocationRequestedBy || '',
-        row.assetallocationApprovedBy || '',
+  // ⭐ Create worksheet
+  const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
 
-        row.assetallocationAssetId || '',
-        row.assetallocationAssetName || '',
-        row.assetallocationAssetType || '',
-        row.assetallocationAssetMake || '',
-        row.assetallocationModel || '',
-        row.assetallocationSerialNumber || '',
+  // 🔥 Auto column width
+  const colWidths = headers.map(() => ({ wch: 20 }));
+  worksheet['!cols'] = colWidths;
 
-        row.assetallocationAllocateTo || '',
-        row.assetallocationEmployeeName || '',
-        row.assetallocationDepartment || '',
-        row.assetallocationLocation || '',
+  // ⭐ Create workbook
+  const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    'Filtered Asset Allocation',
+  );
 
-        row.assetallocationStartDate || '',
-        row.assetallocationExpectedReturnDate || '',
+  // ⭐ Export
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
 
-        row.assetallocationCondition || '',
-        row.assetallocationAcknowledgedBy || '',
-        row.assetallocationAcknowledgementDate || '',
+  const blob = new Blob([excelBuffer], {
+    type: 'application/octet-stream',
+  });
 
-        row.assetallocationRemarks || '',
+  saveAs(blob, 'Filtered_Asset_Allocation_Report.xlsx');
+}
+ exportFilteredPDF(data: TableRow[]) {
+  const doc = new jsPDF('l', 'pt', 'a4'); // Landscape
 
-        row.assetallocationStatus || '',
-        row.loginId || '', // 🔥 added
-      ]);
-    });
+  // ⭐ Title
+  doc.setFontSize(22);
+  doc.setTextColor(0, 70, 140);
 
-    // ⭐ Create worksheet
-    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const titleX = pageWidth / 2;
 
-    // 🔥 Auto column width
-    const colWidths = headers.map(() => ({ wch: 20 }));
-    worksheet['!cols'] = colWidths;
+  doc.text('Asset Allocation Records', titleX, 50, { align: 'center' });
 
-    // ⭐ Create workbook
-    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      'Filtered Asset Allocation',
-    );
+  const titleWidth = doc.getTextWidth('Asset Allocation Records');
+  doc.line(titleX - titleWidth / 2, 55, titleX + titleWidth / 2, 55);
 
-    // ⭐ Export
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
-    });
+  // ⭐ Company + Date
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
 
-    const blob = new Blob([excelBuffer], {
-      type: 'application/octet-stream',
-    });
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('en-GB');
 
-    saveAs(blob, 'Filtered_Asset_Allocation_Report.xlsx');
-  }
-  exportFilteredPDF(data: TableRow[]) {
-    const doc = new jsPDF('l', 'pt', 'a4'); // Landscape
+  doc.text(this.headCompanyName || 'Company Name', 40, 80);
+  doc.text(dateStr, pageWidth - 40, 80, { align: 'right' });
 
-    // ⭐ Title
-    doc.setFontSize(22);
-    doc.setTextColor(0, 70, 140);
+  // ⭐ Table
+  autoTable(doc, {
+    startY: 100,
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const titleX = pageWidth / 2;
+    head: [
+      [
+        'Alloc ID',
+        'Number',
+        'Date',
 
-    doc.text('Asset Allocation Records', titleX, 50, { align: 'center' });
+        'Employee ID',
+        'Dept ID',
+        'Location',
 
-    const titleWidth = doc.getTextWidth('Asset Allocation Records');
-    doc.line(titleX - titleWidth / 2, 55, titleX + titleWidth / 2, 55);
+        'Asset ID',
 
-    // ⭐ Company + Date
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
+        'Expected Return',
+        'Actual Return',
 
-    const today = new Date();
-    const dateStr = today.toLocaleDateString('en-GB');
+        'Cond Issue',
+        'Cond Return',
 
-    doc.text(this.headCompanyName || 'Company Name', 40, 80);
-    doc.text(dateStr, pageWidth - 40, 80, { align: 'right' });
+        'Purpose',
+        'Approval By',
+        'Approval Date',
 
-    // ⭐ Table
-    autoTable(doc, {
-      startY: 100,
+        'Remarks',
+        'Status',
 
-      head: [
-        [
-          'Alloc ID',
-          'Code',
-          'Date',
-          'Type',
-
-          'Requested By',
-          'Approved By',
-
-          'Asset ID',
-          'Asset Name',
-          'Type',
-          'Make',
-          'Model',
-          'Serial',
-
-          'Allocate To',
-          'Employee',
-          'Dept',
-          'Location',
-
-          'Start',
-          'Return',
-
-          'Condition',
-          'Ack By',
-          'Ack Date',
-
-          'Remarks',
-          'Status',
-          'Login ID', // 🔥 added
-        ],
+        'Created By',
       ],
+    ],
 
-      body: data.map((row) => [
-        row.assetallocationId || '',
-        row.assetallocationCode || '',
-        row.assetallocationDate || '',
-        row.assetallocationType || '',
+    body: data.map((row) => [
+      row.allocationId || '',
+      row.allocationNumber || '',
+      row.allocationDate || '',
 
-        row.assetallocationRequestedBy || '',
-        row.assetallocationApprovedBy || '',
+      row.employeeId || '',
+      row.departmentId || '',
+      row.location || '',
 
-        row.assetallocationAssetId || '',
-        row.assetallocationAssetName || '',
-        row.assetallocationAssetType || '',
-        row.assetallocationAssetMake || '',
-        row.assetallocationModel || '',
-        row.assetallocationSerialNumber || '',
+      row.assetId || '',
 
-        row.assetallocationAllocateTo || '',
-        row.assetallocationEmployeeName || '',
-        row.assetallocationDepartment || '',
-        row.assetallocationLocation || '',
+      row.expectedReturnDate || '',
+      row.actualReturnDate || '',
 
-        row.assetallocationStartDate || '',
-        row.assetallocationExpectedReturnDate || '',
+      row.conditionAtIssue || '',
+      row.conditionAtReturn || '',
 
-        row.assetallocationCondition || '',
-        row.assetallocationAcknowledgedBy || '',
-        row.assetallocationAcknowledgementDate || '',
+      row.purpose || '',
+      row.approvalBy || '',
+      row.approvalDate || '',
 
-        row.assetallocationRemarks || '',
-        row.assetallocationStatus || '',
-        row.loginId || '', // 🔥 added
-      ]),
+      row.remarks || '',
+      row.allocationStatus || '',
 
-      theme: 'grid',
+      row.createdBy || '',
+    ]),
 
-      headStyles: {
-        fillColor: [0, 92, 179],
-        textColor: [255, 255, 255],
-        halign: 'center',
-        fontSize: 9,
-      },
+    theme: 'grid',
 
-      bodyStyles: {
-        halign: 'center',
-        textColor: [0, 0, 0],
-        fontSize: 8,
-      },
+    headStyles: {
+      fillColor: [0, 92, 179],
+      textColor: [255, 255, 255],
+      halign: 'center',
+      fontSize: 9,
+    },
 
-      styles: {
-        lineWidth: 0.5,
-        lineColor: [0, 0, 0],
-        valign: 'middle',
-      },
+    bodyStyles: {
+      halign: 'center',
+      textColor: [0, 0, 0],
+      fontSize: 8,
+    },
 
-      // 🔥 Status color
-      didParseCell: function (data: any) {
-        if (data.column.index === 22) {
-          // Status column index
-          if (data.cell.raw === 'Active') {
-            data.cell.styles.textColor = [0, 128, 0];
-          } else if (data.cell.raw === 'Inactive') {
-            data.cell.styles.textColor = [255, 0, 0];
-          }
+    styles: {
+      lineWidth: 0.5,
+      lineColor: [0, 0, 0],
+      valign: 'middle',
+    },
+
+    // 🔥 Status color (UPDATED INDEX)
+    didParseCell: function (data: any) {
+      if (data.column.index === 15) { // ✅ new index
+        if (data.cell.raw === 'Active') {
+          data.cell.styles.textColor = [0, 128, 0];
+        } else if (data.cell.raw === 'Inactive') {
+          data.cell.styles.textColor = [255, 0, 0];
         }
-      },
-    });
+      }
+    },
+  });
 
-    doc.save('Filtered_Asset_Allocation_Report.pdf');
-  }
+  doc.save('Filtered_Asset_Allocation_Report.pdf');
+}
 }

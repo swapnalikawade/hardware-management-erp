@@ -264,3 +264,9 @@ mat-sidenav-content {
   font-weight: 500;
 }
 /* Toast position fix */
+.blur-sidebar {
+  filter: blur(4px);
+  opacity: 0.6;
+  pointer-events: none;
+  transition: 0.3s ease;
+}

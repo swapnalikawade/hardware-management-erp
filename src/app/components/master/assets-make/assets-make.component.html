@@ -219,19 +219,19 @@
     <td>{{ row.updatedDate }}</td>
 
     <!-- Status -->
-    <td>
-      <span
-        [ngClass]="{
-          'status-active': row.status?.toLowerCase() === 'active',
-          'status-inactive': row.status?.toLowerCase() !== 'active'
-        }"
-      >
-        <span *ngIf="row.status?.toLowerCase() === 'active'">✔</span>
-        <span *ngIf="row.status?.toLowerCase() !== 'active'">❌</span>
+ <td>
+  <span
+    [ngClass]="{
+      'status-active': row.status === 'Active',
+      'status-inactive': row.status !== 'Active'
+    }"
+  >
+    <span *ngIf="row.status === 'Active'">✔</span>
+    <span *ngIf="row.status !== 'Active'">❌</span>
 
-        {{ row.status }}
-      </span>
-    </td>
+    {{ row.status }}
+  </span>
+</td>
 
     <td>
       <button class="btn-edit" (click)="onEdit(row, i)">

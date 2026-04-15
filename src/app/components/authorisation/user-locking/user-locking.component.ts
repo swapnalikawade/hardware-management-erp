@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../../services/auth/auth-service';
 import { CommonService } from '../../../services/common/common-service';
+import { ModalService } from '../../../services/modal.service';
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc =
   'node_modules/pdfjs-dist/build/pdf.worker.min.js';
 
@@ -81,6 +82,7 @@ export class UserLockingComponent {
     private authService: AuthService,
     private commonService: CommonService,
     private cdr: ChangeDetectorRef,
+    private modalService: ModalService
   ) {
     this.filteredData = [...this.tableData];
   }
@@ -200,11 +202,7 @@ export class UserLockingComponent {
     this.showViewModal = false;
     this.selectedRow = null;
   }
-  openStatusModal(row: any) {
-    this.statusRow = row;
-    this.statusReason = '';
-    this.showStatusModal = true;
-  }
+  
   toggleStatus() {
     const empCode = this.statusRow.employeeCode;
 
@@ -914,5 +912,25 @@ export class UserLockingComponent {
 
   // Convert CSV → JSON and store in tableData
 
-  // ---------------- Excel Parsing ----------------
+openStatusModal(row: any) {
+  this.statusRow = row;
+  this.statusReason = '';
+  this.showStatusModal = true;
+
+  this.modalService.isModalOpen$.next(true);
+}
+
+closeStatusModal() {
+  this.showStatusModal = false;
+
+  this.modalService.isModalOpen$.next(false);
+}
+
+confirmAndClose() {
+  this.toggleStatus(); // API call
+
+  this.showStatusModal = false;
+
+  this.modalService.isModalOpen$.next(false);
+}
 }

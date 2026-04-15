@@ -11,7 +11,13 @@ export class CommonService {
     private http: HttpClient,
     private authService: AuthService,
   ) {}
+getAuthHeaders() {
+  const token = localStorage.getItem('access_token');
 
+  return new HttpHeaders({
+    Authorization: `Bearer ${token}`
+  });
+}
   // IMPORT SHIFT PATTERN API URL
   departmentUrl = 'http://localhost:8300/department_service';
   // ==============================
@@ -24,14 +30,18 @@ export class CommonService {
   // ==============================
   // Fetch Departments By Head Company
   // ==============================
-  fetchAllDepartmentByHeadCompany(loginId: string) {
-    const [prefix, year, code] = loginId.split('/');
+// fetchAllDepartmentByHeadCompany(loginId: string): Observable<any[]> {
+//   return this.http.get<any[]>(
+//     `http://localhost:8300/department_service/fetchAllDepartmentByHeadCompany/${loginId}`
+//   );
+// }
+fetchAllDepartmentByHeadCompany(loginId: string) {
+  const [prefix, year, code] = loginId.split('/');
 
-    return this.http.get<any[]>(
-      `${this.departmentUrl}/fetchAllDepartmentByHeadCompany/${prefix}/${year}/${code}`,
-    );
-  }
-
+  return this.http.get(
+    `http://localhost:8300/department_service/fetchAllDepartmentByHeadCompany/${prefix}/${year}/${code}`
+  );
+}
   // ==============================
   // Save Departments
   // ==============================
@@ -233,10 +243,7 @@ export class CommonService {
   // GET ALL DEPARTMENT WITH COMPANY API
   private getAllDepartmentByCompnayUrl =
     'http://localhost:8300/department_service/fetchAllDepartmentByHeadCompany';
-  fetchAllDepartmentByCompany(headCompanyId: string): Observable<any> {
-    const url = `${this.getAllDepartmentByCompnayUrl}/${headCompanyId}`;
-    return this.http.get<any>(url);
-  }
+ 
 
   // GET SINGAL DEPARTMENT BY DEPARTMENT ID API
   private getSingleEmployeeByDepartmentUrl =
@@ -245,6 +252,7 @@ export class CommonService {
     const url = `${this.getSingleEmployeeByDepartmentUrl}/${departmentId}`;
     return this.http.get<any>(url);
   }
+
   // ================================
   // DESIGNATION APIs
   // ================================
@@ -467,11 +475,11 @@ fetchAllAssetMakeByLoginId(loginId: string): Observable<any> {
   }
 
   // ✅ fetch employee by loginId
- fetchAllEmployeeByLoginId(loginId: string): Observable<any> {
-  return this.http.get(
-    `${this.employeePrefix}/all/${loginId}`
-  );
-}
+//  fetchAllEmployeeByLoginId(loginId: string): Observable<any> {
+//   return this.http.get(
+//     `${this.employeePrefix}/all/${loginId}`
+//   );
+// }
 
   // ✅ fetch single employee
   fetchSingleEmployee(employeeId: string): Observable<any> {
@@ -547,7 +555,18 @@ fetchAllAssetMakeByLoginId(loginId: string): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.put<any>(this.putEmployeeApiUrl, formData, { headers });
   }
+// fetchAllDepartmentByCompany(loginId: string): Observable<any[]> {
+//   return this.http.get<any[]>(
+//     `http://localhost:8300/department_service/fetchAllDepartmentByHeadCompany/${loginId}`
+//   );
+// }
+fetchAllDepartmentByCompany(loginId: string): Observable<any[]> {
+  const [prefix, year, code] = loginId.split('/');
 
+  return this.http.get<any[]>(
+    `http://localhost:8300/department_service/fetchAllDepartmentByHeadCompany/${prefix}/${year}/${code}`
+  );
+}
   // GET ALL EMPLOYEE BY COMPANY API
   private getAllEmployeeByCompnayUrl =
     'http://localhost:8300/employee_service/fetchAllEmployeeByCompanywise';
@@ -664,11 +683,7 @@ fetchAllAssetMakeByLoginId(loginId: string): Observable<any> {
   }
 
   /* ===================== FETCH BY LOGIN ID ===================== */
-fetchAssetByLoginId(loginId: string): Observable<any[]> {
-  return this.http.get<any[]>(
-    `http://localhost:8300/asset_service/getAllAssetByLoginId/${loginId}`
-  );
-}
+
   /* ===================== FETCH SINGLE ===================== */
   fetchSingleAsset(assetId: string, loginId: string): Observable<any> {
     const [p1, y1, c1] = assetId.split('/');
@@ -678,7 +693,16 @@ fetchAssetByLoginId(loginId: string): Observable<any[]> {
       `${this.assetBaseUrl}/single/${p1}/${y1}/${c1}/${p2}/${y2}/${c2}`,
     );
   }
-
+//   fetchAllAssetAllocationsByCompany(loginId: string) {
+//   return this.http.get<any[]>(
+//     `http://localhost:8300/asset_allocation_service/all/${loginId}/dummy/dummy`
+//   );
+// }
+fetchAllAssetAllocationsByCompany(loginId: string) {
+  return this.http.get<any[]>(
+    `http://localhost:8300/asset_allocation_service/all/${loginId}`
+  );
+}
   /* ===================== UPDATE ===================== */
 updateAsset(assetId: string, data: any): Observable<any> {
   const [p1, y1, c1] = assetId.split('/');
@@ -751,7 +775,11 @@ updateAsset(assetId: string, data: any): Observable<any> {
     const url = `${this.getAllMyAssetByCompanyUrl}/${headCompanyId}`;
     return this.http.get<any>(url);
   }
-
+fetchAssetByLoginId(loginId: string): Observable<any[]> {
+  return this.http.get<any[]>(
+    `http://localhost:8300/asset_service/getAllAssetByLoginId/${loginId}`
+  );
+}
   // SAVE MY ASSET
   private saveMyAssetApiUrl = 'http://localhost:8300/my_asset_service/saveAll';
 
@@ -790,6 +818,7 @@ updateAsset(assetId: string, data: any): Observable<any> {
 
     return this.http.post(`${this.importMyAssetApi}/import`, form);
   }
+  
   // ================================
   // ================================
   // CALL LOGGING APIs
@@ -803,13 +832,11 @@ updateAsset(assetId: string, data: any): Observable<any> {
   }
 
   // FETCH CALL LOGGING BY LOGIN ID
-  fetchAllCallLoggingByLoginId(loginId: string): Observable<any> {
-    const [prefix, year, code] = loginId.split('/');
-
-    return this.http.get(
-      `${this.callLoggingBaseUrl}/getAllCallLoggingByLoginId/${prefix}/${year}/${code}`,
-    );
-  }
+ fetchAllCallLoggingByLoginId(loginId: string) {
+  return this.http.get<any[]>(
+    `http://localhost:8300/call_logging_service/getAllCallLoggingByLoginId/${loginId}`
+  );
+}
   // FETCH SINGLE CALL LOGGING
   fetchSingleCallLogging(callId: string, loginId: string): Observable<any> {
     const [p1, y1, c1] = callId.split('/');
@@ -824,21 +851,32 @@ updateAsset(assetId: string, data: any): Observable<any> {
   submitCallLogging(data: any[]): Observable<any> {
     return this.http.post(`${this.callLoggingBaseUrl}/saveAll`, data);
   }
+formatLoginId(loginId: string): string {
 
+  if (!loginId) return '';
+
+  // Already formatted असेल तर return
+  if (loginId.includes('/')) return loginId;
+
+  // Example: EMP002 → EMP/2026/002
+  const prefix = loginId.substring(0, 3); // EMP
+  const code = loginId.substring(3);      // 002
+
+  const year = new Date().getFullYear();
+
+  return `${prefix}/${year}/${code}`;
+}
   // UPDATE CALL LOGGING
-  updateCallLogging(
-    callId: string,
-    loginId: string,
-    data: any,
-  ): Observable<any> {
-    const [p1, y1, c1] = callId.split('/');
-    const [p2, y2, c2] = loginId.split('/');
+// ✅ UPDATE CALL LOGGING (FINAL FIX)
+updateCallLogging(callId: string, data: any) {
 
-    return this.http.put(
-      `${this.callLoggingBaseUrl}/update/${p1}/${y1}/${c1}/${p2}/${y2}/${c2}`,
-      data,
-    );
-  }
+  const [p1, y1, c1] = callId.split('/');
+
+  return this.http.put(
+    `${this.callLoggingBaseUrl}/update/${p1}/${y1}/${c1}`,
+    data
+  );
+}
 
   // DELETE MULTIPLE CALL LOGGING
   deleteMultipleCallLogging(ids: string[]): Observable<any> {
@@ -866,24 +904,19 @@ updateAsset(assetId: string, data: any): Observable<any> {
   // ================================
 
   // ✅ BASE URL (ONLY ONE USE THIS)
-  private assetAllocationBaseUrl = 'http://localhost:8300/asset-allocation';
+private assetAllocationBaseUrl = 'http://localhost:8300/asset_allocation_service';
   // ==============================
   // GET ALL BY LOGIN ID
   // ==============================
-  fetchAllAssetAllocationsByCompany(loginId: string): Observable<any> {
-    const [prefix, year, code] = loginId.split('/');
 
-    return this.http.get(
-      `${this.assetAllocationBaseUrl}/all/${prefix}/${year}/${code}`,
-    );
-  }
-  fetchMyAssetByLoginId(loginId: string): Observable<any> {
-    const [prefix, year, code] = loginId.split('/');
+fetchMyAssetByLoginId(loginId: string) {
 
-    return this.http.get(
-      `http://localhost:8300/asset-allocation/my-assets/${prefix}/${year}/${code}`,
-    );
-  }
+  const [prefix, year, code] = loginId.split('/');
+
+  return this.http.get(
+    `${this.assetAllocationBaseUrl}/my-assets/${prefix}/${year}/${code}`
+  );
+}
   // ==============================
   // GET ALL (Simple)
   // ==============================
@@ -918,19 +951,13 @@ updateAsset(assetId: string, data: any): Observable<any> {
   // ==============================
   // UPDATE
   // ==============================
-  updateAssetAllocation(
-    allocationId: string,
-    loginId: string,
-    data: any,
-  ): Observable<any> {
-    const [p1, y1, c1] = allocationId.split('/');
-    const [p2, y2, c2] = loginId.split('/');
+ updateAssetAllocation(allocationId: string, loginId: string, data: any) {
 
-    return this.http.put(
-      `${this.assetAllocationBaseUrl}/update/${p1}/${y1}/${c1}/${p2}/${y2}/${c2}`,
-      data,
-    );
-  }
+  return this.http.put(
+    `${this.assetAllocationBaseUrl}/update/${encodeURIComponent(allocationId)}/${encodeURIComponent(loginId)}`,
+    data
+  );
+}
 
   // ==============================
   // DELETE MULTIPLE
@@ -971,18 +998,16 @@ updateAsset(assetId: string, data: any): Observable<any> {
   //private spareEntryBaseUrl =
   //  'http://localhost:8300/spare_entry_service/spare-entry';
   private spareEntryBaseUrl =
-    'http://localhost:8300/spare_entry_service/spare-entry';
+  'http://localhost:8300/spare_entry_service';
   // ==============================
   // GET ALL BY LOGIN ID
 
   // ==============================
-  fetchAllSpareEntryByCompany(loginId: string): Observable<any> {
-    const [prefix, year, code] = loginId.split('/');
-
-    return this.http.get(
-      `${this.spareEntryBaseUrl}/all/${prefix}/${year}/${code}`,
-    );
-  }
+fetchAllSpareEntryByCompany(loginId: string) {
+  return this.http.get(
+    `${this.spareEntryBaseUrl}/getAllSpareEntryByLoginId/${loginId}`
+  );
+}
   // ==============================
   // GET SINGLE
   // ==============================
@@ -1047,118 +1072,49 @@ updateAsset(assetId: string, data: any): Observable<any> {
   // ================================
   // ASSET BOUGHT APIs ✅
   // ================================
-  private assetBoughtBaseUrl = 'http://localhost:8300/asset_bought_service';
 
-  // GET BY LOGIN ID
-  // ✅ ADD THIS METHOD
-  fetchAllAssetBoughtByLoginId(loginId: string): Observable<any> {
-    const [prefix, year, code] = loginId.split('/');
 
-    return this.http.get(
-      `http://localhost:8300/asset_bought_service/getAllAssetBoughtByLoginId/${prefix}/${year}/${code}`,
-    );
-  }
-  // DELETE MULTIPLE
-  deleteMultipleAssetBought(ids: string[]): Observable<any> {
-    return this.http.post(
-      `${this.assetBoughtBaseUrl}/delete-multiple-asset-bought`,
-      ids,
-    );
-  }
 
-  // SAVE
-  submitAssetBought(data: any[]): Observable<any> {
-    return this.http.post(`${this.assetBoughtBaseUrl}/saveAll`, data);
-  }
-
-  // UPDATE
-  updateAssetBought(
-    assetId: string,
-    loginId: string,
-    data: any,
-  ): Observable<any> {
-    const [p1, y1, c1] = assetId.split('/');
-    const [p2, y2, c2] = loginId.split('/');
-
-    return this.http.put(
-      `${this.assetBoughtBaseUrl}/update/${p1}/${y1}/${c1}/${p2}/${y2}/${c2}`,
-      data,
-    );
-  }
-
-  // ==============================
-  // IMPORT EXCEL
-  // ==============================
-  uploadAssetBoughtExcel(file: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file, file.name);
-
-    return this.http.post(`${this.assetBoughtBaseUrl}/import`, formData);
-  }
-
+  
   // ================================
   // ASSET REPLACEMENT APIs (FINAL)
   // ================================
 
-  private assetReplacementBaseUrl =
-    'http://localhost:8300/asset_replacement_service';
+ // ================= ASSET REPLACEMENT =================
 
-  // ==============================
-  // GET ALL BY LOGIN ID
-  // ==============================
-  fetchAllAssetReplacementByCompany(loginId: string): Observable<any> {
-    const [prefix, year, code] = loginId.split('/');
+private assetReplacementUrl = 'http://localhost:8300/asset_replacement_service/asset-replacement';
 
-    return this.http.get(
-      `${this.assetReplacementBaseUrl}/getAllAssetReplacementByLoginId/${prefix}/${year}/${code}`,
-    );
-  }
+// SAVE
+submitAssetReplacement(data: any[]): Observable<any> {
+  return this.http.post(`${this.assetReplacementUrl}/save`, data);
+}
 
-  // ==============================
-  // GET SINGLE
-  // ==============================
-  fetchSingleAssetReplacement(
-    replacementId: string,
-    loginId: string,
-  ): Observable<any> {
-    const [p1, y1, c1] = replacementId.split('/');
-    const [p2, y2, c2] = loginId.split('/');
+// GET ALL
+fetchAllAssetReplacementByCompany(loginId: string): Observable<any> {
+  return this.http.get(`${this.assetReplacementUrl}/all/${loginId}`);
+}
 
-    return this.http.get(
-      `${this.assetReplacementBaseUrl}/single/${p1}/${y1}/${c1}/${p2}/${y2}/${c2}`,
-    );
-  }
+// UPDATE
+updateAssetReplacement(replacementId: string, createdBy: string, data: any) {
 
-  // ==============================
-  // SAVE MULTIPLE
-  // ==============================
-  submitAssetReplacement(data: any[]): Observable<any> {
-    return this.http.post(`${this.assetReplacementBaseUrl}/saveAll`, data);
-  }
+  const [p1, y1, c1] = replacementId.split('/');
 
+  return this.http.put(
+    `http://localhost:8300/asset_replacement_service/asset-replacement/update/${p1}/${y1}/${c1}/${createdBy}`,
+    data
+  );
+}
   // ==============================
   // UPDATE
   // ==============================
-  updateAssetReplacement(
-    replacementId: string,
-    loginId: string,
-    data: any,
-  ): Observable<any> {
-    const [p1, y1, c1] = replacementId.split('/');
-    const [p2, y2, c2] = loginId.split('/');
-
-    return this.http.put(
-      `${this.assetReplacementBaseUrl}/update/${p1}/${y1}/${c1}/${p2}/${y2}/${c2}`,
-      data,
-    );
-  }
+ 
 
   // ==============================
   // DELETE MULTIPLE
   // ==============================
   deleteMultipleAssetReplacement(ids: string[]): Observable<any> {
     return this.http.post(
-      `${this.assetReplacementBaseUrl}/delete-multiple-assetReplacements`,
+      `${this.assetReplacementUrl}/delete-multiple-assetReplacements`,
       ids,
     );
   }
@@ -1170,75 +1126,70 @@ updateAsset(assetId: string, data: any): Observable<any> {
     const formData = new FormData();
     formData.append('file', file, file.name);
 
-    return this.http.post(`${this.assetReplacementBaseUrl}/import`, formData);
+    return this.http.post(`${this.assetReplacementUrl}/import`, formData);
   }
 
   // ================================
   // ASSET STATUS CHANGE APIs (FINAL)
   // ================================
 
-  private assetStatusChangeBaseUrl =
-    'http://localhost:8300/asset_status_change_service/asset-status-change';
+private assetStatusChangeBaseUrl =
+  'http://localhost:8300/asset_status_change_service';
 
-  // ==============================
-  // GET ALL BY LOGIN ID
-  // ==============================
-  fetchAllAssetStatusChangeByCompany(loginId: string): Observable<any> {
-    const [prefix, year, code] = loginId.split('/');
+// ==============================
+fetchAllAssetStatusChangeByLoginId(loginId: string): Observable<any[]> {
 
-    return this.http.get(
-      `${this.assetStatusChangeBaseUrl}/getAllAssetStatusChangeByLoginId/${prefix}/${year}/${code}`,
-    );
-  }
+  return this.http.get<any[]>(
+    `http://localhost:8300/asset_status_change_service/getAllAssetStatusChangeByLoginId/${loginId}`
+  );
+}
 
-  // ==============================
-  // GET SINGLE
-  // ==============================
-  fetchSingleAssetStatusChange(
-    statusChangeId: string,
-    loginId: string,
-  ): Observable<any> {
-    const [p1, y1, c1] = statusChangeId.split('/');
-    const [p2, y2, c2] = loginId.split('/');
+// ==============================
+// GET SINGLE
+// ==============================
+fetchSingleAssetStatusChange(
+  statusChangeId: string
+): Observable<any> {
 
-    return this.http.get(
-      `${this.assetStatusChangeBaseUrl}/single/${p1}/${y1}/${c1}/${p2}/${y2}/${c2}`,
-    );
-  }
+  const [p1, y1, c1] = statusChangeId.split('/');
 
-  // ==============================
-  // SAVE MULTIPLE
-  // ==============================
-  submitAssetStatusChange(data: any[]): Observable<any> {
-    return this.http.post(`${this.assetStatusChangeBaseUrl}/saveAll`, data);
-  }
+  return this.http.get(
+    `${this.assetStatusChangeBaseUrl}/single/${p1}/${y1}/${c1}`
+  );
+}
 
-  // ==============================
-  // UPDATE
-  // ==============================
-  updateAssetStatusChange(
-    statusChangeId: string,
-    loginId: string,
-    data: any,
-  ): Observable<any> {
-    const [p1, y1, c1] = statusChangeId.split('/');
-    const [p2, y2, c2] = loginId.split('/');
+// ==============================
+// SAVE MULTIPLE
+// ==============================
+submitAssetStatusChange(data: any[]): Observable<any> {
+  return this.http.post(
+    `${this.assetStatusChangeBaseUrl}/saveAll`,
+    data
+  );
+}
 
-    return this.http.put(
-      `${this.assetStatusChangeBaseUrl}/update/${p1}/${y1}/${c1}/${p2}/${y2}/${c2}`,
-      data,
-    );
-  }
+// ==============================
+// UPDATE
+// ==============================
+updateAssetStatusChange(id: string, data: any) {
 
-  // ==============================
-  // DELETE MULTIPLE
-  // ==============================
-  deleteMultipleAssetStatusChange(ids: string[]): Observable<any> {
-    return this.http.post(
-      `${this.assetStatusChangeBaseUrl}/delete-multiple`,
-      ids,
-    );
-  }
+  const [prefix, year, code] = id.split('/');
+
+  return this.http.put(
+    `http://localhost:8300/asset_status_change_service/update/${prefix}/${year}/${code}`,
+    data
+  );
+}
+
+// ==============================
+// DELETE MULTIPLE
+// ==============================
+deleteMultipleAssetStatusChange(ids: string[]) {
+  return this.http.post(
+    `http://localhost:8300/asset_status_change_service/delete-multiple`,
+    ids
+  );
+}
 
   // ==============================
   // IMPORT EXCEL
@@ -1261,37 +1212,10 @@ updateAsset(assetId: string, data: any): Observable<any> {
   // ASSET RETURN APIs (FINAL)
   // ================================
 
-  private assetReturnBaseUrl =
-    'http://localhost:8300/asset_returned_service/asset-return';
-  // GET ALL
-  fetchAllAssetReturnsByCompany(loginId: string): Observable<any> {
-    const [prefix, year, code] = loginId.split('/');
 
-    return this.http.get(
-      `${this.assetReturnBaseUrl}/all/${prefix}/${year}/${code}`,
-    );
-  }
+ 
 
-  // SAVE
-  submitAssetReturn(data: any[]): Observable<any> {
-    return this.http.post(`${this.assetReturnBaseUrl}/saveAll`, data);
-  }
 
-  // UPDATE
-  updateAssetReturn(id: string, loginId: string, data: any): Observable<any> {
-    const [p1, y1, c1] = id.split('/');
-    const [p2, y2, c2] = loginId.split('/');
-
-    return this.http.put(
-      `${this.assetReturnBaseUrl}/update/${p1}/${y1}/${c1}/${p2}/${y2}/${c2}`,
-      data,
-    );
-  }
-
-  // DELETE
-  deleteMultipleAssetReturns(ids: string[]): Observable<any> {
-    return this.http.post(`${this.assetReturnBaseUrl}/delete-multiple`, ids);
-  }
 
   /* ==========================================
    UPDATE
@@ -1303,16 +1227,92 @@ updateAsset(assetId: string, data: any): Observable<any> {
    IMPORT EXCEL (BULK UPLOAD)
 ========================================== */
 
+  // ================================
+  // GRAND USER APIs
+  // ================================
+private assetBoughtUrl = 'http://localhost:8300/asset_bought_service';
+
+// FETCH
+fetchAllAssetBoughtByLoginId(loginId: string) {
+  return this.http.get(
+    `http://localhost:8300/asset_bought_service/getAllAssetBoughtByLoginId/${loginId}`
+  );
+}
+// SAVE
+saveAllAssetBought(data: any[]) {
+  return this.http.post(`${this.assetBoughtUrl}/saveAll`, data);
+}
+
+// UPDATE
+updateAssetBought(purchaseId: string, data: any) {
+  const [p, y, c] = purchaseId.split('/');
+  return this.http.put(
+    `${this.assetBoughtUrl}/update/${p}/${y}/${c}`,
+    data
+  );
+}
+
+// DELETE MULTIPLE
+deleteMultipleAssetBought(ids: string[]) {
+  return this.http.post(
+    `${this.assetBoughtUrl}/delete-multiple`,
+    ids
+  );
+}
+// ==============================
+  // IMPORT EXCEL
+  // ==============================
+  uploadAssetBoughtExcel(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+
+    return this.http.post(`${this.assetBoughtUrl}/import`, formData);
+  }
+/* ================= ASSET RETURN ================= */
+
+private assetReturnBaseUrl = 'http://localhost:8300/asset_returned_service';
+
+/* FETCH ALL */
+fetchAllAssetReturnsByLoginId(loginId: string): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.assetReturnBaseUrl}/getAllAssetReturnByLoginId/${loginId}`
+  );
+}
+
+/* SAVE */
+submitAssetReturn(data: any[]): Observable<any> {
+  return this.http.post(
+    `${this.assetReturnBaseUrl}/saveAll`,
+    data
+  );
+}
+
+/* UPDATE */
+
+updateAssetReturn(returnId: string, loginId: string, data: any) {
+
+  const [p1, y1, c1] = returnId.split('/');
+
+  return this.http.put(
+    `http://localhost:8300/asset_returned_service/update/${p1}/${y1}/${c1}/${loginId}`,
+    data
+  );
+}
+
+/* DELETE */
+deleteMultipleAssetReturns(ids: string[]): Observable<any> {
+  return this.http.post(
+    `${this.assetReturnBaseUrl}/delete-multiple`,
+    ids
+  );
+}
+
   uploadAssetReturnExcel(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file, file.name);
 
     return this.http.post<any>(`${this.assetReturnBaseUrl}/import`, formData);
   }
-
-  // ================================
-  // GRAND USER APIs
-  // ================================
 
   // GET ALL GRAND USERS BY LOGIN ID
   private getAllGrandUserApiUrl = 'http://localhost:8300/grand-user/all';
@@ -1410,33 +1410,36 @@ updateAsset(assetId: string, data: any): Observable<any> {
       ids,
     );
   }
-  lockUser(empCode: string, reason: string) {
-    const token = this.authService.getToken();
+  private apiUrl = 'http://localhost:8300/api/users';
 
-    return this.http.put(
-      `http://localhost:8300/api/users/lock/${empCode}`,
-      reason,
-      {
-        headers: new HttpHeaders({
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'text/plain',
-        }),
-      },
-    );
-  }
-  unlockUser(empCode: string) {
-    //const token = localStorage.getItem('accessToken');
-    const token = this.authService.getToken();
-    return this.http.put(
-      `http://localhost:8300/api/users/unlock/${empCode}`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-  }
+updateUser(employeeCode: string, payload: any) {
+  const token = localStorage.getItem('token');
+
+  return this.http.put(
+    `${this.apiUrl}/update/${employeeCode}`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+}
+lockUser(employeeCode: string, reason: string) {
+  return this.http.put(
+    `http://localhost:8300/api/users/lock/${employeeCode}`,
+    { reason },
+    { headers: this.getAuthHeaders() } // 🔥 MUST
+  );
+}
+
+unlockUser(employeeCode: string) {
+  return this.http.put(
+    `http://localhost:8300/api/users/unlock/${employeeCode}`,
+    {},
+    { headers: this.getAuthHeaders() }
+  );
+}
   // GET ALL USER LOCKINGS BY LOGIN ID
   private getAllUserLockingApi = 'http://localhost:8300/user-locking/all';
 
@@ -1649,14 +1652,14 @@ updateAsset(assetId: string, data: any): Observable<any> {
 
   private userBaseUrl = 'http://localhost:8300/api/users';
   // 🔥 ADD THIS METHOD
-  private userApiUrl = 'http://localhost:8300/api/users';
 
-  //fetchAllUsers(): Observable<any> {
+  // fetchAllUsers(): Observable<any> {
   //  return this.http.get(`${this.userApiUrl}/all`);
-  //}
+  // }
   fetchAllUsers() {
     return this.http.get<any[]>('http://localhost:8300/api/users/all');
   }
+
   // ✅ Update User Status (Lock / Unlock)
   updateUserStatus(data: any): Observable<any> {
     return this.http.put(
@@ -1664,42 +1667,25 @@ updateAsset(assetId: string, data: any): Observable<any> {
       data,
     );
   }
-
-  // ✅ Get Single User by Employee Code
-  fetchUserByEmployeeCode(employeeCode: string): Observable<any> {
-    return this.http.get(`${this.userBaseUrl}/username/${employeeCode}`);
-  }
+fetchUserByEmployeeCode(employeeCode: string): Observable<any> {
+  return this.http.get(
+    `${this.userBaseUrl}/${employeeCode}`,
+    { headers: this.getAuthHeaders() }
+  );
+}
   fetchUserLockingData() {
     return this.http.get('http://localhost:8300/fetch-all-user');
   }
-changePassword(data: any) {
-  const token = localStorage.getItem('token'); // 🔥 IMPORTANT FIX
-
-  const headers = new HttpHeaders({
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  });
+changePassword(payload: any) {
+  const headers = this.getAuthHeaders();
 
   return this.http.post(
     'http://localhost:8300/api/users/change-password',
-    data,
-    { headers },
+    payload,
+    { headers }
   );
 }
-  updateUser(prefix: string, year: string, code: string, data: any) {
-    //const token = localStorage.getItem('token');
-    const token = this.authService.getToken();
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    });
 
-    return this.http.put(
-      `http://localhost:8300/api/users/update/${prefix}/${year}/${code}`,
-      data,
-      { headers },
-    );
-  }
   // 🔥 USER LOCKING FETCH API
   private userLockingApi = 'http://localhost:8300/user_locking_service';
 

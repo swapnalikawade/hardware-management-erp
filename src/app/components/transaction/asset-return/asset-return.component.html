@@ -111,365 +111,199 @@
       <!-- Table -->
       <div class="table-wrapper">
         <table>
-          <thead>
-            <tr>
-              <th>
-                <input type="checkbox" (change)="toggleAll($event)" />
-              </th>
+         <thead>
+  <tr>
+    <th><input type="checkbox" (change)="toggleAll($event)" /></th>
 
-              <th>
-                Return ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetreturnEntryId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetreturnEntryId', 'desc')"
-                ></i>
-              </th>
+    <!-- PRIMARY -->
+    <th>
+      Return ID
+      <i (click)="sortTable('returnId','asc')"></i>
+      <i (click)="sortTable('returnId','desc')"></i>
+    </th>
 
-              <th>
-                Return Date
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetreturnDate', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetreturnDate', 'desc')"
-                ></i>
-              </th>
+    
 
-              <th>
-                Return Type
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetreturnType', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetreturnType', 'desc')"
-                ></i>
-              </th>
+    <!-- REFERENCES -->
+    <th>
+      Allocation ID
+      <i (click)="sortTable('allocationId','asc')"></i>
+      <i (click)="sortTable('allocationId','desc')"></i>
+    </th>
 
-              <th>
-                Return Status
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetreturnStatus', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetreturnStatus', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Employee ID
+      <i (click)="sortTable('employeeId','asc')"></i>
+      <i (click)="sortTable('employeeId','desc')"></i>
+    </th>
 
-              <!-- Allocation -->
-              <th>
-                Allocation ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('allocationId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('allocationId', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Department ID
+      <i (click)="sortTable('departmentId','asc')"></i>
+      <i (click)="sortTable('departmentId','desc')"></i>
+    </th>
 
-              <th>
-                Allocation Date
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('allocationDate', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('allocationDate', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Location
+      <i (click)="sortTable('location','asc')"></i>
+      <i (click)="sortTable('location','desc')"></i>
+    </th>
 
-              <th>
-                Location
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('allocationLocation', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('allocationLocation', 'desc')"
-                ></i>
-              </th>
+    <!-- ASSET -->
+    <th>
+      Asset ID
+      <i (click)="sortTable('assetId','asc')"></i>
+      <i (click)="sortTable('assetId','desc')"></i>
+    </th>
 
-              <!-- Asset -->
-              <th>
-                Asset ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetId', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Serial Number
+      <i (click)="sortTable('assetSerialNumber','asc')"></i>
+      <i (click)="sortTable('assetSerialNumber','desc')"></i>
+    </th>
 
-              <th>
-                Asset Name
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetName', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetName', 'desc')"
-                ></i>
-              </th>
+    <!-- DATES -->
+    <th>
+      Expected Date
+      <i (click)="sortTable('expectedReturnDate','asc')"></i>
+      <i (click)="sortTable('expectedReturnDate','desc')"></i>
+    </th>
 
-              <th>
-                Asset Type
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetType', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetType', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Actual Date
+      <i (click)="sortTable('actualReturnDate','asc')"></i>
+      <i (click)="sortTable('actualReturnDate','desc')"></i>
+    </th>
 
-              <th>
-                Make
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetMake', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetMake', 'desc')"
-                ></i>
-              </th>
+    <!-- CONDITION -->
+    <th>
+      Condition
+      <i (click)="sortTable('conditionAtReturn','asc')"></i>
+      <i (click)="sortTable('conditionAtReturn','desc')"></i>
+    </th>
 
-              <th>
-                Model
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetModel', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetModel', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Damage Details
+      <i (click)="sortTable('damageDetails','asc')"></i>
+      <i (click)="sortTable('damageDetails','desc')"></i>
+    </th>
 
-              <th>
-                Serial Number
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('serialNumber', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('serialNumber', 'desc')"
-                ></i>
-              </th>
+    <!-- PENALTY -->
+    <th>
+      Penalty
+      <i (click)="sortTable('penaltyApplicable','asc')"></i>
+      <i (click)="sortTable('penaltyApplicable','desc')"></i>
+    </th>
 
-              <!-- Returned -->
-              <th>
-                Returned By
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('returnedBy', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('returnedBy', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Amount
+      <i (click)="sortTable('penaltyAmount','asc')"></i>
+      <i (click)="sortTable('penaltyAmount','desc')"></i>
+    </th>
 
-              <th>
-                Department
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('department', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('department', 'desc')"
-                ></i>
-              </th>
+    <!-- VERIFICATION -->
+    <th>
+      Verified By
+      <i (click)="sortTable('verifiedBy','asc')"></i>
+      <i (click)="sortTable('verifiedBy','desc')"></i>
+    </th>
 
-              <!-- Inspection -->
-              <th>
-                Inspection Date
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('inspectionDate', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('inspectionDate', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Verification Date
+      <i (click)="sortTable('verificationDate','asc')"></i>
+      <i (click)="sortTable('verificationDate','desc')"></i>
+    </th>
 
-              <th>
-                Condition
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetConditionOnReturn', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetConditionOnReturn', 'desc')"
-                ></i>
-              </th>
+    <!-- STATUS -->
+    <th>
+      Status
+      <i (click)="sortTable('returnStatus','asc')"></i>
+      <i (click)="sortTable('returnStatus','desc')"></i>
+    </th>
 
-              <th>
-                Working Status
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('workingStatus', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('workingStatus', 'desc')"
-                ></i>
-              </th>
+    <!-- AUDIT -->
+    <th>
+      Created Date
+      <i (click)="sortTable('createdDate','asc')"></i>
+      <i (click)="sortTable('createdDate','desc')"></i>
+    </th>
 
-              <th>
-                AMC Status
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('amcStatus', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('amcStatus', 'desc')"
-                ></i>
-              </th>
+    <th>Action</th>
+  </tr>
+</thead>
 
-              <th>
-                Store Location
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('storeLocation', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('storeLocation', 'desc')"
-                ></i>
-              </th>
+        <tbody>
+  <tr
+    *ngFor="
+      let row of filteredData
+        | slice:(currentPage - 1) * itemsPerPage:(currentPage * itemsPerPage);
+      let i = index
+    "
+  >
+    <!-- Select -->
+    <td>
+      <input
+        type="checkbox"
+        [checked]="selectedRows.includes(row)"
+        (change)="toggleRowSelection(row, $event)"
+      />
+    </td>
 
-              <th>
-                Created Date
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('createdDate', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('createdDate', 'desc')"
-                ></i>
-              </th>
+    <!-- PRIMARY -->
+    <td>{{ row.returnId }}</td>
 
-              <th>
-                Status
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('status', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('status', 'desc')"
-                ></i>
-              </th>
+    <!-- REFERENCES -->
+    <td>{{ row.allocationId }}</td>
+    <td>{{ row.employeeId }}</td>
+    <td>{{ row.departmentId }}</td>
+    <td>{{ row.location }}</td>
 
-              <th>Action</th>
-            </tr>
-          </thead>
+    <!-- ASSET -->
+    <td>{{ row.assetId }}</td>
+    <td>{{ row.assetSerialNumber }}</td>
 
-          <tbody>
-            <tr
-              *ngFor="
-                let row of filteredData
-                  | slice
-                    : (currentPage - 1) * itemsPerPage
-                    : currentPage * itemsPerPage;
-                let i = index
-              "
-            >
-              <!-- Select -->
-            <td>
-  <input
-    type="checkbox"
-    [checked]="selectedRows.includes(row)"
-    (change)="toggleRowSelection(row, $event)"
-  />
-</td>
+    <!-- DATES -->
+    <td>{{ row.expectedReturnDate }}</td>
+    <td>{{ row.actualReturnDate }}</td>
 
-              <!-- Return -->
-              <td>{{ row.assetreturnEntryId }}</td>
-              <td>{{ row.assetreturnDate }}</td>
-              <td>{{ row.assetreturnType }}</td>
-              <td>{{ row.assetreturnStatus }}</td>
+    <!-- CONDITION -->
+    <td>{{ row.conditionAtReturn }}</td>
+    <td>{{ row.damageDetails }}</td>
 
-              <!-- Allocation -->
-              <td>{{ row.allocationId }}</td>
-              <td>{{ row.allocationDate }}</td>
-              <td>{{ row.allocationLocation }}</td>
+    <!-- PENALTY -->
+    <td>{{ row.penaltyApplicable }}</td>
+    <td>{{ row.penaltyAmount }}</td>
 
-              <!-- Asset -->
-              <td>{{ row.assetId }}</td>
-              <td>{{ row.assetName }}</td>
-              <td>{{ row.assetType }}</td>
-              <td>{{ row.assetMake }}</td>
-              <td>{{ row.assetModel }}</td>
-              <td>{{ row.serialNumber }}</td>
+    <!-- VERIFICATION -->
+    <td>{{ row.verifiedBy }}</td>
+    <td>{{ row.verificationDate }}</td>
 
-              <!-- Returned -->
-              <td>{{ row.returnedBy }}</td>
-              <td>{{ row.department }}</td>
+    <!-- STATUS -->
+    <td>
+      <span
+        [ngClass]="{
+          'status-active': row.returnStatus === 'Active',
+          'status-inactive': row.returnStatus !== 'Active'
+        }"
+      >
+        <span *ngIf="row.returnStatus === 'Active'">✔</span>
+        <span *ngIf="row.returnStatus !== 'Active'">❌</span>
+        {{ row.returnStatus }}
+      </span>
+    </td>
 
-              <!-- Inspection -->
-              <td>{{ row.inspectionDate }}</td>
-              <td>{{ row.assetConditionOnReturn }}</td>
-              <td>{{ row.workingStatus }}</td>
+    <!-- AUDIT -->
+    <td>{{ row.createdDate }}</td>
 
-              <!-- AMC -->
-              <td>
-                {{ row.amcStatus }}
-              </td>
-
-              <!-- Store -->
-              <td>{{ row.storeLocation }}</td>
-
-              <!-- Created -->
-              <td>{{ row.createdDate }}</td>
-
-              <!-- Status -->
-              <td>
-                <span
-                  [ngClass]="{
-                    'status-active': row.status === 'Active',
-                    'status-inactive': row.status !== 'Active',
-                  }"
-                >
-                  <span *ngIf="row.status === 'Active'">✔</span>
-                  <span *ngIf="row.status !== 'Active'">❌</span>
-                  {{ row.status }}
-                </span>
-              </td>
-
-              <!-- Action -->
-              <td class="text-center">
-                <button class="btn btn-sm btn-primary" (click)="onEdit(row, i)">
-                  <i class="bi bi-pencil-square me-1"></i>
-                  Edit
-                </button>
-              </td>
-            </tr>
-          </tbody>
+    <!-- ACTION -->
+    <td class="text-center">
+      <button class="btn btn-sm btn-primary" (click)="onEdit(row, i)">
+        <i class="bi bi-pencil-square me-1"></i>
+        Edit
+      </button>
+    </td>
+  </tr>
+</tbody>
         </table>
       </div>
       <div class="no-data-message" *ngIf="filteredData.length === 0">
@@ -537,7 +371,7 @@
             {{
               isEditMode
                 ? "Update Assets return Details (ID: " +
-                  tableData[editIndex!].assetreturnEntryId +
+                  tableData[editIndex!].returnId +
                   ")"
                 : "Add  Assets return  Details " + (i + 1)
             }}
@@ -553,296 +387,226 @@
         </div>
 
         <!-- FORM -->
-        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
-          <div class="row mb-3">
-            <!-- Hidden ID -->
-            <input
-              type="hidden"
-              [(ngModel)]="form.newRecord.assetreturnEntryId"
-              name="assetreturnEntryId{{ i }}"
-            />
+       <form #recordForm="ngForm" class="container-fluid p-0">
+  <div class="row">
 
-            <!-- Asset ID -->
-            <input
-              type="hidden"
-              [(ngModel)]="form.newRecord.assetId"
-              name="assetId{{ i }}"
-            />
+    <!-- RETURN ID (HIDDEN) -->
+    <input type="hidden" [(ngModel)]="form.newRecord.returnId" name="returnId{{i}}" />
 
-            <!-- Department -->
-            <div class="col-md-4">
-              <label class="form-label">Department *</label>
+    <!-- RETURN NUMBER -->
+    <div class="col-md-4">
+      <label>Return Number *</label>
+      <input type="text" class="form-control"
+        [(ngModel)]="form.newRecord.returnNumber"
+        name="returnNumber{{i}}"
+        placeholder="Enter Return Number"
+        required #returnNumber="ngModel">
+      <small class="text-danger" *ngIf="returnNumber.invalid && returnNumber.touched">
+        Required
+      </small>
+    </div>
+   <!-- ASSET -->
+    <div class="col-md-4">
+      <label>Asset *</label>
+      <select class="form-control"
+        [(ngModel)]="form.newRecord.assetId"
+        name="assetId{{i}}"
+        (change)="onAssetChange(i)"
+        required>
+        <option value="">Select Asset</option>
+        <option *ngFor="let a of assetList" [value]="a.assetId">
+          {{ a.assetName }}
+        </option>
+      </select>
+    </div>
 
-              <select
-                class="form-control"
-                [(ngModel)]="form.newRecord.department"
-                name="department{{ i }}"
-                required
-                #department="ngModel"
-              >
-                <option value="">-- Select Department --</option>
-                <!-- Department -->
-                <option
-                  *ngFor="let dept of departments"
-                  [value]="dept.departmentName"
-                >
-                  {{ dept.departmentName }}
-                </option>
-              </select>
+    <!-- EMPLOYEE -->
+  <div class="col-md-4">
+  <label>Employee *</label>
+  <select class="form-select"
+    [(ngModel)]="form.newRecord.employeeId"
+    name="employeeId{{i}}"
+     (change)="onEmployeeChange(i)"   
+    required #emp="ngModel">
 
-              <div
-                *ngIf="department.invalid && department.touched"
-                class="text-danger"
-              >
-                Department is required
-              </div>
-            </div>
+    <option value="">Select Employee</option>
 
-            <div class="col-md-4">
-              <label class="form-label">Asset *</label>
+    <option *ngFor="let emp of employees" [value]="emp.employeeId">
+      {{ emp.employeeName }} ({{ emp.employeeId }})
+    </option>
 
-              <select
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetId"
-                name="assetId{{ i }}"
-                (change)="onAssetChange(i)"
-                required
-              >
-                <option value="">-- Select Asset --</option>
+  </select>
 
-                <option *ngFor="let asset of assetList" [value]="asset.assetId">
-                  {{ asset.assetName }}
-                </option>
-              </select>
-            </div>
+  <small *ngIf="emp.invalid && emp.touched" class="text-danger">
+    Employee required
+  </small>
+</div>
 
-            <!-- Asset Type -->
-            <div class="col-md-4">
-              <label class="form-label">Asset Type *</label>
-              <select
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetType"
-                name="assetType{{ i }}"
-                required
-              >
-                <option value="">Select</option>
-                <!-- Asset Type -->
-                <option *ngFor="let type of assetTypes" [value]="type.typeName">
-                  {{ type.typeName }}
-                </option>
-              </select>
-            </div>
+    <!-- DEPARTMENT -->
+   <div class="col-md-4">
+  <label>Department *</label>
+  <select class="form-select"
+    [(ngModel)]="form.newRecord.departmentId"
+    name="departmentId{{i}}"
+    required #dept="ngModel">
 
-            <!-- Serial Number -->
-            <div class="col-md-4">
-              <label class="form-label">Serial Number *</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.serialNumber"
-                name="serialNumber{{ i }}"
-                required
-              />
-            </div>
-            <!-- Allocation ID -->
-            <div class="col-md-4">
-              <label class="form-label">Allocation ID</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.allocationId"
-                name="allocationId{{ i }}"
-              />
-            </div>
-            <!-- Location -->
-            <div class="col-md-4">
-              <label class="form-label">Location</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.allocationLocation"
-                name="allocationLocation{{ i }}"
-              />
-            </div>
-            <!-- Asset Make -->
-            <div class="col-md-4">
-              <label class="form-label">Make</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetMake"
-                name="assetMake{{ i }}"
-              />
-            </div>
-            <!-- Asset Model -->
-            <div class="col-md-4">
-              <label class="form-label">Model</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetModel"
-                name="assetModel{{ i }}"
-              />
-            </div>
-            <!-- Returned By -->
-            <div class="col-md-4">
-              <label class="form-label">Returned By *</label>
-              <select
-                class="form-control"
-                [(ngModel)]="form.newRecord.returnedBy"
-                name="returnedBy{{ i }}"
-                required
-              >
-                <option value="">Select</option>
-                <option value="Employee">Employee</option>
-                <option value="Client">Client</option>
-              </select>
-            </div>
+    <option value="">Select Department</option>
 
-            <!-- Condition -->
-            <div class="col-md-4">
-              <label class="form-label">Condition *</label>
-              <select
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetConditionOnReturn"
-                name="assetConditionOnReturn{{ i }}"
-                required
-              >
-                <option value="">Select</option>
-                <option value="Good">Good</option>
-                <option value="Damaged">Damaged</option>
-                <option value="Broken">Broken</option>
-              </select>
-            </div>
+    <option *ngFor="let d of departments" [value]="d.departmentId">
+      {{ d.departmentName }}
+    </option>
 
-            <!-- Working Status -->
-            <div class="col-md-4">
-              <label class="form-label">Working Status *</label>
-              <select
-                class="form-control"
-                [(ngModel)]="form.newRecord.workingStatus"
-                name="workingStatus{{ i }}"
-                required
-              >
-                <option value="">Select</option>
-                <option value="Working">Working</option>
-                <option value="Not Working">Not Working</option>
-              </select>
-            </div>
+  </select>
 
-            <!-- Inspection Date -->
-            <div class="col-md-4">
-              <label class="form-label">Inspection Date</label>
-              <input
-                type="date"
-                class="form-control"
-                [(ngModel)]="form.newRecord.inspectionDate"
-                name="inspectionDate{{ i }}"
-              />
-            </div>
+  <small *ngIf="dept.invalid && dept.touched" class="text-danger">
+    Department required
+  </small>
+</div>
 
-            <!-- AMC Status -->
-            <div class="col-md-4">
-              <label class="form-label">AMC Status *</label>
-              <select
-                class="form-control"
-                [(ngModel)]="form.newRecord.amcStatus"
-                name="amcStatus{{ i }}"
-                required
-              >
-                <option value="">Select</option>
-                <option value="Under AMC">Under AMC</option>
-                <option value="AMC Closed">AMC Closed</option>
-                <option value="Out of AMC">Out of AMC</option>
-              </select>
-            </div>
+    <!-- LOCATION -->
+    <div class="col-md-4">
+      <label>location *</label>
+     <input type="text" class="form-control"
+  [(ngModel)]="form.newRecord.location"
+  name="location{{i}}"
+  placeholder="Enter Location (e.g. Pune Office)"
+  required #loc="ngModel">
 
-            <!-- Store Location -->
-            <div class="col-md-4">
-              <label class="form-label">Store Location *</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.storeLocation"
-                name="storeLocation{{ i }}"
-                required
-              />
-            </div>
+<small *ngIf="loc.invalid && loc.touched" class="text-danger">
+  Location required
+</small>
+    </div>
 
-            <!-- Return Date -->
-            <div class="col-md-4">
-              <label class="form-label">Return Date *</label>
-              <input
-                type="date"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetreturnDate"
-                name="assetreturnDate{{ i }}"
-                required
-              />
-            </div>
+ 
+    <!-- SERIAL NUMBER (AUTO) -->
+    <div class="col-md-4">
+      <label>Serial Number</label>
+      <input type="text" class="form-control"
+        [(ngModel)]="form.newRecord.assetSerialNumber"
+        name="serial{{i}}"
+        readonly>
+    </div>
 
-            <!-- Return Type -->
-            <div class="col-md-4">
-              <label class="form-label">Return Type</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetreturnType"
-                name="assetreturnType{{ i }}"
-                readonly
-              />
-            </div>
+    <!-- EXPECTED DATE -->
+    <div class="col-md-4">
+      <label>Expected Return Date *</label>
+      <input type="date" class="form-control"
+        [(ngModel)]="form.newRecord.expectedReturnDate"
+        name="expectedDate{{i}}"
+        required>
+    </div>
 
-            <!-- Return Status -->
-            <div class="col-md-4">
-              <label class="form-label">Return Status *</label>
-              <select
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetreturnStatus"
-                name="assetreturnStatus{{ i }}"
-                required
-              >
-                <option value="">Select</option>
-                <option value="Returned">Returned</option>
-                <option value="Inspected">Inspected</option>
-                <option value="Closed">Closed</option>
-              </select>
-            </div>
+    <!-- ACTUAL DATE -->
+    <div class="col-md-4">
+      <label>Actual Return Date *</label>
+      <input type="date" class="form-control"
+        [(ngModel)]="form.newRecord.actualReturnDate"
+        name="actualDate{{i}}"
+        required>
+    </div>
 
-            <!-- Status -->
-            <div class="col-md-4">
-              <label class="form-label">Record Status</label>
-              <select
-                class="form-control"
-                [(ngModel)]="form.newRecord.status"
-                name="status{{ i }}"
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
+    <!-- CONDITION -->
+    <div class="col-md-4">
+      <label>Condition *</label>
+      <select class="form-control"
+        [(ngModel)]="form.newRecord.conditionAtReturn"
+        name="condition{{i}}"
+        required>
+        <option value="">Select</option>
+        <option>Good</option>
+        <option>Damaged</option>
+        <option>Broken</option>
+      </select>
+    </div>
 
-            <!-- Created Date -->
-            <div class="col-md-4">
-              <label class="form-label">Created Date</label>
-              <input
-                type="date"
-                class="form-control"
-                [(ngModel)]="form.newRecord.createdDate"
-                name="createdDate{{ i }}"
-                readonly
-              />
-            </div>
-          </div>
+    <!-- DAMAGE -->
+    <div class="col-md-4">
+      <label>Damage Details</label>
+      <input type="text" class="form-control"
+        [(ngModel)]="form.newRecord.damageDetails"
+        name="damage{{i}}"
+        placeholder="Enter damage details">
+    </div>
 
-          <!-- Buttons -->
-          <div
-            class="mt-3 d-flex gap-2 justify-content-end"
+    <!-- PENALTY -->
+    <div class="col-md-4">
+     <select class="form-select"
+  [(ngModel)]="form.newRecord.penaltyApplicable"
+  name="penalty{{i}}"
+  required>
+
+  <option value="">Select</option>
+  <option>Yes</option>
+  <option>No</option>
+</select>
+    </div>
+
+    <!-- PENALTY AMOUNT -->
+    <div class="col-md-4">
+      <label>Penalty Amount</label>
+      <input type="number" class="form-control"
+  [(ngModel)]="form.newRecord.penaltyAmount"
+  name="penaltyAmt{{i}}"
+  placeholder="Enter Amount"
+  [required]="form.newRecord.penaltyApplicable === 'Yes'">
+
+<small class="text-danger"
+  *ngIf="form.newRecord.penaltyApplicable === 'Yes' && !form.newRecord.penaltyAmount">
+  Amount required when penalty = Yes
+</small>
+    </div>
+
+    <!-- VERIFIED BY -->
+    <div class="col-md-4">
+      <label>Verified By</label>
+      <input type="text" class="form-control"
+        [(ngModel)]="form.newRecord.verifiedBy"
+        name="verifiedBy{{i}}">
+    </div>
+
+    <!-- STATUS -->
+    <div class="col-md-4">
+      <label>Status *</label>
+     <select class="form-select"
+  [(ngModel)]="form.newRecord.returnStatus"
+  name="status{{i}}"
+  required>
+
+  <option value="">Select Status</option>
+  <option value="Active"> Active</option>
+  <option value="Inactive"> Inactive</option>
+</select>
+    </div>
+
+    <!-- CREATED BY (AUTO) -->
+    <div class="col-md-4">
+      <label>Created By</label>
+      <input type="text" class="form-control"
+        [(ngModel)]="form.newRecord.createdBy"
+        [value]="loginId"
+        name="createdBy{{i}}"
+        readonly>
+    </div>
+
+    <!-- CREATED DATE -->
+    <div class="col-md-4">
+      <label>Created Date</label>
+      <input type="date" class="form-control"
+        [(ngModel)]="form.newRecord.createdDate"
+        name="createdDate{{i}}"
+        readonly>
+    </div>
+
+  </div>
+
+  <!-- BUTTONS -->
+ <div
             *ngIf="i === forms.length - 1"
+            class="mt-3 d-flex gap-2 justify-content-end"
           >
             <button type="button" class="btn-save" (click)="saveAllRecords()">
-              <i class="bi bi-floppy-fill"></i>
-              {{ isEditMode ? "Update" : "Save All" }}
+              <i class="bi bi-floppy"></i>
+              {{ isEditMode ? "Update" : "Save" }}
             </button>
 
             <button
@@ -850,10 +614,12 @@
               class="btn-cancel"
               (click)="cancelRecord(recordForm)"
             >
-              <i class="bi bi-arrow-counterclockwise"></i> Reset
+              <i class="bi bi-arrow-counterclockwise"></i>
+              Reset
             </button>
           </div>
-        </form>
+
+</form>
       </div>
     </div>
 
@@ -1181,136 +947,151 @@
 </div>
 
 <!-- Asset Return VIEW MODAL -->
+<!-- Asset Return VIEW MODAL -->
 <div class="modal" [class.show]="showViewModal">
   <div class="modal-content">
     <div class="modal-header">
-      <h5>Asset Return Details (ID: {{ selectedRow?.assetreturnEntryId }})</h5>
+      <h5>Asset Return Details (ID: {{ selectedRow?.returnId }})</h5>
       <button class="close-btn1" (click)="closeViewModal()">×</button>
     </div>
 
     <div class="modal-body">
       <table class="popup-table">
-        <!-- ================= RETURN DETAILS ================= -->
+
+        <!-- ================= PRIMARY ================= -->
         <tr>
-          <th>Asset Return ID</th>
-          <td>{{ selectedRow?.assetreturnEntryId }}</td>
+          <th>Return ID</th>
+          <td>{{ selectedRow?.returnId }}</td>
         </tr>
 
         <tr>
-          <th>Return Date</th>
-          <td>{{ selectedRow?.assetreturnDate }}</td>
+          <th>Return Number</th>
+          <td>{{ selectedRow?.returnNumber }}</td>
         </tr>
 
-        <tr>
-          <th>Return Type</th>
-          <td>{{ selectedRow?.assetreturnType }}</td>
-        </tr>
-
-        <tr>
-          <th>Return Status</th>
-          <td>{{ selectedRow?.assetreturnStatus }}</td>
-        </tr>
-
-        <!-- ================= ALLOCATION ================= -->
+        <!-- ================= REFERENCES ================= -->
         <tr>
           <th>Allocation ID</th>
           <td>{{ selectedRow?.allocationId }}</td>
         </tr>
 
         <tr>
-          <th>Allocation Date</th>
-          <td>{{ selectedRow?.allocationDate }}</td>
+          <th>Employee ID</th>
+          <td>{{ selectedRow?.employeeId }}</td>
+        </tr>
+
+        <tr>
+          <th>Department ID</th>
+          <td>{{ selectedRow?.departmentId }}</td>
         </tr>
 
         <tr>
           <th>Location</th>
-          <td>{{ selectedRow?.allocationLocation }}</td>
+          <td>{{ selectedRow?.location }}</td>
         </tr>
 
-        <!-- ================= ASSET DETAILS ================= -->
+        <!-- ================= ASSET ================= -->
         <tr>
           <th>Asset ID</th>
           <td>{{ selectedRow?.assetId }}</td>
         </tr>
 
         <tr>
-          <th>Asset Name</th>
-          <td>{{ selectedRow?.assetName }}</td>
-        </tr>
-
-        <tr>
-          <th>Asset Type</th>
-          <td>{{ selectedRow?.assetType }}</td>
-        </tr>
-
-        <tr>
-          <th>Make</th>
-          <td>{{ selectedRow?.assetMake }}</td>
-        </tr>
-
-        <tr>
-          <th>Model</th>
-          <td>{{ selectedRow?.assetModel }}</td>
-        </tr>
-
-        <tr>
           <th>Serial Number</th>
-          <td>{{ selectedRow?.serialNumber }}</td>
+          <td>{{ selectedRow?.assetSerialNumber }}</td>
         </tr>
 
-        <!-- ================= RETURNED BY ================= -->
+        <!-- ================= DATES ================= -->
         <tr>
-          <th>Returned By</th>
-          <td>{{ selectedRow?.returnedBy }}</td>
-        </tr>
-
-        <tr>
-          <th>Department</th>
-          <td>{{ selectedRow?.department }}</td>
-        </tr>
-
-        <!-- ================= INSPECTION ================= -->
-        <tr>
-          <th>Inspection Date</th>
-          <td>{{ selectedRow?.inspectionDate }}</td>
+          <th>Expected Return Date</th>
+          <td>{{ selectedRow?.expectedReturnDate }}</td>
         </tr>
 
         <tr>
-          <th>Condition On Return</th>
-          <td>{{ selectedRow?.assetConditionOnReturn }}</td>
+          <th>Actual Return Date</th>
+          <td>{{ selectedRow?.actualReturnDate }}</td>
+        </tr>
+
+        <!-- ================= CONDITION ================= -->
+        <tr>
+          <th>Condition</th>
+          <td>{{ selectedRow?.conditionAtReturn }}</td>
         </tr>
 
         <tr>
-          <th>Working Status</th>
-          <td>{{ selectedRow?.workingStatus }}</td>
+          <th>Damage Details</th>
+          <td>{{ selectedRow?.damageDetails }}</td>
         </tr>
 
-        <!-- ================= AMC ================= -->
+        <!-- ================= PENALTY ================= -->
         <tr>
-          <th>AMC Status</th>
-          <td>{{ selectedRow?.amcStatus }}</td>
-        </tr>
-
-        <tr>
-          <th>Store Location</th>
-          <td>{{ selectedRow?.storeLocation }}</td>
-        </tr>
-
-        <!-- ================= SYSTEM ================= -->
-        <tr>
-          <th>Record Status</th>
-          <td>{{ selectedRow?.status }}</td>
+          <th>Penalty Applicable</th>
+          <td>{{ selectedRow?.penaltyApplicable }}</td>
         </tr>
 
         <tr>
-          <th>Login ID</th>
-          <td>{{ selectedRow?.loginId }}</td>
+          <th>Penalty Amount</th>
+          <td>{{ selectedRow?.penaltyAmount }}</td>
+        </tr>
+
+        <tr>
+          <th>Reason</th>
+          <td>{{ selectedRow?.reasonForPenalty }}</td>
+        </tr>
+
+        <!-- ================= VERIFICATION ================= -->
+        <tr>
+          <th>Verified By</th>
+          <td>{{ selectedRow?.verifiedBy }}</td>
+        </tr>
+
+        <tr>
+          <th>Verification Date</th>
+          <td>{{ selectedRow?.verificationDate }}</td>
+        </tr>
+
+        <!-- ================= STATUS ================= -->
+        <tr>
+          <th>Status</th>
+          <td>
+            <span
+              [ngClass]="{
+                'status-active': selectedRow?.returnStatus === 'Active',
+                'status-inactive': selectedRow?.returnStatus !== 'Active'
+              }"
+            >
+              {{ selectedRow?.returnStatus }}
+            </span>
+          </td>
+        </tr>
+
+        <!-- ================= REMARKS ================= -->
+        <tr>
+          <th>Remarks</th>
+          <td>{{ selectedRow?.remarks }}</td>
+        </tr>
+
+        <!-- ================= AUDIT ================= -->
+        <tr>
+          <th>Created By</th>
+          <td>{{ selectedRow?.createdBy }}</td>
         </tr>
 
         <tr>
           <th>Created Date</th>
           <td>{{ selectedRow?.createdDate }}</td>
         </tr>
+
+        <tr>
+          <th>Updated By</th>
+          <td>{{ selectedRow?.updatedBy }}</td>
+        </tr>
+
+        <tr>
+          <th>Updated Date</th>
+          <td>{{ selectedRow?.updatedDate }}</td>
+        </tr>
+
       </table>
     </div>
   </div>

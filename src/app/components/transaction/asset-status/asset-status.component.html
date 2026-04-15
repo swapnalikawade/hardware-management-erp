@@ -110,363 +110,208 @@
       <div class="table-wrapper">
         <table>
           <thead>
-            <tr>
-              <!-- SELECT -->
-              <th>
-                <input type="checkbox" (change)="toggleAll($event)" />
-              </th>
+  <tr>
 
-              <!-- PRIMARY -->
-              <th>
-                Status Change ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetStatusChangeId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetStatusChangeId', 'desc')"
-                ></i>
-              </th>
+    <!-- SELECT -->
+    <th>
+      <input type="checkbox" (change)="toggleAll($event)" />
+    </th>
 
-              <th>
-                Code
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetStatusChangeCode', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetStatusChangeCode', 'desc')"
-                ></i>
-              </th>
+    <!-- PRIMARY -->
+    <th>
+      Status Change ID
+      <i (click)="sortTable('statusChangeId','asc')"></i>
+      <i (click)="sortTable('statusChangeId','desc')"></i>
+    </th>
 
-              <!-- DATES -->
-              <th>
-                Created Date
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetStatusCreatedDate', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetStatusCreatedDate', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Change Number
+      <i (click)="sortTable('changeNumber','asc')"></i>
+      <i (click)="sortTable('changeNumber','desc')"></i>
+    </th>
 
-              <th>
-                Change Date
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetStatusChangeDate', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetStatusChangeDate', 'desc')"
-                ></i>
-              </th>
+    <!-- DATE -->
+    <th>
+      Change Date
+      <i (click)="sortTable('changeDate','asc')"></i>
+      <i (click)="sortTable('changeDate','desc')"></i>
+    </th>
 
-              <!-- ASSET DETAILS -->
-              <th>
-                Asset ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetId', 'desc')"
-                ></i>
-              </th>
+    <!-- ASSET -->
+    <th>
+      Asset ID
+      <i (click)="sortTable('assetId','asc')"></i>
+      <i (click)="sortTable('assetId','desc')"></i>
+    </th>
 
-              <th>
-                Name
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetName', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetName', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Serial Number
+      <i (click)="sortTable('assetSerialNumber','asc')"></i>
+      <i (click)="sortTable('assetSerialNumber','desc')"></i>
+    </th>
 
-              <th>
-                Type
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetType', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetType', 'desc')"
-                ></i>
-              </th>
+    <!-- STATUS -->
+    <th>
+      Old Status
+      <i (click)="sortTable('oldStatus','asc')"></i>
+      <i (click)="sortTable('oldStatus','desc')"></i>
+    </th>
 
-              <th>
-                Serial No
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetSerialNumber', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetSerialNumber', 'desc')"
-                ></i>
-              </th>
+    <th>
+      New Status
+      <i (click)="sortTable('newStatus','asc')"></i>
+      <i (click)="sortTable('newStatus','desc')"></i>
+    </th>
 
-              <!-- STATUS -->
-              <th>
-                Current Status
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetCurrentStatus', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetCurrentStatus', 'desc')"
-                ></i>
-              </th>
+    <!-- DETAILS -->
+    <th>
+      Reason
+      <i (click)="sortTable('reasonForStatusChange','asc')"></i>
+      <i (click)="sortTable('reasonForStatusChange','desc')"></i>
+    </th>
 
-              <th>
-                New Status
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetNewStatus', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetNewStatus', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Description
+      <i (click)="sortTable('description','asc')"></i>
+      <i (click)="sortTable('description','desc')"></i>
+    </th>
 
-              <!-- REASON -->
-              <th>
-                Reason
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetStatusChangeReason', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetStatusChangeReason', 'desc')"
-                ></i>
-              </th>
+    <!-- REFERENCES -->
+    <th>
+      Allocation ID
+      <i (click)="sortTable('allocationId','asc')"></i>
+      <i (click)="sortTable('allocationId','desc')"></i>
+    </th>
 
-              <th>
-                Remarks<i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetStatusChangeRemarks', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetStatusChangeRemarks', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Call Logging ID
+      <i (click)="sortTable('callLoggingId','asc')"></i>
+      <i (click)="sortTable('callLoggingId','desc')"></i>
+    </th>
 
-              <!-- USER -->
-              <th>
-                Initiated By
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetChangeInitiatedBy', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetChangeInitiatedBy', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Replacement ID
+      <i (click)="sortTable('replacementId','asc')"></i>
+      <i (click)="sortTable('replacementId','desc')"></i>
+    </th>
 
-              <th>
-                Approved By
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetChangeApprovedBy', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetChangeApprovedBy', 'desc')"
-                ></i>
-              </th>
+    <!-- USER -->
+    <th>
+      Changed By
+      <i (click)="sortTable('changedBy','asc')"></i>
+      <i (click)="sortTable('changedBy','desc')"></i>
+    </th>
 
-              <th>
-                Assigned To
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetStatusChangeAssignedTo', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetStatusChangeAssignedTo', 'desc')"
-                ></i>
-              </th>
+    <!-- CONDITION -->
+    <th>
+      Condition
+      <i (click)="sortTable('assetCondition','asc')"></i>
+      <i (click)="sortTable('assetCondition','desc')"></i>
+    </th>
 
-              <!-- APPROVAL -->
-              <th>
-                Approval Status
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('approvalStatus', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('approvalStatus', 'desc')"
-                ></i>
-              </th>
+    <!-- REMARKS -->
+    <th>
+      Remarks
+      <i (click)="sortTable('remarks','asc')"></i>
+      <i (click)="sortTable('remarks','desc')"></i>
+    </th>
 
-              <th>
-                Approval Date
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('approvalDate', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('approvalDate', 'desc')"
-                ></i>
-              </th>
+    <!-- AUDIT -->
+    <th>
+      Created Date
+      <i (click)="sortTable('createdDate','asc')"></i>
+      <i (click)="sortTable('createdDate','desc')"></i>
+    </th>
 
-              <!-- REPAIR -->
+    <th>
+      Updated Date
+      <i (click)="sortTable('updatedDate','asc')"></i>
+      <i (click)="sortTable('updatedDate','desc')"></i>
+    </th>
 
-              <!-- REFERENCES -->
-              <th>
-                Call ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('callId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('callId', 'desc')"
-                ></i>
-              </th>
-              <th>
-                Allocation ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('allocationId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('allocationId', 'desc')"
-                ></i>
-              </th>
+    <!-- ACTION -->
+    <th>Action</th>
 
-              <!-- SYSTEM -->
-              <th>
-                Status
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetStatus', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetStatus', 'desc')"
-                ></i>
-              </th>
+  </tr>
+</thead>
+         <tbody>
+  <tr
+    *ngFor="
+      let row of filteredData
+        | slice
+          : (currentPage - 1) * itemsPerPage
+          : currentPage * itemsPerPage;
+      let i = index
+    "
+  >
 
-              <!-- ACTION -->
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              *ngFor="
-                let row of filteredData
-                  | slice
-                    : (currentPage - 1) * itemsPerPage
-                    : currentPage * itemsPerPage;
-                let i = index
-              "
-            >
-              <!-- SELECT -->
-              <td>
-                <input
-                  type="checkbox"
-                  [checked]="selectedRows.includes(row)"
-                  (change)="toggleRowSelection(row, $event)"
-                />
-              </td>
+    <!-- SELECT -->
+    <td>
+      <input
+        type="checkbox"
+        [checked]="selectedRows.includes(row)"
+        (change)="toggleRowSelection(row, $event)"
+      />
+    </td>
 
-              <!-- ID -->
-              <td>
-                <span
-                  class="leave-link"
-                  [ngClass]="{
-                    'active-id':
-                      selectedRow?.assetStatusChangeId ===
-                      row.assetStatusChangeId,
-                  }"
-                  (click)="openDetails(row)"
-                >
-                  {{ row.assetStatusChangeId }}
-                </span>
-              </td>
+    <!-- ID -->
+    <td>
+      <span
+        class="leave-link"
+        [ngClass]="{
+          'active-id': selectedRow?.statusChangeId === row.statusChangeId
+        }"
+        (click)="openDetails(row)"
+      >
+        {{ row.statusChangeId }}
+      </span>
+    </td>
 
-              <!-- CODE -->
-              <td>{{ row.assetStatusChangeCode }}</td>
+    <!-- NUMBER -->
+    <td>{{ row.changeNumber }}</td>
 
-              <!-- DATES -->
-              <td>{{ row.assetStatusCreatedDate }}</td>
-              <td>{{ row.assetStatusChangeDate }}</td>
+    <!-- DATE -->
+    <td>{{ row.changeDate }}</td>
 
-              <!-- ASSET -->
-              <td>{{ row.assetId }}</td>
-              <td>{{ row.assetName }}</td>
-              <td>{{ row.assetType }}</td>
-              <td>{{ row.assetSerialNumber || "-" }}</td>
+    <!-- ASSET -->
+    <td>{{ row.assetId }}</td>
+    <td>{{ row.assetSerialNumber || '-' }}</td>
 
-              <!-- CURRENT STATUS -->
-              <td>
-                {{ row.assetCurrentStatus }}
-              </td>
+    <!-- STATUS -->
+    <td>{{ row.oldStatus }}</td>
+    <td>{{ row.newStatus }}</td>
 
-              <!-- NEW STATUS -->
-              <td>
-                {{ row.assetNewStatus }}
-              </td>
+    <!-- DETAILS -->
+    <td>{{ row.reasonForStatusChange }}</td>
+    <td>{{ row.description || '-' }}</td>
 
-              <!-- REASON -->
-              <td>{{ row.assetStatusChangeReason }}</td>
-              <td>{{ row.assetStatusChangeRemarks || "-" }}</td>
+    <!-- REFERENCES -->
+    <td>{{ row.allocationId || '-' }}</td>
+    <td>{{ row.callLoggingId || '-' }}</td>
+    <td>{{ row.replacementId || '-' }}</td>
 
-              <!-- USER -->
-              <td>{{ row.assetChangeInitiatedBy }}</td>
-              <td>{{ row.assetChangeApprovedBy || "-" }}</td>
-              <td>{{ row.assetStatusChangeAssignedTo }}</td>
+    <!-- USER -->
+    <td>{{ row.changedBy }}</td>
 
-              <!-- APPROVAL -->
-              <td>
-                {{ row.approvalStatus }}
-              </td>
-              <td>{{ row.approvalDate || "-" }}</td>
+    <!-- CONDITION -->
+    <td>{{ row.assetCondition }}</td>
 
-              <!-- REFERENCES -->
-              <td>{{ row.callId || "-" }}</td>
-              <td>{{ row.allocationId || "-" }}</td>
+    <!-- REMARKS -->
+    <td>{{ row.remarks || '-' }}</td>
 
-              <!-- STATUS -->
-              <td>
-                <span
-                  [ngClass]="{
-                    'status-active': row.assetStatus === 'Active',
-                    'status-inactive': row.assetStatus !== 'Active',
-                  }"
-                >
-                  <span *ngIf="row.assetStatus === 'Active'">✔</span>
-                  <span *ngIf="row.assetStatus !== 'Active'">❌</span>
-                  {{ row.assetStatus }}
-                </span>
-              </td>
+    <!-- AUDIT -->
+    <td>{{ row.createdDate }}</td>
+    <td>{{ row.updatedDate || '-' }}</td>
 
-              <!-- ACTION -->
-              <td>
-                <button class="btn-edit" (click)="onEdit(row, i)">
-                  <i class="bi bi-pencil-fill"></i> Edit
-                </button>
-              </td>
-            </tr>
-          </tbody>
+    <!-- ACTION -->
+    <td>
+      <button class="btn-edit" (click)="onEdit(row, i)">
+        <i class="bi bi-pencil-fill"></i> Edit
+      </button>
+    </td>
+
+  </tr>
+</tbody>
         </table>
       </div>
       <div class="no-data-message" *ngIf="filteredData.length === 0">
@@ -532,7 +377,7 @@
             {{
               isEditMode
                 ? "Update Asset Status Details (ID: " +
-                  tableData[editIndex!].assetStatusChangeId +
+                  tableData[editIndex!].statusChangeId +
                   ")"
                 : "Add Asset Status Details " + (i + 1)
             }}
@@ -548,382 +393,182 @@
         </div>
 
         <!-- FORM -->
-        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
-          <div class="row mb-3">
-            <!-- Status Change Code -->
-            <div class="col-md-4">
-              <label class="form-label">
-                Status Change Code <span class="text-danger">*</span>
-              </label>
+       <form #recordForm="ngForm" class="container-fluid">
 
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetStatusChangeCode"
-                name="assetStatusChangeCode{{ i }}"
-                required
-                placeholder="Enter Status Change Code"
-              />
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">
-                Change Date <span class="text-danger">*</span>
-              </label>
+  <div class="row">
 
-              <input
-                type="date"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetStatusChangeDate"
-                name="assetStatusChangeDate{{ i }}"
-                required
-                [max]="currentDate"
-              />
-            </div>
+    <!-- CHANGE NUMBER -->
+    <div class="col-md-4">
+      <label>Change Number *</label>
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="form.newRecord.changeNumber"
+        name="changeNumber{{i}}"
+        required
+        minlength="3"
+        placeholder="Enter change number (e.g. ASC-001)"
+        #changeNumber="ngModel"
+      />
+      <small class="text-danger" *ngIf="changeNumber.invalid && changeNumber.touched">
+        Change Number is required (min 3 chars)
+      </small>
+    </div>
 
-            <div class="col-md-4">
-              <label class="form-label">
-                Asset ID <span class="text-danger">*</span>
-              </label>
+    <!-- DATE -->
+    <div class="col-md-4">
+      <label>Change Date *</label>
+      <input
+        type="date"
+        class="form-control"
+        [(ngModel)]="form.newRecord.changeDate"
+        name="changeDate{{i}}"
+        required
+        [max]="currentDate"
+        #changeDate="ngModel"
+      />
+      <small class="text-danger" *ngIf="changeDate.invalid && changeDate.touched">
+        Valid date required
+      </small>
+    </div>
 
-              <select
-                class="form-select"
-                [(ngModel)]="form.newRecord.assetId"
-                name="assetId{{ i }}"
-                required
-                (change)="onAssetSelect(form.newRecord.assetId, i)"
-              >
-                <option value="">Select Asset</option>
-                <option *ngFor="let a of assets" [value]="a.assetId">
-                  {{ a.assetId }} - {{ a.assetName }}
-                </option>
-              </select>
-            </div>
+    <!-- ASSET -->
+    <div class="col-md-4">
+      <label>Asset ID *</label>
+      <select
+        class="form-select"
+        [(ngModel)]="form.newRecord.assetId"
+        name="assetId{{i}}"
+        required
+        #assetId="ngModel"
+          (change)="onAssetSelect(form.newRecord.assetId, i)"  
 
-            <!-- Asset Type -->
-            <div class="col-md-4 mt-2">
-              <label class="form-label">
-                Asset Type <span class="text-danger">*</span>
-              </label>
+      >
+        <option value="">Select Asset</option>
+        <option *ngFor="let a of assets" [value]="a.assetId">
+          {{ a.assetId }}
+        </option>
+      </select>
+      <small class="text-danger" *ngIf="assetId.invalid && assetId.touched">
+        Asset is required
+      </small>
+    </div>
 
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetType"
-                name="assetType{{ i }}"
-                readonly
-                placeholder="Auto filled"
-              />
-            </div>
+    <!-- SERIAL -->
+    <div class="col-md-4 mt-2">
+      <label>Serial Number *</label>
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="form.newRecord.assetSerialNumber"
+        name="serial{{i}}"
+        required
+        placeholder="Enter serial number"
+        #serial="ngModel"
+      />
+      <small class="text-danger" *ngIf="serial.invalid && serial.touched">
+        Serial number required
+      </small>
+    </div>
 
-            <div class="col-md-4 mt-2">
-              <label class="form-label">
-                Serial Number <span class="text-danger">*</span>
-              </label>
+    <!-- OLD STATUS -->
+    <div class="col-md-4 mt-2">
+      <label>Old Status *</label>
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="form.newRecord.oldStatus"
+        name="oldStatus{{i}}"
+        required
+        placeholder="Current status"
+        #oldStatus="ngModel"
+      />
+      <small class="text-danger" *ngIf="oldStatus.invalid && oldStatus.touched">
+        Required
+      </small>
+    </div>
 
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetSerialNumber"
-                name="assetSerialNumber{{ i }}"
-                readonly
-                placeholder="Auto filled"
-              />
-            </div>
-            <div class="col-md-4 mt-2">
-              <label class="form-label">
-                Current Status <span class="text-danger">*</span>
-              </label>
+    <!-- NEW STATUS -->
+    <div class="col-md-4 mt-2">
+      <label>New Status *</label>
+      <select
+        class="form-select"
+        [(ngModel)]="form.newRecord.newStatus"
+        name="newStatus{{i}}"
+        required
+        #newStatus="ngModel"
+      >
+        <option value="">Select Status</option>
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+      </select>
+      <small class="text-danger" *ngIf="newStatus.invalid && newStatus.touched">
+        Required
+      </small>
+    </div>
 
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetCurrentStatus"
-                name="assetCurrentStatus{{ i }}"
-                readonly
-                placeholder="Auto filled"
-              />
-            </div>
+    <!-- REASON -->
+    <div class="col-md-6 mt-2">
+      <label>Reason *</label>
+      <input
+        class="form-control"
+        [(ngModel)]="form.newRecord.reasonForStatusChange"
+        name="reason{{i}}"
+        required
+        placeholder="Why status changed?"
+        #reason="ngModel"
+      />
+      <small class="text-danger" *ngIf="reason.invalid && reason.touched">
+        Required
+      </small>
+    </div>
 
-            <div class="col-md-4 mt-2">
-              <label class="form-label">
-                New Status <span class="text-danger">*</span>
-              </label>
+    <!-- DESCRIPTION -->
+    <div class="col-md-6 mt-2">
+      <label>Description</label>
+      <input
+        class="form-control"
+        [(ngModel)]="form.newRecord.description"
+        name="desc{{i}}"
+        placeholder="Optional description"
+      />
+    </div>
 
-              <select
-                class="form-select"
-                [(ngModel)]="form.newRecord.assetNewStatus"
-                name="assetNewStatus{{ i }}"
-                required
-                (change)="onStatusChange(i)"
-              >
-                <option value="">Select</option>
+    <!-- CONDITION -->
+    <div class="col-md-4 mt-2">
+      <label>Condition</label>
+      <select
+        class="form-select"
+        [(ngModel)]="form.newRecord.assetCondition"
+        name="condition{{i}}"
+      >
+        <option value="Good">Good</option>
+        <option value="Faulty">Faulty</option>
+        <option value="Damaged">Damaged</option>
+      </select>
+    </div>
 
-                <option value="Active">Active</option>
-                <option value="Under Repair">Under Repair</option>
-                <option value="Replaced">Replaced</option>
-                <option value="Scrapped">Scrapped</option>
-              </select>
-            </div>
-            <!-- CALL ID -->
-            <div class="col-md-4 mt-2">
-              <label>Call ID</label>
-              <select
-                class="form-control"
-                [(ngModel)]="form.newRecord.callId"
-                name="callId{{ i }}"
-              >
-                <option value="">Select Call</option>
-                <option *ngFor="let c of filteredCalls" [value]="c.callLogId">
-                  {{ c.callLogId }}
-                </option>
-              </select>
-            </div>
+    <!-- REMARKS -->
+    <div class="col-md-12 mt-2">
+      <label>Remarks</label>
+      <textarea
+        class="form-control"
+        rows="2"
+        [(ngModel)]="form.newRecord.remarks"
+        name="remarks{{i}}"
+        maxlength="250"
+        placeholder="Enter remarks (optional)"
+      ></textarea>
 
-            <!-- ALLOCATION -->
-            <div class="col-md-4 mt-2">
-              <label>Allocation ID</label>
-              <select
-                class="form-control"
-                [(ngModel)]="form.newRecord.allocationId"
-                name="allocationId{{ i }}"
-              >
-                <option value="">Select Allocation</option>
+      <small>
+        {{ form.newRecord.remarks?.length || 0 }}/250
+      </small>
+    </div>
 
-                <option
-                  *ngFor="let a of filteredAllocations"
-                  [value]="a.assetallocationId"
-                >
-                  {{ a.assetallocationId }}
-                </option>
-              </select>
-            </div>
-            <div class="col-md-4 mt-2">
-              <label class="form-label">
-                Initiated By <span class="text-danger">*</span>
-              </label>
+  </div>
 
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetChangeInitiatedBy"
-                name="assetChangeInitiatedBy{{ i }}"
-                readonly
-                placeholder="Auto filled (Logged-in user)"
-              />
-            </div>
-
-            <div class="col-md-4 mt-2">
-              <label class="form-label">Approved By</label>
-
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetChangeApprovedBy"
-                name="assetChangeApprovedBy{{ i }}"
-                placeholder="Enter Approver"
-                required
-              />
-            </div>
-
-            <div
-              class="col-md-4 mt-2"
-              *ngIf="form.newRecord.assetNewStatus === 'Under Repair'"
-            >
-              <label class="form-label">
-                Repair Vendor <span class="text-danger">*</span>
-              </label>
-
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetRepairVendor"
-                name="assetRepairVendor{{ i }}"
-                placeholder="Enter Vendor Name"
-                required
-              />
-            </div>
-
-            <!-- Expected Return Date -->
-            <div
-              class="col-md-4 mt-2"
-              *ngIf="form.newRecord.assetNewStatus === 'Under Repair'"
-            >
-              <label class="form-label">
-                Expected Return Date <span class="text-danger">*</span>
-              </label>
-
-              <input
-                type="date"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetExpectedReturnDate"
-                name="assetExpectedReturnDate{{ i }}"
-                required
-                [min]="todayDate"
-              />
-            </div>
-            <div class="col-md-4 mt-2">
-              <label>Approval Status</label>
-              <select
-                class="form-select"
-                [(ngModel)]="form.newRecord.approvalStatus"
-                name="approvalStatus{{ i }}"
-              >
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-              </select>
-            </div>
-
-            <div class="col-md-4 mt-2">
-              <label>Approval Date</label>
-              <input
-                type="date"
-                class="form-control"
-                [(ngModel)]="form.newRecord.approvalDate"
-                name="assetApprovalDate{{ i }}"
-              />
-            </div>
-            <div
-              class="col-md-4 mt-2"
-              *ngIf="form.newRecord.assetNewStatus === 'Under Repair'"
-            >
-              <label>Repair Cost</label>
-
-              <input
-                type="number"
-                class="form-control"
-                [(ngModel)]="form.newRecord.repairCost"
-                name="repairCost{{ i }}"
-              />
-            </div>
-            <div
-              class="col-md-4 mt-2"
-              *ngIf="form.newRecord.assetNewStatus === 'Replaced'"
-            >
-              <label>Replacement Asset ID</label>
-
-              <input
-                class="form-control"
-                [(ngModel)]="form.newRecord.replacementAssetId"
-                name="replacementAssetId{{ i }}"
-              />
-            </div>
-            <div class="col-md-4 mt-2">
-              <label class="form-label">
-                Assigned To <span class="text-danger">*</span>
-              </label>
-
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetStatusChangeAssignedTo"
-                name="assetStatusChangeAssignedTo{{ i }}"
-                required
-              />
-            </div>
-            <div
-              class="col-md-4 mt-2"
-              *ngIf="form.newRecord.assetNewStatus === 'Replaced'"
-            >
-              <label>Replacement Date</label>
-
-              <input
-                type="date"
-                class="form-control"
-                [(ngModel)]="form.newRecord.replacementDate"
-                name="replacementDate{{ i }}"
-              />
-            </div>
-            <!-- Created Date -->
-            <div class="col-md-4 mt-2">
-              <label class="form-label">Created Date</label>
-
-              <input
-                type="date"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetStatusCreatedDate"
-                name="assetStatusCreatedDate{{ i }}"
-                readonly
-              />
-            </div>
-            <div class="col-md-12 mt-2">
-              <label class="form-label">
-                Change Reason <span class="text-danger">*</span>
-              </label>
-
-              <!-- DROPDOWN -->
-              <select
-                class="form-select"
-                [(ngModel)]="form.newRecord.assetStatusChangeReason"
-                name="assetStatusChangeReason{{ i }}"
-                required
-              >
-                <option value="">Select Reason</option>
-
-                <!-- 🔥 Dynamic reasons -->
-                <option
-                  *ngIf="form.newRecord.assetNewStatus === 'Under Repair'"
-                  value="Hardware Issue"
-                >
-                  Hardware Issue
-                </option>
-                <option
-                  *ngIf="form.newRecord.assetNewStatus === 'Under Repair'"
-                  value="Software Issue"
-                >
-                  Software Issue
-                </option>
-
-                <option
-                  *ngIf="form.newRecord.assetNewStatus === 'Replaced'"
-                  value="Old Asset Replaced"
-                >
-                  Old Asset Replaced
-                </option>
-
-                <option
-                  *ngIf="form.newRecord.assetNewStatus === 'Scrapped'"
-                  value="Damaged Beyond Repair"
-                >
-                  Damaged Beyond Repair
-                </option>
-                <option
-                  *ngIf="form.newRecord.assetNewStatus === 'Scrapped'"
-                  value="Obsolete"
-                >
-                  Obsolete
-                </option>
-
-                <option
-                  *ngIf="form.newRecord.assetNewStatus === 'Active'"
-                  value="Returned From Repair"
-                >
-                  Returned From Repair
-                </option>
-              </select>
-            </div>
-            <!-- Remarks -->
-            <div class="col-md-12 mt-2">
-              <label class="form-label">Remarks</label>
-
-              <textarea
-                class="form-control"
-                rows="2"
-                [(ngModel)]="form.newRecord.assetStatusChangeRemarks"
-                name="assetStatusChangeRemarks{{ i }}"
-                maxlength="250"
-                placeholder="Enter additional remarks (optional)"
-              ></textarea>
-
-              <!-- 🔥 Character counter -->
-              <small class="text-muted">
-                {{ form.newRecord.assetStatusChangeRemarks?.length || 0 }}/250
-                characters
-              </small>
-            </div>
-          </div>
-
-          <div
+  
+<div
             class="mt-3 d-flex gap-2 justify-content-end"
             *ngIf="activeForm === i"
           >
@@ -941,10 +586,11 @@
               class="btn-cancel"
               (click)="cancelRecord(recordForm)"
             >
-              <i class="bi bi-arrow-counterclockwise"></i> Reset
+              <i class="bi bi-arrow-counterclockwise"></i>
+              Reset
             </button>
           </div>
-        </form>
+</form>
       </div>
     </div>
 
@@ -1261,10 +907,11 @@
 <!-- ASSET STATUS CHANGE VIEW MODAL -->
 <div class="modal" [class.show]="showViewModal" *ngIf="selectedRow">
   <div class="modal-content">
+
     <!-- HEADER -->
     <div class="modal-header">
       <h5>
-        Asset Status Change Details (ID: {{ selectedRow?.assetStatusChangeId }})
+        Asset Status Change Details (ID: {{ selectedRow?.statusChangeId }})
       </h5>
       <button class="close-btn1" (click)="closeViewModal()">×</button>
     </div>
@@ -1272,26 +919,22 @@
     <!-- BODY -->
     <div class="modal-body">
       <table class="popup-table">
+
         <!-- PRIMARY -->
         <tr>
           <th>Status Change ID</th>
-          <td>{{ selectedRow?.assetStatusChangeId }}</td>
+          <td>{{ selectedRow?.statusChangeId }}</td>
         </tr>
 
         <tr>
-          <th>Status Change Code</th>
-          <td>{{ selectedRow?.assetStatusChangeCode }}</td>
+          <th>Change Number</th>
+          <td>{{ selectedRow?.changeNumber }}</td>
         </tr>
 
-        <!-- DATES -->
+        <!-- DATE -->
         <tr>
           <th>Change Date</th>
-          <td>{{ selectedRow?.assetStatusChangeDate }}</td>
-        </tr>
-
-        <tr>
-          <th>Created Date</th>
-          <td>{{ selectedRow?.assetStatusCreatedDate }}</td>
+          <td>{{ selectedRow?.changeDate }}</td>
         </tr>
 
         <!-- ASSET -->
@@ -1301,131 +944,79 @@
         </tr>
 
         <tr>
-          <th>Asset Name</th>
-          <td>{{ selectedRow?.assetName }}</td>
-        </tr>
-
-        <tr>
-          <th>Asset Type</th>
-          <td>{{ selectedRow?.assetType }}</td>
-        </tr>
-
-        <tr>
           <th>Serial Number</th>
-          <td>{{ selectedRow?.assetSerialNumber }}</td>
+          <td>{{ selectedRow?.assetSerialNumber || '-' }}</td>
         </tr>
 
         <!-- STATUS -->
         <tr>
-          <th>Current Status</th>
-          <td>{{ selectedRow?.assetCurrentStatus }}</td>
+          <th>Old Status</th>
+          <td>{{ selectedRow?.oldStatus }}</td>
         </tr>
 
         <tr>
           <th>New Status</th>
-          <td>{{ selectedRow?.assetNewStatus }}</td>
+          <td>{{ selectedRow?.newStatus }}</td>
         </tr>
 
-        <!-- REASON -->
+        <!-- DETAILS -->
         <tr>
-          <th>Change Reason</th>
-          <td>{{ selectedRow?.assetStatusChangeReason }}</td>
-        </tr>
-
-        <tr>
-          <th>Remarks</th>
-          <td>{{ selectedRow?.assetStatusChangeRemarks || "-" }}</td>
-        </tr>
-
-        <!-- USERS -->
-        <tr>
-          <th>Initiated By</th>
-          <td>{{ selectedRow?.assetChangeInitiatedBy }}</td>
+          <th>Reason</th>
+          <td>{{ selectedRow?.reasonForStatusChange }}</td>
         </tr>
 
         <tr>
-          <th>Approved By</th>
-          <td>{{ selectedRow?.assetChangeApprovedBy || "-" }}</td>
+          <th>Description</th>
+          <td>{{ selectedRow?.description || '-' }}</td>
         </tr>
 
-        <tr>
-          <th>Assigned To</th>
-          <td>{{ selectedRow?.assetStatusChangeAssignedTo }}</td>
-        </tr>
-
-        <!-- APPROVAL 🔥 -->
-        <tr>
-          <th>Approval Status</th>
-          <td>{{ selectedRow?.approvalStatus }}</td>
-        </tr>
-
-        <tr>
-          <th>Approval Date</th>
-          <td>{{ selectedRow?.approvalDate || "-" }}</td>
-        </tr>
-
-        <!-- REPAIR 🔧 -->
-        <tr *ngIf="selectedRow?.assetNewStatus === 'Under Repair'">
-          <th>Repair Vendor</th>
-          <td>{{ selectedRow?.assetRepairVendor }}</td>
-        </tr>
-
-        <tr *ngIf="selectedRow?.assetNewStatus === 'Under Repair'">
-          <th>Expected Return Date</th>
-          <td>{{ selectedRow?.assetExpectedReturnDate }}</td>
-        </tr>
-
-        <tr *ngIf="selectedRow?.assetNewStatus === 'Under Repair'">
-          <th>Repair Cost</th>
-          <td>
-            {{ selectedRow?.repairCost ? "₹ " + selectedRow?.repairCost : "-" }}
-          </td>
-        </tr>
-
-        <!-- REPLACEMENT 🔁 -->
-        <tr *ngIf="selectedRow?.assetNewStatus === 'Replaced'">
-          <th>Replacement Asset ID</th>
-          <td>{{ selectedRow?.replacementAssetId }}</td>
-        </tr>
-
-        <tr *ngIf="selectedRow?.assetNewStatus === 'Replaced'">
-          <th>Replacement Date</th>
-          <td>{{ selectedRow?.replacementDate }}</td>
-        </tr>
-
-        <!-- SCRAP 🗑 -->
-        <tr *ngIf="selectedRow?.assetNewStatus === 'Scrapped'">
-          <th>Scrap Reason</th>
-          <td>{{ selectedRow?.scrapReason }}</td>
-        </tr>
-
-        <tr *ngIf="selectedRow?.assetNewStatus === 'Scrapped'">
-          <th>Scrap Date</th>
-          <td>{{ selectedRow?.scrapDate }}</td>
-        </tr>
-
-        <!-- REFERENCES 🔗 -->
-        <tr>
-          <th>Call ID</th>
-          <td>{{ selectedRow?.callId || "-" }}</td>
-        </tr>
-
+        <!-- REFERENCES -->
         <tr>
           <th>Allocation ID</th>
-          <td>{{ selectedRow?.allocationId || "-" }}</td>
+          <td>{{ selectedRow?.allocationId || '-' }}</td>
         </tr>
 
         <tr>
-          <th>Return ID</th>
-          <td>{{ selectedRow?.returnId || "-" }}</td>
+          <th>Call Logging ID</th>
+          <td>{{ selectedRow?.callLoggingId || '-' }}</td>
         </tr>
 
-        <!-- SYSTEM -->
         <tr>
-          <th>Status</th>
-          <td>{{ selectedRow?.assetStatus }}</td>
+          <th>Replacement ID</th>
+          <td>{{ selectedRow?.replacementId || '-' }}</td>
         </tr>
+
+        <!-- USER -->
+        <tr>
+          <th>Changed By</th>
+          <td>{{ selectedRow?.changedBy }}</td>
+        </tr>
+
+        <!-- CONDITION -->
+        <tr>
+          <th>Condition</th>
+          <td>{{ selectedRow?.assetCondition }}</td>
+        </tr>
+
+        <!-- REMARKS -->
+        <tr>
+          <th>Remarks</th>
+          <td>{{ selectedRow?.remarks || '-' }}</td>
+        </tr>
+
+        <!-- AUDIT -->
+        <tr>
+          <th>Created Date</th>
+          <td>{{ selectedRow?.createdDate }}</td>
+        </tr>
+
+        <tr>
+          <th>Updated Date</th>
+          <td>{{ selectedRow?.updatedDate || '-' }}</td>
+        </tr>
+
       </table>
     </div>
+
   </div>
 </div>

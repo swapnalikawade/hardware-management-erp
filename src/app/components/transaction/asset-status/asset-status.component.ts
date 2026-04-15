@@ -52,67 +52,45 @@ import { AuthService } from '../../../services/auth/auth-service';
 import { CommonService } from '../../../services/common/common-service';
 
 export interface TableRow {
-  /* ================= PRIMARY ================= */
-  assetStatusChangeId: string;
-  assetStatusChangeCode: string;
 
-  /* ================= DATES ================= */
-  assetStatusCreatedDate: string;
-  assetStatusChangeDate: string;
+  /* ========= PRIMARY ========= */
+  statusChangeId: string;
+  changeNumber: string;
 
-  /* ================= ASSET DETAILS ================= */
+  /* ========= DATE ========= */
+  changeDate: string;   // YYYY-MM-DD
+
+  /* ========= ASSET ========= */
   assetId: string;
-  assetName: string;
-  assetType: string;
   assetSerialNumber: string;
 
-  /* ================= STATUS ================= */
-  assetCurrentStatus: string;
-  assetNewStatus: string;
+  /* ========= STATUS ========= */
+  oldStatus: string;
+  newStatus: string;
 
-  /* ================= REASON ================= */
-  assetStatusChangeReason: string;
-  assetStatusChangeRemarks?: string;
+  reasonForStatusChange: string;
+  description: string;
 
-  /* ================= USER DETAILS ================= */
-  assetChangeInitiatedBy: string;
-  assetChangeApprovedBy?: string;
-  assetStatusChangeAssignedTo: string;
+  /* ========= REFERENCES ========= */
+  allocationId: string;
+  callLoggingId: string;
+  replacementId: string;
 
-  /* ================= APPROVAL WORKFLOW 🔥 ================= */
-  approvalStatus: 'Pending' | 'Approved' | 'Rejected';
-  approvalDate?: string;
+  /* ========= USER ========= */
+  changedBy: string;
 
-  /* ================= REPAIR DETAILS 🔧 ================= */
-  assetRepairVendor?: string;
-  assetExpectedReturnDate?: string;
-  repairCost?: number;
+  /* ========= CONDITION ========= */
+  assetCondition: string;   // Good / Faulty / Damaged
 
-  /* ================= REPLACEMENT DETAILS 🔁 ================= */
-  replacementAssetId?: string;
-  replacementDate?: string;
+  /* ========= REMARKS ========= */
+  remarks?: string;
 
-  /* ================= SCRAP DETAILS 🗑 ================= */
-  scrapReason?: string;
-  scrapDate?: string;
+  /* ========= AUDIT ========= */
+  createdBy: string;
+  createdDate: string;
 
-  /* ================= MODULE REFERENCES 🔗 ================= */
-  callId?: string; // Call Logging reference
-  allocationId?: string; // Asset Allocation reference
-  returnId?: string; // Asset Return reference
-  replacementId?: string; // Replacement reference
-
-  /* ================= AUDIT FIELDS 🔍 ================= */
-  createdBy?: string;
-  createdDate?: string;
   updatedBy?: string;
   updatedDate?: string;
-
-  /* ================= SYSTEM STATUS ================= */
-  assetStatus: 'Active' | 'Inactive';
-
-  /* ================= LOGIN ================= */
-  loginId?: string;
 }
 
 @Component({
@@ -186,187 +164,188 @@ export class AssetStatusComponent {
     this.todayDate = this.getTodayDate(); // 🔥 important
   }
 
-  private initializeForm(): void {
-    this.forms = [
-      {
-        /* ================= UI BINDING ================= */
+private initializeForm(): void {
+  this.forms = [
+    {
+      /* ================= UI BINDING ================= */
 
-        spareEntryCode: '',
-        spareEntryDate: this.currentDate || '',
+      changeNumber: '',
+      changeDate: this.currentDate || '',
 
-        /* BASIC DETAILS */
-        spareEntryType: '',
-        spareEntrycallId: '',
-        spareEntryassetId: '',
-        spareEntryclientName: '',
-        spareEntryengineerName: '',
-        department: '',
+      /* ========= ASSET ========= */
+      assetId: '',
+      assetSerialNumber: '',
 
-        /* SPARE DETAILS */
-        spareEntryCategory: '',
-        spareEntryName: '',
-        spareEntryCompatibleAssetType: '',
+      /* ========= STATUS ========= */
+      oldStatus: '',
+      newStatus: '',
 
-        /* QUANTITY */
-        spareEntryquantityUsed: 0,
-        spareEntryunit: '',
-        spareEntryserialNumber: '',
-        spareEntrywarrantyApplicable: '',
+      reasonForStatusChange: '',
+      description: '',
 
-        /* COST */
-        spareEntryunitCost: 0,
-        spareEntrytotalCost: 0,
+      /* ========= REFERENCES ========= */
+      allocationId: '',
+      callLoggingId: '',
+      replacementId: '',
 
-        /* STOCK */
-        spareEntrystockAvailable: 0,
-        spareEntrystockAfterEntry: 0,
+      /* ========= USER ========= */
+      changedBy: this.loginId || '',
 
-        /* EXTRA 🔥 */
-        spareEntryremarks: '',
+      /* ========= CONDITION ========= */
+      assetCondition: 'Good',
 
-        /* APPROVAL 🔥 */
-        approvalStatus: 'Pending',
-        approvalDate: '',
+      /* ========= REMARKS ========= */
+      remarks: '',
 
-        /* AUDIT 🔥 */
-        createdBy: '',
+      /* ========= AUDIT ========= */
+      createdBy: this.loginId || '',
+      createdDate: this.currentDate,
+
+      updatedBy: '',
+      updatedDate: '',
+
+      /* ================= BACKEND ================= */
+      newRecord: {
+
+        /* ========= PRIMARY ========= */
+        statusChangeId: '0',
+        changeNumber: '',
+
+        /* ========= DATE ========= */
+        changeDate: this.currentDate,
+
+        /* ========= ASSET ========= */
+        assetId: '',
+        assetSerialNumber: '',
+
+        /* ========= STATUS ========= */
+        oldStatus: '',
+        newStatus: '',
+
+        reasonForStatusChange: '',
+        description: '',
+
+        /* ========= REFERENCES ========= */
+        allocationId: '',
+        callLoggingId: '',
+        replacementId: '',
+
+        /* ========= USER ========= */
+        changedBy: this.loginId || '',
+
+        /* ========= CONDITION ========= */
+        assetCondition: 'Good',
+
+        /* ========= REMARKS ========= */
+        remarks: '',
+
+        /* ========= AUDIT ========= */
+        createdBy: this.loginId || '',
         createdDate: this.currentDate,
+
         updatedBy: '',
         updatedDate: '',
-
-        /* SYSTEM */
-        spareEntryStatus: 'Active',
-        loginId: this.loginId,
-
-        /* ================= BACKEND ================= */
-        newRecord: {
-          spareEntryId: '0',
-
-          spareEntryCode: '',
-          spareEntryDate: this.currentDate,
-          assetStatusChangeDate: this.currentDate, // 🔥 AUTO TODAY
-
-          /* BASIC */
-          spareEntryType: '',
-          spareEntrycallId: '',
-          spareEntryassetId: '',
-          spareEntryclientName: '',
-          spareEntryengineerName: '',
-          department: '',
-
-          /* SPARE */
-          spareEntryCategory: '',
-          spareEntryName: '',
-          spareEntryCompatibleAssetType: '',
-
-          /* QUANTITY */
-          spareEntryquantityUsed: 0,
-          spareEntryunit: '',
-          spareEntryserialNumber: '',
-          spareEntrywarrantyApplicable: '',
-
-          /* COST */
-          spareEntryunitCost: 0,
-          spareEntrytotalCost: 0,
-
-          /* STOCK */
-          spareEntrystockAvailable: 0,
-          spareEntrystockAfterEntry: 0,
-
-          /* EXTRA */
-          spareEntryremarks: '',
-
-          /* APPROVAL 🔥 */
-          approvalStatus: 'Pending',
-          approvalDate: '',
-
-          /* AUDIT 🔥 */
-          createdBy: '',
-          createdDate: this.currentDate,
-          updatedBy: '',
-          updatedDate: '',
-
-          /* SYSTEM */
-          spareEntryStatus: 'Active',
-          loginId: this.loginId,
-        },
       },
-    ];
+    },
+  ];
+}
+loadAssetStatusChange(): void {
+
+  /* ================= LOGIN CHECK ================= */
+  if (!this.loginId) {
+    console.warn('Login ID missing');
+    return;
   }
-  loadAssetStatusChange(): void {
-    if (!this.loginId) {
-      console.warn('Login ID missing');
-      return;
-    }
 
-    this.loading = true;
+  /* 🔥 FORMAT LOGIN ID (IMPORTANT) */
+  
+  // const [prefix, year, code] = formattedLoginId.split('/');
 
-    this.commonService
-      .fetchAllAssetStatusChangeByCompany(this.loginId)
-      .subscribe({
-        next: (res: TableRow[]) => {
-          // 🔥 SAFE MAPPING (important for optional fields)
-          this.tableData = (res || []).map(
-            (r: TableRow): TableRow => ({
-              ...r,
+  this.loading = true;
 
-              approvalStatus: r.approvalStatus || 'Pending',
-              assetStatus: r.assetStatus || 'Active',
+  /* ================= API CALL ================= */
+  this.commonService
+    .fetchAllAssetStatusChangeByLoginId(this.loginId)
+    .subscribe({
 
-              assetStatusChangeRemarks: r.assetStatusChangeRemarks || '',
-              assetRepairVendor: r.assetRepairVendor || '',
-              assetExpectedReturnDate: r.assetExpectedReturnDate || '',
-
-              // 🔥 FINAL FIX (NO null, STRICT TYPE)
-              repairCost:
-                typeof r.repairCost === 'number' ? r.repairCost : undefined,
-
-              replacementAssetId: r.replacementAssetId || '',
-              replacementDate: r.replacementDate || '',
-
-              scrapReason: r.scrapReason || '',
-              scrapDate: r.scrapDate || '',
-
-              callId: r.callId || '',
-              allocationId: r.allocationId || '',
-              returnId: r.returnId || '',
-              replacementId: r.replacementId || '',
-
-              createdBy: r.createdBy || '',
-              createdDate: r.createdDate || '',
-              updatedBy: r.updatedBy || '',
-              updatedDate: r.updatedDate || '',
-            }),
-          );
-
-          this.filteredData = [...this.tableData];
-          this.loading = false;
-        },
-
-        error: (err) => {
-          console.error('API Error:', err);
-          this.loading = false;
-
-          this.toast.danger(
-            'Failed to load Asset Status Change data!',
-            'ERROR',
-            4000,
-          );
-        },
-      });
-  }
-  loadEmployees(): void {
-    if (!this.loginId) return;
-
-    this.commonService.fetchAllEmployeeByLoginId(this.loginId).subscribe({
       next: (res: any[]) => {
-        this.employees = res || [];
+
+        console.log('API RESPONSE:', res); // 🔥 debug
+
+        this.tableData = (res || []).map((r: any) => ({
+
+          /* ========= PRIMARY ========= */
+          statusChangeId: r.statusChangeId ?? '',
+          changeNumber: r.changeNumber ?? '',
+
+          /* ========= DATE ========= */
+          changeDate: r.changeDate ?? '',
+
+          /* ========= ASSET ========= */
+          assetId: r.assetId ?? '',
+          assetSerialNumber: r.assetSerialNumber ?? '',
+
+          /* ========= STATUS ========= */
+          oldStatus: r.oldStatus ?? '',
+          newStatus: r.newStatus ?? '',
+
+          reasonForStatusChange: r.reasonForStatusChange ?? '',
+          description: r.description ?? '',
+
+          /* ========= REFERENCES ========= */
+          allocationId: r.allocationId ?? '',
+          callLoggingId: r.callLoggingId ?? '',
+          replacementId: r.replacementId ?? '',
+
+          /* ========= USER ========= */
+          changedBy: r.changedBy ?? '',
+
+          /* ========= CONDITION ========= */
+          assetCondition: r.assetCondition ?? 'Good',
+
+          /* ========= REMARKS ========= */
+          remarks: r.remarks ?? '',
+
+          /* ========= AUDIT ========= */
+          createdBy: r.createdBy ?? '',
+          createdDate: r.createdDate ?? '',
+
+          updatedBy: r.updatedBy ?? '',
+          updatedDate: r.updatedDate ?? '',
+        }));
+
+        this.filteredData = [...this.tableData];
+        this.loading = false;
+      },
+
+      /* ================= ERROR HANDLING ================= */
+      error: (err: any) => {   // ✅ FIX (TS7006)
+        console.error('API Error:', err);
+        this.loading = false;
+
+        this.toast.danger(
+          err?.error?.message || 'Failed to load Asset Status Change data!',
+          'ERROR',
+          4000
+        );
+      }
+    });
+}
+ loadEmployees(): void {
+
+  this.commonService.fetchAllEmployee()
+    .subscribe({
+      next: (res) => {
+        console.log('Employee API Response:', res);
+
+        this.tableData = res;
+        this.filteredData = [...this.tableData];
       },
       error: (err) => {
-        console.error('Employee Load Error:', err);
-      },
+        console.error('Employee API Error:', err);
+      }
     });
-  }
+}
   loadAssets(): void {
     if (!this.loginId) return;
 
@@ -579,7 +558,7 @@ export class AssetStatusComponent {
 
     // 🔥 Collect valid IDs safely
     const ids: string[] = this.selectedRows
-      .map((row) => row.assetStatusChangeId)
+      .map((row) => row.statusChangeId )
       .filter((id) => !!id);
 
     if (ids.length === 0) {
@@ -594,7 +573,7 @@ export class AssetStatusComponent {
         const idSet = new Set(ids);
 
         this.tableData = this.tableData.filter(
-          (row) => !idSet.has(row.assetStatusChangeId),
+          (row) => !idSet.has(row.statusChangeId),
         );
 
         this.filteredData = [...this.tableData];
@@ -668,103 +647,84 @@ export class AssetStatusComponent {
     this.filteredData = sorted; // UI uses this
     this.tableData = sorted; // keep main data updated
   }
-  exportExcel() {
-    if (!this.tableData || this.tableData.length === 0) {
-      this.toast.warning('No data available to export!', '', 3000);
-      return;
-    }
+exportExcel() {
 
-    const exportData = this.tableData.map((row: TableRow) => ({
-      /* ================= PRIMARY ================= */
-      Status_Change_ID: row.assetStatusChangeId || '',
-      Status_Change_Code: row.assetStatusChangeCode || '',
-
-      /* ================= DATES ================= */
-      Created_Date: row.assetStatusCreatedDate || '',
-      Change_Date: row.assetStatusChangeDate || '',
-
-      /* ================= ASSET ================= */
-      Asset_ID: row.assetId || '',
-      Asset_Name: row.assetName || '',
-      Asset_Type: row.assetType || '',
-      Serial_Number: row.assetSerialNumber || '',
-
-      /* ================= STATUS ================= */
-      Current_Status: row.assetCurrentStatus || '',
-      New_Status: row.assetNewStatus || '',
-
-      /* ================= REASON ================= */
-      Change_Reason: row.assetStatusChangeReason || '',
-      Remarks: row.assetStatusChangeRemarks || '',
-
-      /* ================= USERS ================= */
-      Initiated_By: row.assetChangeInitiatedBy || '',
-      Approved_By: row.assetChangeApprovedBy || '',
-      Assigned_To: row.assetStatusChangeAssignedTo || '',
-
-      /* ================= APPROVAL ================= */
-      Approval_Status: row.approvalStatus || '',
-      Approval_Date: row.approvalDate || '',
-
-      /* ================= REPAIR ================= */
-      Repair_Vendor: row.assetRepairVendor || '',
-      Expected_Return_Date: row.assetExpectedReturnDate || '',
-      Repair_Cost: row.repairCost ?? '',
-
-      /* ================= REPLACEMENT ================= */
-      Replacement_Asset_ID: row.replacementAssetId || '',
-      Replacement_Date: row.replacementDate || '',
-
-      /* ================= SCRAP ================= */
-      Scrap_Reason: row.scrapReason || '',
-      Scrap_Date: row.scrapDate || '',
-
-      /* ================= REFERENCES ================= */
-      Call_ID: row.callId || '',
-      Allocation_ID: row.allocationId || '',
-      Return_ID: row.returnId || '',
-      Replacement_ID: row.replacementId || '',
-
-      /* ================= AUDIT ================= */
-      Created_By: row.createdBy || '',
-      Created_Date_Audit: row.createdDate || '',
-      Updated_By: row.updatedBy || '',
-      Updated_Date: row.updatedDate || '',
-
-      /* ================= SYSTEM ================= */
-      Record_Status: row.assetStatus || '',
-
-      /* ================= LOGIN ================= */
-      Login_ID: row.loginId || '',
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-
-    // 🔥 Auto column width (dynamic)
-    worksheet['!cols'] = Object.keys(exportData[0]).map((key) => ({
-      wch: Math.max(key.length + 2, 20),
-    }));
-
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Asset_Status_Change');
-
-    // 🔥 Dynamic file name with date
-    const today = new Date().toISOString().split('T')[0];
-
-    XLSX.writeFile(workbook, `Asset_Status_Change_Report_${today}.xlsx`);
+  if (!this.tableData || this.tableData.length === 0) {
+    this.toast.warning('No data available to export!', '', 3000);
+    return;
   }
-  exportDoc() {
-    if (!this.tableData || this.tableData.length === 0) {
-      this.toast.warning('No data available to export!', '', 3000);
-      return;
-    }
 
-    const currentDate = new Date().toLocaleDateString('en-GB');
+  const exportData = this.tableData.map((row: any) => ({
 
-    let content = `
+    /* ================= PRIMARY ================= */
+    Status_Change_ID: row.statusChangeId || '',
+    Change_Number: row.changeNumber || '',
+
+    /* ================= DATE ================= */
+    Change_Date: row.changeDate || '',
+
+    /* ================= ASSET ================= */
+    Asset_ID: row.assetId || '',
+    Serial_Number: row.assetSerialNumber || '',
+
+    /* ================= STATUS ================= */
+    Old_Status: row.oldStatus || '',
+    New_Status: row.newStatus || '',
+
+    /* ================= DETAILS ================= */
+    Reason: row.reasonForStatusChange || '',
+    Description: row.description || '',
+
+    /* ================= REFERENCES ================= */
+    Allocation_ID: row.allocationId || '',
+    Call_Logging_ID: row.callLoggingId || '',
+    Replacement_ID: row.replacementId || '',
+
+    /* ================= USER ================= */
+    Changed_By: row.changedBy || '',
+
+    /* ================= CONDITION ================= */
+    Asset_Condition: row.assetCondition || '',
+
+    /* ================= REMARKS ================= */
+    Remarks: row.remarks || '',
+
+    /* ================= AUDIT ================= */
+    Created_By: row.createdBy || '',
+    Created_Date: row.createdDate || '',
+    Updated_By: row.updatedBy || '',
+    Updated_Date: row.updatedDate || '',
+
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+  /* 🔥 AUTO WIDTH */
+  worksheet['!cols'] = Object.keys(exportData[0]).map((key) => ({
+    wch: Math.max(key.length + 2, 20),
+  }));
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Asset_Status_Change');
+
+  const today = new Date().toISOString().split('T')[0];
+
+  XLSX.writeFile(workbook, `Asset_Status_Change_Report_${today}.xlsx`);
+}
+exportDoc() {
+
+  if (!this.tableData || this.tableData.length === 0) {
+    this.toast.warning('No data available to export!', '', 3000);
+    return;
+  }
+
+  const currentDate = new Date().toLocaleDateString('en-GB');
+
+  let content = `
 <html xmlns:o='urn:schemas-microsoft-com:office:office'
       xmlns:w='urn:schemas-microsoft-com:office:word'
       xmlns='http://www.w3.org/TR/REC-html40'>
+
 <head>
 <meta charset="utf-8">
 
@@ -786,40 +746,26 @@ table {
   width: 100%;
   table-layout: fixed;
   font-size: 10px;
-  word-wrap: break-word;
 }
 
 th, td {
   border: 1px solid #000;
   padding: 5px;
-  text-align: left;
-  vertical-align: top;
 }
 
 th {
   background: #d9e1f2;
-  font-weight: bold;
   text-align: center;
-}
-
-.header-table {
-  width: 100%;
-  margin-bottom: 15px;
 }
 
 .header-table td {
   border: none;
-  padding: 0;
 }
 
 .title {
   text-align: center;
   font-size: 20px;
   font-weight: bold;
-}
-
-.sub-header {
-  font-size: 12px;
 }
 
 </style>
@@ -831,8 +777,8 @@ th {
 <!-- HEADER -->
 <table class="header-table">
 <tr>
-<td class="sub-header">Date: ${currentDate}</td>
-<td class="sub-header" style="text-align:right;">Total Records: ${this.tableData.length}</td>
+<td>Date: ${currentDate}</td>
+<td style="text-align:right;">Total Records: ${this.tableData.length}</td>
 </tr>
 <tr>
 <td colspan="2" class="title">Asset Status Change Report</td>
@@ -841,240 +787,214 @@ th {
 
 <!-- TABLE -->
 <table>
+
 <tr>
 <th>ID</th>
-<th>Code</th>
-<th>Created</th>
-<th>Change Date</th>
+<th>Number</th>
+<th>Date</th>
 
 <th>Asset ID</th>
-<th>Asset Name</th>
-<th>Type</th>
 <th>Serial</th>
 
-<th>Current</th>
-<th>New</th>
+<th>Old Status</th>
+<th>New Status</th>
 
 <th>Reason</th>
+<th>Description</th>
 
-<th>Initiated</th>
-<th>Approved</th>
-<th>Assigned</th>
-
-<th>Approval Status</th>
-
-<th>Vendor</th>
-<th>Return Date</th>
-<th>Cost</th>
-
+<th>Allocation</th>
+<th>Call</th>
 <th>Replacement</th>
-<th>Scrap</th>
+
+<th>Changed By</th>
+<th>Condition</th>
 
 <th>Remarks</th>
-<th>Status</th>
+
+<th>Created</th>
+<th>Updated</th>
 </tr>
 `;
 
-    this.tableData.forEach((row: TableRow) => {
-      content += `
+  this.tableData.forEach((row: any) => {
+    content += `
 <tr>
-<td>${row.assetStatusChangeId || ''}</td>
-<td>${row.assetStatusChangeCode || ''}</td>
-<td>${row.assetStatusCreatedDate || ''}</td>
-<td>${row.assetStatusChangeDate || ''}</td>
+
+<td>${row.statusChangeId || ''}</td>
+<td>${row.changeNumber || ''}</td>
+<td>${row.changeDate || ''}</td>
 
 <td>${row.assetId || ''}</td>
-<td>${row.assetName || ''}</td>
-<td>${row.assetType || ''}</td>
 <td>${row.assetSerialNumber || ''}</td>
 
-<td>${row.assetCurrentStatus || ''}</td>
-<td>${row.assetNewStatus || ''}</td>
+<td>${row.oldStatus || ''}</td>
+<td>${row.newStatus || ''}</td>
 
-<td>${row.assetStatusChangeReason || ''}</td>
+<td>${row.reasonForStatusChange || ''}</td>
+<td>${row.description || ''}</td>
 
-<td>${row.assetChangeInitiatedBy || ''}</td>
-<td>${row.assetChangeApprovedBy || ''}</td>
-<td>${row.assetStatusChangeAssignedTo || ''}</td>
+<td>${row.allocationId || ''}</td>
+<td>${row.callLoggingId || ''}</td>
+<td>${row.replacementId || ''}</td>
 
-<td>${row.approvalStatus || ''}</td>
+<td>${row.changedBy || ''}</td>
+<td>${row.assetCondition || ''}</td>
 
-<td>${row.assetRepairVendor || ''}</td>
-<td>${row.assetExpectedReturnDate || ''}</td>
-<td>${row.repairCost ?? ''}</td>
+<td>${row.remarks || ''}</td>
 
-<td>${row.replacementAssetId || ''}</td>
-<td>${row.scrapReason || ''}</td>
+<td>${row.createdDate || ''}</td>
+<td>${row.updatedDate || ''}</td>
 
-<td>${row.assetStatusChangeRemarks || ''}</td>
-<td>${row.assetStatus || ''}</td>
 </tr>
 `;
-    });
+  });
 
-    content += `
+  content += `
 </table>
 </div>
 </body>
 </html>
 `;
 
-    const blob = new Blob(['\ufeff', content], {
-      type: 'application/msword',
-    });
+  const blob = new Blob(['\ufeff', content], {
+    type: 'application/msword',
+  });
 
-    const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split('T')[0];
 
-    saveAs(blob, `Asset_Status_Change_Report_${today}.doc`);
+  saveAs(blob, `Asset_Status_Change_Report_${today}.doc`);
+}
+
+exportPDF() {
+
+  if (!this.tableData || this.tableData.length === 0) {
+    this.toast.warning('No data available to export!', '', 3000);
+    return;
   }
 
-  exportPDF() {
-    if (!this.tableData || this.tableData.length === 0) {
-      this.toast.warning('No data available to export!', '', 3000);
-      return;
-    }
+  const doc = new jsPDF('l', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const currentDate = new Date().toLocaleDateString('en-GB');
 
-    const doc = new jsPDF('l', 'mm', 'a4'); // landscape
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const currentDate = new Date().toLocaleDateString('en-GB');
+  /* ================= HEADER ================= */
 
-    /* ================= HEADER ================= */
+  doc.setFontSize(10);
+  doc.text(`Date: ${currentDate}`, 10, 10);
 
-    // Date (Left)
-    doc.setFontSize(10);
-    doc.text(`Date: ${currentDate}`, 10, 10);
+  doc.setFontSize(18);
+  doc.text('Asset Status Change Report', pageWidth / 2, 12, {
+    align: 'center',
+  });
 
-    // Title (Center)
-    doc.setFontSize(18);
-    doc.text('Asset Status Change Report', pageWidth / 2, 12, {
-      align: 'center',
-    });
+  doc.setFontSize(10);
+  doc.text(`Total Records: ${this.tableData.length}`, pageWidth - 60, 10);
 
-    // Subheading
-    doc.setFontSize(10);
-    doc.text(`Total Records: ${this.tableData.length}`, pageWidth - 60, 10);
+  /* ================= TABLE ================= */
 
-    /* ================= TABLE ================= */
+  autoTable(doc, {
+    startY: 18,
 
-    autoTable(doc, {
-      startY: 18,
+    styles: {
+      fontSize: 7,
+      cellPadding: 2,
+      halign: 'left',
+      valign: 'middle',
+      lineColor: [0, 0, 0],
+      lineWidth: 0.2,
+    },
 
-      styles: {
-        fontSize: 7,
-        cellPadding: 2,
-        halign: 'left',
-        valign: 'middle',
-        lineColor: [0, 0, 0],
-        lineWidth: 0.2,
-      },
+    headStyles: {
+      fillColor: [41, 128, 185],
+      textColor: '#fff',
+      halign: 'center',
+      fontSize: 8,
+    },
 
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: '#fff',
-        halign: 'center',
-        fontSize: 8,
-      },
+    alternateRowStyles: {
+      fillColor: [245, 245, 245],
+    },
 
-      alternateRowStyles: {
-        fillColor: [245, 245, 245], // zebra striping
-      },
+    head: [[
+      'ID',
+      'Number',
+      'Date',
 
-      tableWidth: 'auto',
+      'Asset ID',
+      'Serial',
 
-      head: [
-        [
-          'ID',
-          'Code',
-          'Created',
-          'Change Date',
+      'Old Status',
+      'New Status',
 
-          'Asset ID',
-          'Asset Name',
-          'Type',
-          'Serial',
+      'Reason',
+      'Description',
 
-          'Current',
-          'New',
+      'Allocation',
+      'Call',
+      'Replacement',
 
-          'Reason',
+      'Changed By',
+      'Condition',
 
-          'Initiated',
-          'Approved',
-          'Assigned',
+      'Remarks',
 
-          'Approval Status',
+      'Created',
+      'Updated'
+    ]],
 
-          'Vendor',
-          'Return Date',
-          'Cost',
+    body: this.tableData.map((row: any) => [
 
-          'Replacement',
-          'Scrap',
+      row.statusChangeId || '',
+      row.changeNumber || '',
+      row.changeDate || '',
 
-          'Remarks',
-          'Status',
-        ],
-      ],
+      row.assetId || '',
+      row.assetSerialNumber || '',
 
-      body: this.tableData.map((row: TableRow) => [
-        row.assetStatusChangeId || '',
-        row.assetStatusChangeCode || '',
-        row.assetStatusCreatedDate || '',
-        row.assetStatusChangeDate || '',
+      row.oldStatus || '',
+      row.newStatus || '',
 
-        row.assetId || '',
-        row.assetName || '',
-        row.assetType || '',
-        row.assetSerialNumber || '',
+      row.reasonForStatusChange || '',
+      row.description || '',
 
-        row.assetCurrentStatus || '',
-        row.assetNewStatus || '',
+      row.allocationId || '',
+      row.callLoggingId || '',
+      row.replacementId || '',
 
-        row.assetStatusChangeReason || '',
+      row.changedBy || '',
+      row.assetCondition || '',
 
-        row.assetChangeInitiatedBy || '',
-        row.assetChangeApprovedBy || '',
-        row.assetStatusChangeAssignedTo || '',
+      row.remarks || '',
 
-        row.approvalStatus || '',
+      row.createdDate || '',
+      row.updatedDate || ''
+    ]),
 
-        row.assetRepairVendor || '',
-        row.assetExpectedReturnDate || '',
-        row.repairCost ?? '',
+    didDrawCell: (data) => {
+      doc.setDrawColor(0);
+      doc.setLineWidth(0.2);
+      doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height);
+    },
+  });
 
-        row.replacementAssetId || '',
-        row.scrapReason || '',
+  /* ================= FOOTER ================= */
 
-        row.assetStatusChangeRemarks || '',
-        row.assetStatus || '',
-      ]),
+  const pageCount = (doc as any).internal.getNumberOfPages();
 
-      didDrawCell: (data) => {
-        doc.setDrawColor(0);
-        doc.setLineWidth(0.2);
-        doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height);
-      },
-    });
-
-    /* ================= FOOTER ================= */
-
-    const pageCount = (doc as any).internal.getNumberOfPages();
-
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        pageWidth - 30,
-        doc.internal.pageSize.height - 5,
-      );
-    }
-
-    /* ================= SAVE ================= */
-
-    const today = new Date().toISOString().split('T')[0];
-    doc.save(`Asset_Status_Change_Report_${today}.pdf`);
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.text(
+      `Page ${i} of ${pageCount}`,
+      pageWidth - 30,
+      doc.internal.pageSize.height - 5
+    );
   }
+
+  /* ================= SAVE ================= */
+
+  const today = new Date().toISOString().split('T')[0];
+  doc.save(`Asset_Status_Change_Report_${today}.pdf`);
+}
 
   //pagination
   // Pagination Variables
@@ -1119,69 +1039,48 @@ th {
 
     return `${y}-${m}-${d}`; // ✅ FIXED
   }
-  newRecord: TableRow = {
-    /* ================= PRIMARY ================= */
-    assetStatusChangeId: '0', // auto-generate
-    assetStatusChangeCode: '',
+newRecord: any = {
 
-    /* ================= DATES ================= */
-    assetStatusCreatedDate: this.getTodayDate(),
-    assetStatusChangeDate: this.getTodayDate(),
+  /* ================= PRIMARY ================= */
+  statusChangeId: '0',   // auto-generate
+  changeNumber: '',
 
-    /* ================= ASSET ================= */
-    assetId: '',
-    assetName: '',
-    assetType: '',
-    assetSerialNumber: '',
+  /* ================= DATE ================= */
+  changeDate: this.getTodayDate(),
 
-    /* ================= STATUS ================= */
-    assetCurrentStatus: '',
-    assetNewStatus: '',
+  /* ================= ASSET ================= */
+  assetId: '',
+  assetSerialNumber: '',
 
-    /* ================= REASON ================= */
-    assetStatusChangeReason: '',
-    assetStatusChangeRemarks: '',
+  /* ================= STATUS ================= */
+  oldStatus: '',
+  newStatus: '',
 
-    /* ================= USERS ================= */
-    assetChangeInitiatedBy: '',
-    assetChangeApprovedBy: '',
-    assetStatusChangeAssignedTo: '',
+  /* ================= DETAILS ================= */
+  reasonForStatusChange: '',
+  description: '',
 
-    /* ================= APPROVAL ================= */
-    approvalStatus: 'Pending',
-    approvalDate: '',
+  /* ================= REFERENCES ================= */
+  allocationId: '',
+  callLoggingId: '',
+  replacementId: '',
 
-    /* ================= REPAIR ================= */
-    assetRepairVendor: '',
-    assetExpectedReturnDate: '',
-    repairCost: undefined,
+  /* ================= USER ================= */
+  changedBy: this.loginId || '',
 
-    /* ================= REPLACEMENT ================= */
-    replacementAssetId: '',
-    replacementDate: '',
+  /* ================= CONDITION ================= */
+  assetCondition: 'Good',
 
-    /* ================= SCRAP ================= */
-    scrapReason: '',
-    scrapDate: '',
+  /* ================= REMARKS ================= */
+  remarks: '',
 
-    /* ================= REFERENCES ================= */
-    callId: '',
-    allocationId: '',
-    returnId: '',
-    replacementId: '',
+  /* ================= AUDIT ================= */
+  createdBy: this.loginId || '',
+  createdDate: this.getTodayDate(),
 
-    /* ================= AUDIT ================= */
-    createdBy: '',
-    createdDate: this.getTodayDate(),
-    updatedBy: '',
-    updatedDate: '',
-
-    /* ================= SYSTEM ================= */
-    assetStatus: 'Active',
-
-    /* ================= LOGIN ================= */
-    loginId: this.loginId,
-  };
+  updatedBy: '',
+  updatedDate: '',
+};
 
   // --------------------------
   // STATE VARIABLES
@@ -1209,78 +1108,60 @@ th {
   // --------------------------
   // ADD NEW FORM
   // --------------------------
-  addForm() {
-    if (this.isEditMode) return; // ❌ edit mode मध्ये add नको
+addForm() {
 
-    const newEntry: TableRow = {
-      ...this.newRecord,
+  if (this.isEditMode) return; // ❌ edit mode मध्ये add नको
 
-      /* ================= DEFAULTS ================= */
-      assetStatusChangeId: '0',
-      assetStatusCreatedDate: this.getTodayDate(),
+  const newEntry: any = {
 
-      // ✅ FIXED (no function call)
-      assetStatusChangeDate: this.getTodayDate(),
+    /* ================= PRIMARY ================= */
+    statusChangeId: '0',
+    changeNumber: '',
 
-      approvalStatus: 'Pending',
+    /* ================= DATE ================= */
+    changeDate: this.getTodayDate(),
 
-      /* ================= RESET FIELDS ================= */
-      assetId: '',
-      assetName: '',
-      assetType: '',
-      assetSerialNumber: '',
+    /* ================= ASSET ================= */
+    assetId: '',
+    assetSerialNumber: '',
 
-      assetCurrentStatus: '',
-      assetNewStatus: '',
+    /* ================= STATUS ================= */
+    oldStatus: '',
+    newStatus: '',
 
-      assetStatusChangeReason: '',
-      assetStatusChangeRemarks: '',
+    /* ================= DETAILS ================= */
+    reasonForStatusChange: '',
+    description: '',
 
-      // ✅ IMPORTANT (auto set user)
-      assetChangeInitiatedBy: this.userName || '',
-      assetChangeApprovedBy: '',
-      assetStatusChangeAssignedTo: this.userName || '',
+    /* ================= REFERENCES ================= */
+    allocationId: '',
+    callLoggingId: '',
+    replacementId: '',
 
-      /* ================= REPAIR ================= */
-      assetRepairVendor: '',
-      assetExpectedReturnDate: '',
-      repairCost: undefined,
+    /* ================= USER ================= */
+    changedBy: this.loginId || '',
 
-      /* ================= REPLACEMENT ================= */
-      replacementAssetId: '',
-      replacementDate: '',
+    /* ================= CONDITION ================= */
+    assetCondition: 'Good',
 
-      /* ================= SCRAP ================= */
-      scrapReason: '',
-      scrapDate: '',
+    /* ================= REMARKS ================= */
+    remarks: '',
 
-      /* ================= REFERENCES ================= */
-      callId: '',
-      allocationId: '',
-      returnId: '',
-      replacementId: '',
+    /* ================= AUDIT ================= */
+    createdBy: this.loginId || '',
+    createdDate: this.getTodayDate(),
 
-      /* ================= AUDIT ================= */
-      createdBy: this.userName || '',
-      createdDate: this.getTodayDate(),
-      updatedBy: '',
-      updatedDate: '',
+    updatedBy: '',
+    updatedDate: '',
+  };
 
-      /* ================= SYSTEM ================= */
-      assetStatus: 'Active',
+  this.forms.push({
+    newRecord: newEntry,
+  });
 
-      /* ================= LOGIN ================= */
-      loginId: this.loginId,
-    };
-
-    this.forms.push({
-      newRecord: newEntry,
-    });
-
-    this.activeForm = this.forms.length - 1;
-    this.showErrors = false;
-  }
-
+  this.activeForm = this.forms.length - 1;
+  this.showErrors = false;
+}
   // --------------------------
   // REMOVE FORM
   // --------------------------
@@ -1295,190 +1176,126 @@ th {
   // --------------------------
   // SAVE RECORD (SINGLE OR MULTIPLE)
   // --------------------------
-  saveAllRecords(form?: NgForm) {
-    this.showErrors = true;
+ saveAllRecords(form?: NgForm) {
 
-    /* ================= VALIDATION ================= */
-    if (form) {
-      Object.keys(form.controls).forEach((key) => {
-        form.controls[key].markAsTouched();
-        form.controls[key].markAsDirty();
-      });
-    }
+  this.showErrors = true;
 
-    if (form && !form.valid) return;
-
-    /* ================= LOGIN CHECK ================= */
-    if (!this.loginId) {
-      this.toast.danger('Login ID missing!', 'ERROR', 3000);
-      return;
-    }
-
-    /* ================= EDIT MODE ================= */
-    if (this.isEditMode && this.editIndex !== -1) {
-      const r = this.forms[0].newRecord;
-
-      const formData: TableRow = {
-        ...r,
-
-        assetStatusChangeDate: r.assetStatusChangeDate || this.getTodayDate(),
-
-        approvalStatus: r.approvalStatus || 'Pending',
-        assetStatus: r.assetStatus || 'Active',
-
-        assetStatusChangeAssignedTo:
-          r.assetStatusChangeAssignedTo || this.userName,
-
-        loginId: this.loginId,
-      };
-
-      // 🔥 STATUS VALIDATION (EDIT)
-      if (
-        formData.assetNewStatus === 'Under Repair' &&
-        !formData.assetRepairVendor
-      ) {
-        this.toast.danger('Repair vendor required!', 'ERROR', 3000);
-        return;
-      }
-
-      if (
-        formData.assetNewStatus === 'Under Repair' &&
-        !formData.assetExpectedReturnDate
-      ) {
-        this.toast.danger('Expected return date required!', 'ERROR', 3000);
-        return;
-      }
-
-      if (
-        formData.assetNewStatus === 'Replaced' &&
-        !formData.replacementAssetId
-      ) {
-        this.toast.danger('Replacement Asset ID required!', 'ERROR', 3000);
-        return;
-      }
-
-      if (formData.assetNewStatus === 'Scrapped' && !formData.scrapReason) {
-        this.toast.danger('Scrap reason required!', 'ERROR', 3000);
-        return;
-      }
-
-      const statusChangeId = this.tableData[this.editIndex].assetStatusChangeId;
-
-      console.log('UPDATE DATA:', formData);
-
-      this.commonService
-        .updateAssetStatusChange(statusChangeId, this.loginId, formData)
-        .subscribe({
-          next: (res) => {
-            console.log('UPDATE SUCCESS:', res);
-
-            this.toast.success(
-              'Asset Status Change updated successfully',
-              'SUCCESS',
-              4000,
-            );
-
-            this.resetAfterSave();
-            this.loadAssetStatusChange();
-          },
-
-          error: (err) => {
-            console.error('UPDATE ERROR:', err);
-
-            this.toast.danger(
-              err?.error?.message || 'Update failed!',
-              'ERROR',
-              4000,
-            );
-          },
-        });
-
-      return;
-    }
-
-    /* ================= ADD MODE ================= */
-
-    const payload: TableRow[] = this.forms.map((f) => {
-      const r = f.newRecord;
-
-      return {
-        ...r,
-
-        assetStatusChangeDate: r.assetStatusChangeDate || this.getTodayDate(),
-
-        approvalStatus: r.approvalStatus || 'Pending',
-        assetStatus: r.assetStatus || 'Active',
-
-        assetStatusChangeAssignedTo:
-          r.assetStatusChangeAssignedTo || this.userName,
-
-        loginId: this.loginId,
-      };
-    });
-
-    // 🔥 STATUS VALIDATION (ADD)
-    if (
-      payload.some(
-        (p) => p.assetNewStatus === 'Under Repair' && !p.assetRepairVendor,
-      )
-    ) {
-      this.toast.danger('Repair vendor required!', 'ERROR', 3000);
-      return;
-    }
-
-    if (
-      payload.some(
-        (p) =>
-          p.assetNewStatus === 'Under Repair' && !p.assetExpectedReturnDate,
-      )
-    ) {
-      this.toast.danger('Expected return date required!', 'ERROR', 3000);
-      return;
-    }
-
-    if (
-      payload.some(
-        (p) => p.assetNewStatus === 'Replaced' && !p.replacementAssetId,
-      )
-    ) {
-      this.toast.danger('Replacement Asset ID required!', 'ERROR', 3000);
-      return;
-    }
-
-    if (
-      payload.some((p) => p.assetNewStatus === 'Scrapped' && !p.scrapReason)
-    ) {
-      this.toast.danger('Scrap reason required!', 'ERROR', 3000);
-      return;
-    }
-
-    console.log('SAVE PAYLOAD:', payload);
-
-    this.commonService.submitAssetStatusChange(payload).subscribe({
-      next: (res) => {
-        console.log('SAVE SUCCESS:', res);
-
-        this.toast.success(
-          'Asset Status Change record added successfully!',
-          'SUCCESS',
-          4000,
-        );
-
-        this.resetAfterSave();
-        this.loadAssetStatusChange();
-      },
-
-      error: (err) => {
-        console.error('SAVE ERROR:', err);
-
-        this.toast.danger(
-          err?.error?.message || 'Backend API Error!',
-          'ERROR',
-          4000,
-        );
-      },
+  /* ================= VALIDATION ================= */
+  if (form) {
+    Object.keys(form.controls).forEach((key) => {
+      form.controls[key].markAsTouched();
+      form.controls[key].markAsDirty();
     });
   }
+
+  if (form && !form.valid) return;
+
+  /* ================= LOGIN CHECK ================= */
+  if (!this.loginId) {
+    this.toast.danger('Login ID missing!', 'ERROR', 3000);
+    return;
+  }
+
+  /* ================= PAYLOAD BUILDER ================= */
+  const preparePayload = (r: any, isEdit = false, existing?: any) => {
+
+    return {
+
+      /* ================= PRIMARY ================= */
+      changeNumber: r.changeNumber || '',
+
+      /* ================= DATE ================= */
+      changeDate: r.changeDate || this.getTodayDate(),
+
+      /* ================= ASSET ================= */
+      assetId: r.assetId || '',
+      assetSerialNumber: r.assetSerialNumber || '',
+
+      /* ================= STATUS ================= */
+      oldStatus: r.oldStatus || '',
+      newStatus: r.newStatus || '',
+
+      /* ================= DETAILS ================= */
+      reasonForStatusChange: r.reasonForStatusChange || '',
+      description: r.description || '',
+
+      /* ================= REFERENCES ================= */
+      allocationId: r.allocationId || '',
+      callLoggingId: r.callLoggingId || '',
+      replacementId: r.replacementId || '',
+
+      /* ================= USER ================= */
+      changedBy: this.loginId,
+
+      /* ================= CONDITION ================= */
+      assetCondition: r.assetCondition || 'Good',
+
+      /* ================= REMARKS ================= */
+      remarks: r.remarks || '',
+
+      /* ================= AUDIT ================= */
+      createdBy: isEdit ? existing?.createdBy : this.loginId,
+      createdDate: isEdit ? existing?.createdDate : this.getTodayDate(),
+
+      updatedBy: isEdit ? this.loginId : '',
+      updatedDate: isEdit ? this.getTodayDate() : '',
+    };
+  };
+
+  /* ================= EDIT MODE ================= */
+  if (this.isEditMode && this.editIndex !== -1) {
+
+    const formData = this.forms[0].newRecord;
+    const existing = this.tableData[this.editIndex];
+
+    const payload = preparePayload(formData, true, existing);
+
+    const statusChangeId = existing?.statusChangeId;
+
+    if (!statusChangeId) {
+      this.toast.danger('Invalid ID!', 'ERROR', 3000);
+      return;
+    }
+
+    this.commonService
+      .updateAssetStatusChange(statusChangeId, payload)
+      .subscribe({
+
+        next: () => {
+          this.toast.success('Updated Successfully', 'SUCCESS', 4000);
+          this.resetAfterSave();
+          this.loadAssetStatusChange();
+        },
+
+        error: (err) => {
+          console.error('UPDATE ERROR:', err);
+          this.toast.danger('Update failed!', 'ERROR', 4000);
+        },
+      });
+
+    return;
+  }
+
+  /* ================= ADD MODE ================= */
+
+  const payload = this.forms.map((f) =>
+    preparePayload(f.newRecord, false)
+  );
+
+  this.commonService.submitAssetStatusChange(payload).subscribe({
+
+    next: () => {
+      this.toast.success('Saved Successfully', 'SUCCESS', 4000);
+      this.resetAfterSave();
+      this.loadAssetStatusChange();
+    },
+
+    error: (err) => {
+      console.error('SAVE ERROR:', err);
+      this.toast.danger('Save failed!', 'ERROR', 4000);
+    },
+  });
+}
   resetAfterSave() {
     this.forms = [
       {
@@ -1513,77 +1330,137 @@ th {
   // --------------------------
   // CANCEL / RESET FORM
   // --------------------------
-  cancelRecord(form?: NgForm) {
-    /* ================= RESET FORM UI ================= */
-    if (form) {
-      form.resetForm();
-    }
+cancelRecord(form?: NgForm) {
 
-    /* ================= RESET STATE ================= */
-    this.showErrors = false;
-    this.isEditMode = false;
-    this.editIndex = -1;
-
-    /* ================= RESET FORMS ================= */
-    this.forms = [
-      {
-        newRecord: {
-          ...this.newRecord,
-
-          // 🔥 reset important defaults
-          assetStatusChangeId: '0',
-          assetStatusCreatedDate: this.getTodayDate(),
-          assetStatusChangeDate: this.getTodayDate(),
-
-          approvalStatus: 'Pending',
-
-          assetStatus: 'Active',
-          loginId: this.loginId,
-        },
-      },
-    ];
-
-    this.activeForm = 0;
-
-    /* ================= OPTIONAL: SWITCH TAB ================= */
-    // this.activeTab = 'details';
-
-    /* ================= OPTIONAL: CLEAR SELECTION ================= */
-    this.selectedRows = [];
-
-    /* ================= SUCCESS MESSAGE ================= */
-    this.toast.info('Form cleared successfully', '', 3000);
+  /* ================= RESET FORM UI ================= */
+  if (form) {
+    form.resetForm();
   }
 
+  /* ================= RESET STATE ================= */
+  this.showErrors = false;
+  this.isEditMode = false;
+  this.editIndex = -1;
+
+  /* ================= RESET FORMS ================= */
+  this.forms = [
+    {
+      newRecord: {
+
+        /* ================= PRIMARY ================= */
+        statusChangeId: '0',
+        changeNumber: '',
+
+        /* ================= DATE ================= */
+        changeDate: this.getTodayDate(),
+
+        /* ================= ASSET ================= */
+        assetId: '',
+        assetSerialNumber: '',
+
+        /* ================= STATUS ================= */
+        oldStatus: '',
+        newStatus: '',
+
+        /* ================= DETAILS ================= */
+        reasonForStatusChange: '',
+        description: '',
+
+        /* ================= REFERENCES ================= */
+        allocationId: '',
+        callLoggingId: '',
+        replacementId: '',
+
+        /* ================= USER ================= */
+        changedBy: this.loginId || '',
+
+        /* ================= CONDITION ================= */
+        assetCondition: 'Good',
+
+        /* ================= REMARKS ================= */
+        remarks: '',
+
+        /* ================= AUDIT ================= */
+        createdBy: this.loginId || '',
+        createdDate: this.getTodayDate(),
+
+        updatedBy: '',
+        updatedDate: '',
+      },
+    },
+  ];
+
+  this.activeForm = 0;
+
+  /* ================= CLEAR SELECTION ================= */
+  this.selectedRows = [];
+
+  /* ================= SUCCESS MESSAGE ================= */
+  this.toast.info('Form cleared successfully', '', 3000);
+}
   // --------------------------
   // EDIT EXISTING ROW
   // --------------------------
-  onEdit(row: TableRow, index: number) {
-    this.activeTab = 'newRecord';
-    this.isEditMode = true;
-    this.editIndex = index;
+onEdit(row: any, index: number) {
 
-    /* ================= SAFE COPY (IMPORTANT 🔥) ================= */
-    const record: TableRow = {
-      ...this.newRecord, // default structure
-      ...row, // override with actual data
+  this.activeTab = 'newRecord';
+  this.isEditMode = true;
+  this.editIndex = index;
 
-      // 🔥 fallback defaults (avoid undefined issues)
-      approvalStatus: row.approvalStatus || 'Pending',
-      assetStatus: row.assetStatus || 'Active',
-      loginId: this.loginId,
-    };
+  /* ================= SAFE COPY ================= */
+  const record = {
 
-    /* ================= RESET FORMS ================= */
-    this.forms = [
-      {
-        newRecord: record,
-      },
-    ];
+    /* ================= PRIMARY ================= */
+    statusChangeId: row.statusChangeId || '0',
+    changeNumber: row.changeNumber || '',
 
-    this.activeForm = 0;
-    this.showErrors = false;
-  }
+    /* ================= DATE ================= */
+    changeDate: row.changeDate || this.getTodayDate(),
+
+    /* ================= ASSET ================= */
+    assetId: row.assetId || '',
+    assetSerialNumber: row.assetSerialNumber || '',
+
+    /* ================= STATUS ================= */
+    oldStatus: row.oldStatus || '',
+    newStatus: row.newStatus || '',
+
+    /* ================= DETAILS ================= */
+    reasonForStatusChange: row.reasonForStatusChange || '',
+    description: row.description || '',
+
+    /* ================= REFERENCES ================= */
+    allocationId: row.allocationId || '',
+    callLoggingId: row.callLoggingId || '',
+    replacementId: row.replacementId || '',
+
+    /* ================= USER ================= */
+    changedBy: row.changedBy || this.loginId,
+
+    /* ================= CONDITION ================= */
+    assetCondition: row.assetCondition || 'Good',
+
+    /* ================= REMARKS ================= */
+    remarks: row.remarks || '',
+
+    /* ================= AUDIT ================= */
+    createdBy: row.createdBy || this.loginId,
+    createdDate: row.createdDate || this.getTodayDate(),
+
+    updatedBy: row.updatedBy || '',
+    updatedDate: row.updatedDate || '',
+  };
+
+  /* ================= RESET FORMS ================= */
+  this.forms = [
+    {
+      newRecord: record,
+    },
+  ];
+
+  this.activeForm = 0;
+  this.showErrors = false;
+}
 
   //bulk export date format
   startDateError: string = '';
@@ -1753,187 +1630,196 @@ th {
   csvRecords: any[] = [];
 
   // Convert CSV → JSON and store in tableData
-  parseCSV(csv: string) {
-    const lines = csv
-      .split('\n')
-      .map((l) => l.trim())
-      .filter((l) => l);
+parseCSV(csv: string) {
 
-    if (lines.length <= 1) {
-      this.showToast('CSV has no data', 'warning');
+  const lines = csv
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l);
+
+  if (lines.length <= 1) {
+    this.showToast('CSV has no data', 'warning');
+    return;
+  }
+
+  /* ================= HEADER MAPPING ================= */
+  const mapHeader = (h: string) => {
+    switch (h.toLowerCase()) {
+
+      case 'status change id': return 'statusChangeId';
+      case 'change number': return 'changeNumber';
+      case 'change date': return 'changeDate';
+
+      case 'asset id': return 'assetId';
+      case 'serial number': return 'assetSerialNumber';
+
+      case 'old status': return 'oldStatus';
+      case 'new status': return 'newStatus';
+
+      case 'reason': return 'reasonForStatusChange';
+      case 'description': return 'description';
+
+      case 'allocation id': return 'allocationId';
+      case 'call logging id': return 'callLoggingId';
+      case 'replacement id': return 'replacementId';
+
+      case 'changed by': return 'changedBy';
+      case 'condition': return 'assetCondition';
+
+      case 'remarks': return 'remarks';
+
+      case 'created by': return 'createdBy';
+      case 'created date': return 'createdDate';
+      case 'updated by': return 'updatedBy';
+      case 'updated date': return 'updatedDate';
+
+      default:
+        return h;
+    }
+  };
+
+  const csvHeaders = lines[0].split(',').map((h) => mapHeader(h.trim()));
+
+  const results: any[] = [];
+
+  /* ================= ROW PARSING ================= */
+  for (let i = 1; i < lines.length; i++) {
+
+    const values = lines[i].split(',');
+    const obj: any = {};
+
+    csvHeaders.forEach((h, idx) => {
+      obj[h] = values[idx] ? values[idx].trim() : '';
+    });
+
+    const newRecord = {
+
+      /* ================= PRIMARY ================= */
+      statusChangeId: obj.statusChangeId || '0',
+      changeNumber: obj.changeNumber || '',
+
+      /* ================= DATE ================= */
+      changeDate: obj.changeDate || this.getTodayDate(),
+
+      /* ================= ASSET ================= */
+      assetId: obj.assetId || '',
+      assetSerialNumber: obj.assetSerialNumber || '',
+
+      /* ================= STATUS ================= */
+      oldStatus: obj.oldStatus || '',
+      newStatus: obj.newStatus || '',
+
+      /* ================= DETAILS ================= */
+      reasonForStatusChange: obj.reasonForStatusChange || '',
+      description: obj.description || '',
+
+      /* ================= REFERENCES ================= */
+      allocationId: obj.allocationId || '',
+      callLoggingId: obj.callLoggingId || '',
+      replacementId: obj.replacementId || '',
+
+      /* ================= USER ================= */
+      changedBy: obj.changedBy || this.loginId,
+
+      /* ================= CONDITION ================= */
+      assetCondition: obj.assetCondition || 'Good',
+
+      /* ================= REMARKS ================= */
+      remarks: obj.remarks || '',
+
+      /* ================= AUDIT ================= */
+      createdBy: obj.createdBy || this.loginId,
+      createdDate: obj.createdDate || this.getTodayDate(),
+
+      updatedBy: obj.updatedBy || '',
+      updatedDate: obj.updatedDate || '',
+    };
+
+    results.push(newRecord);
+  }
+
+  /* ================= SAVE ================= */
+  this.tableData = [...this.tableData, ...results];
+  this.filteredData = [...this.tableData];
+  this.currentPage = 1;
+
+  this.cdr.detectChanges();
+
+  this.showToast(
+    `${results.length} record(s) imported successfully!`,
+    'success'
+  );
+}
+
+  // ---------------- Excel Parsing ----------------
+  // ---------------- Excel Parsing ----------------
+readExcel(file: File) {
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+
+    const workbook = XLSX.read(reader.result, { type: 'binary' });
+
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+
+    const json: any[] = XLSX.utils.sheet_to_json(sheet);
+
+    if (!json || json.length === 0) {
+      this.showToast('Excel file is empty!', 'warning');
       return;
     }
 
-    /* ================= HEADER MAPPING ================= */
-    const mapHeader = (h: string) => {
-      switch (h.toLowerCase()) {
-        case 'status change id':
-          return 'assetStatusChangeId';
-        case 'status change code':
-          return 'assetStatusChangeCode';
+    const results: any[] = [];
 
-        case 'created date':
-          return 'assetStatusCreatedDate';
-        case 'change date':
-          return 'assetStatusChangeDate';
+    json.forEach((obj: any) => {
 
-        case 'asset id':
-          return 'assetId';
-        case 'asset name':
-          return 'assetName';
-        case 'asset type':
-          return 'assetType';
+      const newRecord = {
 
-        case 'serial number':
-        case 'serial no':
-          return 'assetSerialNumber';
+        /* ================= PRIMARY ================= */
+        statusChangeId: obj['Status Change ID'] || '0',
+        changeNumber: obj['Change Number'] || '',
 
-        case 'current status':
-          return 'assetCurrentStatus';
-        case 'new status':
-          return 'assetNewStatus';
+        /* ================= DATE ================= */
+        changeDate: obj['Change Date'] || this.getTodayDate(),
 
-        case 'change reason':
-          return 'assetStatusChangeReason';
-        case 'remarks':
-          return 'assetStatusChangeRemarks';
+        /* ================= ASSET ================= */
+        assetId: obj['Asset ID'] || '',
+        assetSerialNumber: obj['Serial Number'] || '',
 
-        case 'initiated by':
-          return 'assetChangeInitiatedBy';
-        case 'approved by':
-          return 'assetChangeApprovedBy';
-        case 'assigned to':
-          return 'assetStatusChangeAssignedTo';
+        /* ================= STATUS ================= */
+        oldStatus: obj['Old Status'] || '',
+        newStatus: obj['New Status'] || '',
 
-        case 'approval status':
-          return 'approvalStatus';
-        case 'approval date':
-          return 'approvalDate';
+        /* ================= DETAILS ================= */
+        reasonForStatusChange: obj['Reason'] || '',
+        description: obj['Description'] || '',
 
-        case 'repair vendor':
-          return 'assetRepairVendor';
-        case 'expected return date':
-          return 'assetExpectedReturnDate';
-        case 'repair cost':
-          return 'repairCost';
+        /* ================= REFERENCES ================= */
+        allocationId: obj['Allocation ID'] || '',
+        callLoggingId: obj['Call Logging ID'] || '',
+        replacementId: obj['Replacement ID'] || '',
 
-        case 'replacement asset id':
-          return 'replacementAssetId';
-        case 'replacement date':
-          return 'replacementDate';
+        /* ================= USER ================= */
+        changedBy: obj['Changed By'] || this.loginId,
 
-        case 'scrap reason':
-          return 'scrapReason';
-        case 'scrap date':
-          return 'scrapDate';
+        /* ================= CONDITION ================= */
+        assetCondition: obj['Condition'] || 'Good',
 
-        case 'call id':
-          return 'callId';
-        case 'allocation id':
-          return 'allocationId';
-        case 'return id':
-          return 'returnId';
-        case 'replacement id':
-          return 'replacementId';
+        /* ================= REMARKS ================= */
+        remarks: obj['Remarks'] || '',
 
-        case 'created by':
-          return 'createdBy';
-        case 'created date audit':
-          return 'createdDate';
-        case 'updated by':
-          return 'updatedBy';
-        case 'updated date':
-          return 'updatedDate';
+        /* ================= AUDIT ================= */
+        createdBy: obj['Created By'] || this.loginId,
+        createdDate: obj['Created Date'] || this.getTodayDate(),
 
-        case 'status':
-          return 'assetStatus';
-
-        default:
-          return h;
-      }
-    };
-
-    const csvHeaders = lines[0].split(',').map((h) => mapHeader(h.trim()));
-
-    const results: TableRow[] = [];
-
-    /* ================= ROW PARSING ================= */
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',');
-      const obj: any = {};
-
-      csvHeaders.forEach((h, idx) => {
-        obj[h] = values[idx] ? values[idx].trim() : '';
-      });
-
-      const newRecord: TableRow = {
-        /* PRIMARY */
-        assetStatusChangeId:
-          obj.assetStatusChangeId || `ASC-${this.tableData.length + i}`,
-        assetStatusChangeCode: obj.assetStatusChangeCode || '',
-
-        /* DATES */
-        assetStatusCreatedDate:
-          obj.assetStatusCreatedDate || this.getTodayDate(),
-        assetStatusChangeDate: obj.assetStatusChangeDate || this.getTodayDate(),
-
-        /* ASSET */
-        assetId: obj.assetId || '',
-        assetName: obj.assetName || '',
-        assetType: obj.assetType || '',
-        assetSerialNumber: obj.assetSerialNumber || '',
-
-        /* STATUS */
-        assetCurrentStatus: obj.assetCurrentStatus || '',
-        assetNewStatus: obj.assetNewStatus || '',
-
-        /* REASON */
-        assetStatusChangeReason: obj.assetStatusChangeReason || '',
-        assetStatusChangeRemarks: obj.assetStatusChangeRemarks || '',
-
-        /* USERS */
-        assetChangeInitiatedBy: obj.assetChangeInitiatedBy || '',
-        assetChangeApprovedBy: obj.assetChangeApprovedBy || '',
-        assetStatusChangeAssignedTo: obj.assetStatusChangeAssignedTo || '',
-
-        /* APPROVAL */
-        approvalStatus: obj.approvalStatus || 'Pending',
-        approvalDate: obj.approvalDate || '',
-
-        /* REPAIR */
-        assetRepairVendor: obj.assetRepairVendor || '',
-        assetExpectedReturnDate: obj.assetExpectedReturnDate || '',
-        repairCost: obj.repairCost ? Number(obj.repairCost) : undefined,
-
-        /* REPLACEMENT */
-        replacementAssetId: obj.replacementAssetId || '',
-        replacementDate: obj.replacementDate || '',
-
-        /* SCRAP */
-        scrapReason: obj.scrapReason || '',
-        scrapDate: obj.scrapDate || '',
-
-        /* REFERENCES */
-        callId: obj.callId || '',
-        allocationId: obj.allocationId || '',
-        returnId: obj.returnId || '',
-        replacementId: obj.replacementId || '',
-
-        /* AUDIT */
-        createdBy: obj.createdBy || '',
-        createdDate: obj.createdDate || this.getTodayDate(),
-        updatedBy: obj.updatedBy || '',
-        updatedDate: obj.updatedDate || '',
-
-        /* SYSTEM */
-        assetStatus: (obj.assetStatus as 'Active' | 'Inactive') || 'Active',
-
-        /* LOGIN */
-        loginId: this.loginId,
+        updatedBy: obj['Updated By'] || '',
+        updatedDate: obj['Updated Date'] || '',
       };
 
       results.push(newRecord);
-    }
+    });
 
     /* ================= SAVE ================= */
     this.tableData = [...this.tableData, ...results];
@@ -1944,217 +1830,184 @@ th {
 
     this.showToast(
       `${results.length} record(s) imported successfully!`,
-      'success',
+      'success'
     );
-  }
+  };
 
-  // ---------------- Excel Parsing ----------------
-  // ---------------- Excel Parsing ----------------
-  readExcel(file: File) {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const workbook = XLSX.read(reader.result, { type: 'binary' });
-
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-
-      const json: any[] = XLSX.utils.sheet_to_json(sheet);
-
-      if (!json || json.length === 0) {
-        this.showToast('Excel file is empty!', 'warning');
-        return;
-      }
-
-      const results: TableRow[] = [];
-
-      json.forEach((obj: any, i: number) => {
-        const newId = this.tableData.length + i + 1;
-
-        const newRecord: TableRow = {
-          /* ================= PRIMARY ================= */
-          assetStatusChangeId: obj['Status Change ID'] || `ASC-${newId}`,
-
-          assetStatusChangeCode:
-            obj['Status Change Code'] ||
-            `ASC-${String(newId).padStart(3, '0')}`,
-
-          /* ================= DATES ================= */
-          assetStatusCreatedDate: obj['Created Date'] || this.getTodayDate(),
-
-          assetStatusChangeDate: obj['Change Date'] || this.getTodayDate(),
-
-          /* ================= ASSET ================= */
-          assetId: obj['Asset ID'] || '',
-          assetName: obj['Asset Name'] || '',
-          assetType: obj['Asset Type'] || '',
-          assetSerialNumber: obj['Serial Number'] || obj['Serial No'] || '',
-
-          /* ================= STATUS ================= */
-          assetCurrentStatus: obj['Current Status'] || '',
-          assetNewStatus: obj['New Status'] || '',
-
-          /* ================= REASON ================= */
-          assetStatusChangeReason: obj['Change Reason'] || '',
-          assetStatusChangeRemarks: obj['Remarks'] || '',
-
-          /* ================= USERS ================= */
-          assetChangeInitiatedBy: obj['Initiated By'] || '',
-          assetChangeApprovedBy: obj['Approved By'] || '',
-          assetStatusChangeAssignedTo: obj['Assigned To'] || '',
-
-          /* ================= APPROVAL ================= */
-          approvalStatus: obj['Approval Status'] || 'Pending',
-          approvalDate: obj['Approval Date'] || '',
-
-          /* ================= REPAIR ================= */
-          assetRepairVendor: obj['Repair Vendor'] || '',
-          assetExpectedReturnDate: obj['Expected Return Date'] || '',
-          repairCost: obj['Repair Cost']
-            ? Number(obj['Repair Cost'])
-            : undefined,
-
-          /* ================= REPLACEMENT ================= */
-          replacementAssetId: obj['Replacement Asset ID'] || '',
-          replacementDate: obj['Replacement Date'] || '',
-
-          /* ================= SCRAP ================= */
-          scrapReason: obj['Scrap Reason'] || '',
-          scrapDate: obj['Scrap Date'] || '',
-
-          /* ================= REFERENCES ================= */
-          callId: obj['Call ID'] || '',
-          allocationId: obj['Allocation ID'] || '',
-          returnId: obj['Return ID'] || '',
-          replacementId: obj['Replacement ID'] || '',
-
-          /* ================= AUDIT ================= */
-          createdBy: obj['Created By'] || '',
-          createdDate: obj['Created Date Audit'] || this.getTodayDate(),
-          updatedBy: obj['Updated By'] || '',
-          updatedDate: obj['Updated Date'] || '',
-
-          /* ================= SYSTEM ================= */
-          assetStatus: (obj['Status'] as 'Active' | 'Inactive') || 'Active',
-
-          /* ================= LOGIN ================= */
-          loginId: this.loginId,
-        };
-
-        results.push(newRecord);
-      });
-
-      /* ================= SAVE ================= */
-      this.tableData = [...this.tableData, ...results];
-      this.filteredData = [...this.tableData];
-      this.currentPage = 1;
-
-      this.cdr.detectChanges();
-
-      this.showToast(
-        `${results.length} record(s) imported successfully!`,
-        'success',
-      );
-    };
-
-    reader.readAsBinaryString(file);
-  }
+  reader.readAsBinaryString(file);
+}
 
   // ---------------- TXT Parsing ----------------
-  readTXT(file: File) {
-    const reader = new FileReader();
+readTXT(file: File) {
 
-    reader.onload = () => {
-      const text = reader.result as string;
+  const reader = new FileReader();
 
-      const lines = text
-        .split(/\r?\n/)
-        .map((l) => l.trim())
-        .filter((l) => l !== '');
+  reader.onload = () => {
 
-      if (lines.length === 0) {
-        this.showToast('TXT file is empty!', 'warning');
+    const text = reader.result as string;
+
+    const lines = text
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter((l) => l !== '');
+
+    if (lines.length === 0) {
+      this.showToast('TXT file is empty!', 'warning');
+      return;
+    }
+
+    const results: any[] = [];
+
+    lines.forEach((line) => {
+
+      const cols = line.split(',').map((c) => c.trim());
+
+      // 🔥 expected columns = 18 (clean structure)
+      while (cols.length < 18) cols.push('');
+
+      const newRecord = {
+
+        /* ================= PRIMARY ================= */
+        statusChangeId: cols[0] || '0',
+        changeNumber: cols[1] || '',
+
+        /* ================= DATE ================= */
+        changeDate: cols[2] || this.getTodayDate(),
+
+        /* ================= ASSET ================= */
+        assetId: cols[3] || '',
+        assetSerialNumber: cols[4] || '',
+
+        /* ================= STATUS ================= */
+        oldStatus: cols[5] || '',
+        newStatus: cols[6] || '',
+
+        /* ================= DETAILS ================= */
+        reasonForStatusChange: cols[7] || '',
+        description: cols[8] || '',
+
+        /* ================= REFERENCES ================= */
+        allocationId: cols[9] || '',
+        callLoggingId: cols[10] || '',
+        replacementId: cols[11] || '',
+
+        /* ================= USER ================= */
+        changedBy: cols[12] || this.loginId,
+
+        /* ================= CONDITION ================= */
+        assetCondition: cols[13] || 'Good',
+
+        /* ================= REMARKS ================= */
+        remarks: cols[14] || '',
+
+        /* ================= AUDIT ================= */
+        createdBy: cols[15] || this.loginId,
+        createdDate: cols[16] || this.getTodayDate(),
+
+        updatedBy: cols[17] || '',
+        updatedDate: '',
+      };
+
+      results.push(newRecord);
+    });
+
+    /* ================= SAVE ================= */
+    this.tableData = [...this.tableData, ...results];
+    this.filteredData = [...this.tableData];
+    this.currentPage = 1;
+
+    this.cdr.detectChanges();
+
+    this.showToast(
+      `${results.length} record(s) imported successfully!`,
+      'success'
+    );
+  };
+
+  reader.readAsText(file);
+}
+
+  // ---------------- DOCX Parsing (mammoth.js) ----------------
+async readDOCX(file: File) {
+
+  const reader = new FileReader();
+
+  reader.onload = async () => {
+
+    const arrayBuffer = reader.result as ArrayBuffer;
+
+    try {
+
+      /* ================= DOCX → HTML ================= */
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+      const html = result.value;   // ✅ FIXED
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      const table = doc.querySelector('table');
+
+      if (!table) {
+        this.showToast('No table found in DOCX!', 'warning');
         return;
       }
 
-      const results: TableRow[] = [];
+      const rows = table.querySelectorAll('tr');
 
-      lines.forEach((line, idx) => {
-        const cols = line.split(',').map((c) => c.trim());
+      const results: any[] = [];
 
-        // 🔥 ensure enough columns (now full interface ~30 fields)
-        while (cols.length < 30) cols.push('');
+      rows.forEach((row, rowIndex) => {
 
-        const newId = this.tableData.length + idx + 1;
+        if (rowIndex === 0) return; // skip header
 
-        const newRecord: TableRow = {
+        const cells = Array.from(row.querySelectorAll('td')).map(
+          (cell) => cell.textContent?.trim() || ''
+        );
+
+        // 🔥 expected columns = 18 (clean structure)
+        while (cells.length < 18) cells.push('');
+
+        const newRecord = {
+
           /* ================= PRIMARY ================= */
-          assetStatusChangeId: cols[0] || `ASC-${newId}`,
-          assetStatusChangeCode:
-            cols[1] || `ASC-${String(newId).padStart(3, '0')}`,
+          statusChangeId: cells[0] || '0',
+          changeNumber: cells[1] || '',
 
-          /* ================= DATES ================= */
-          assetStatusCreatedDate: cols[2] || this.getTodayDate(),
-          assetStatusChangeDate: cols[3] || this.getTodayDate(),
+          /* ================= DATE ================= */
+          changeDate: cells[2] || this.getTodayDate(),
 
           /* ================= ASSET ================= */
-          assetId: cols[4] || '',
-          assetName: cols[5] || '',
-          assetType: cols[6] || '',
-          assetSerialNumber: cols[7] || '',
+          assetId: cells[3] || '',
+          assetSerialNumber: cells[4] || '',
 
           /* ================= STATUS ================= */
-          assetCurrentStatus: cols[8] || '',
-          assetNewStatus: cols[9] || '',
+          oldStatus: cells[5] || '',
+          newStatus: cells[6] || '',
 
-          /* ================= REASON ================= */
-          assetStatusChangeReason: cols[10] || '',
-          assetStatusChangeRemarks: cols[11] || '',
-
-          /* ================= USERS ================= */
-          assetChangeInitiatedBy: cols[12] || '',
-          assetChangeApprovedBy: cols[13] || '',
-          assetStatusChangeAssignedTo: cols[14] || '',
-
-          /* ================= APPROVAL ================= */
-          approvalStatus: ['Approved', 'Pending', 'Rejected'].includes(cols[15])
-            ? (cols[15] as 'Approved' | 'Pending' | 'Rejected')
-            : 'Pending',
-
-          approvalDate: cols[16] || '',
-
-          /* ================= REPAIR ================= */
-          assetRepairVendor: cols[17] || '',
-          assetExpectedReturnDate: cols[18] || '',
-          repairCost: cols[19] ? Number(cols[19]) : undefined,
-
-          /* ================= REPLACEMENT ================= */
-          replacementAssetId: cols[20] || '',
-          replacementDate: cols[21] || '',
-
-          /* ================= SCRAP ================= */
-          scrapReason: cols[22] || '',
-          scrapDate: cols[23] || '',
+          /* ================= DETAILS ================= */
+          reasonForStatusChange: cells[7] || '',
+          description: cells[8] || '',
 
           /* ================= REFERENCES ================= */
-          callId: cols[24] || '',
-          allocationId: cols[25] || '',
-          returnId: cols[26] || '',
-          replacementId: cols[27] || '',
+          allocationId: cells[9] || '',
+          callLoggingId: cells[10] || '',
+          replacementId: cells[11] || '',
+
+          /* ================= USER ================= */
+          changedBy: cells[12] || this.loginId,
+
+          /* ================= CONDITION ================= */
+          assetCondition: cells[13] || 'Good',
+
+          /* ================= REMARKS ================= */
+          remarks: cells[14] || '',
 
           /* ================= AUDIT ================= */
-          createdBy: cols[28] || '',
-          createdDate: this.getTodayDate(),
-          updatedBy: '',
+          createdBy: cells[15] || this.loginId,
+          createdDate: cells[16] || this.getTodayDate(),
+
+          updatedBy: cells[17] || '',
           updatedDate: '',
-
-          /* ================= SYSTEM ================= */
-          assetStatus: ['Active', 'Inactive'].includes(cols[29])
-            ? (cols[29] as 'Active' | 'Inactive')
-            : 'Active',
-
-          /* ================= LOGIN ================= */
-          loginId: this.loginId,
         };
 
         results.push(newRecord);
@@ -2169,319 +2022,142 @@ th {
 
       this.showToast(
         `${results.length} record(s) imported successfully!`,
-        'success',
+        'success'
       );
-    };
 
-    reader.readAsText(file);
-  }
+    } catch (err) {
+      console.error('DOCX Parse Error:', err);
+      this.showToast('Failed to read DOCX file!', 'danger');
+    }
+  };
 
-  // ---------------- DOCX Parsing (mammoth.js) ----------------
-  async readDOCX(file: File) {
-    const reader = new FileReader();
+  reader.readAsArrayBuffer(file);
+}
 
-    reader.onload = async () => {
-      const arrayBuffer = reader.result as ArrayBuffer;
+downloadSampleCSV() {
 
-      try {
-        /* ================= DOCX → HTML ================= */
-        const result = await mammoth.convertToHtml({ arrayBuffer });
-        const html = result.value;
+  /* ================= HEADERS (CLEAN STRUCTURE) ================= */
+  const headers = [
+    'Status Change ID',
+    'Change Number',
+    'Change Date',
 
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
+    'Asset ID',
+    'Serial Number',
 
-        const table = doc.querySelector('table');
+    'Old Status',
+    'New Status',
 
-        if (!table) {
-          this.showToast('No table found in DOCX!', 'warning');
-          return;
-        }
+    'Reason',
+    'Description',
 
-        const rows = table.querySelectorAll('tr');
+    'Allocation ID',
+    'Call Logging ID',
+    'Replacement ID',
 
-        const results: TableRow[] = [];
+    'Changed By',
+    'Condition',
 
-        rows.forEach((row, rowIndex) => {
-          if (rowIndex === 0) return; // skip header
+    'Remarks',
 
-          const cells = Array.from(row.querySelectorAll('td')).map(
-            (cell) => cell.textContent?.trim() || '',
-          );
+    'Created By',
+    'Created Date',
 
-          // 🔥 ensure enough columns (full interface ~30)
-          while (cells.length < 30) cells.push('');
+    'Updated By',
+    'Updated Date',
+  ];
 
-          const newId = this.tableData.length + rowIndex;
+  const csvRows: string[] = [];
+  csvRows.push(headers.join(','));
 
-          const newRecord: TableRow = {
-            /* ================= PRIMARY ================= */
-            assetStatusChangeId: cells[0] || `ASC-${newId}`,
-            assetStatusChangeCode:
-              cells[1] || `ASC-${String(newId).padStart(3, '0')}`,
+  /* ================= SAMPLE ROW ================= */
+  const sampleRow = [
+    'ASC-001',
+    'ASC-001',
+    this.getTodayDate(),
 
-            /* ================= DATES ================= */
-            assetStatusCreatedDate: cells[2] || this.getTodayDate(),
-            assetStatusChangeDate: cells[3] || this.getTodayDate(),
+    'A-1001',
+    'SN123456',
 
-            /* ================= ASSET ================= */
-            assetId: cells[4] || '',
-            assetName: cells[5] || '',
-            assetType: cells[6] || '',
-            assetSerialNumber: cells[7] || '',
+    'Active',
+    'Inactive',
 
-            /* ================= STATUS ================= */
-            assetCurrentStatus: cells[8] || '',
-            assetNewStatus: cells[9] || '',
+    'Maintenance',
+    'Routine check',
 
-            /* ================= REASON ================= */
-            assetStatusChangeReason: cells[10] || '',
-            assetStatusChangeRemarks: cells[11] || '',
+    'ALLOC001',
+    'CALL001',
+    '',
 
-            /* ================= USERS ================= */
-            assetChangeInitiatedBy: cells[12] || '',
-            assetChangeApprovedBy: cells[13] || '',
-            assetStatusChangeAssignedTo: cells[14] || '',
+    'EMP001',
+    'Good',
 
-            /* ================= APPROVAL ================= */
-            approvalStatus: ['Approved', 'Pending', 'Rejected'].includes(
-              cells[15],
-            )
-              ? (cells[15] as 'Approved' | 'Pending' | 'Rejected')
-              : 'Pending',
-            approvalDate: cells[16] || '',
+    'Working fine',
 
-            /* ================= REPAIR ================= */
-            assetRepairVendor: cells[17] || '',
-            assetExpectedReturnDate: cells[18] || '',
-            repairCost: cells[19] ? Number(cells[19]) : undefined,
+    'Admin',
+    this.getTodayDate(),
 
-            /* ================= REPLACEMENT ================= */
-            replacementAssetId: cells[20] || '',
-            replacementDate: cells[21] || '',
+    '',
+    '',
+  ];
 
-            /* ================= SCRAP ================= */
-            scrapReason: cells[22] || '',
-            scrapDate: cells[23] || '',
+  csvRows.push(sampleRow.join(','));
 
-            /* ================= REFERENCES ================= */
-            callId: cells[24] || '',
-            allocationId: cells[25] || '',
-            returnId: cells[26] || '',
-            replacementId: cells[27] || '',
+  /* ================= OPTIONAL: EXISTING DATA ================= */
+  this.tableData.forEach((row: any) => {
 
-            /* ================= AUDIT ================= */
-            createdBy: cells[28] || '',
-            createdDate: this.getTodayDate(),
-            updatedBy: '',
-            updatedDate: '',
+    const rowData = [
+      row.statusChangeId || '',
+      row.changeNumber || '',
+      row.changeDate || '',
 
-            /* ================= SYSTEM ================= */
-            assetStatus: ['Active', 'Inactive'].includes(cells[29])
-              ? (cells[29] as 'Active' | 'Inactive')
-              : 'Active',
+      row.assetId || '',
+      row.assetSerialNumber || '',
 
-            /* ================= LOGIN ================= */
-            loginId: this.loginId,
-          };
+      row.oldStatus || '',
+      row.newStatus || '',
 
-          results.push(newRecord);
-        });
+      row.reasonForStatusChange || '',
+      row.description || '',
 
-        /* ================= SAVE ================= */
-        this.tableData = [...this.tableData, ...results];
-        this.filteredData = [...this.tableData];
-        this.currentPage = 1;
+      row.allocationId || '',
+      row.callLoggingId || '',
+      row.replacementId || '',
 
-        this.cdr.detectChanges();
+      row.changedBy || '',
+      row.assetCondition || '',
 
-        this.showToast(
-          `${results.length} record(s) imported successfully!`,
-          'success',
-        );
-      } catch (err) {
-        console.error('DOCX Parse Error:', err);
-        this.showToast('Failed to read DOCX file!', 'danger');
-      }
-    };
+      row.remarks || '',
 
-    reader.readAsArrayBuffer(file);
-  }
+      row.createdBy || '',
+      row.createdDate || '',
 
-  downloadSampleCSV() {
-    /* ================= HEADERS (FULL INTERFACE) ================= */
-    const headers = [
-      'Status Change ID',
-      'Status Change Code',
-      'Created Date',
-      'Change Date',
-
-      'Asset ID',
-      'Asset Name',
-      'Asset Type',
-      'Serial Number',
-
-      'Current Status',
-      'New Status',
-
-      'Change Reason',
-      'Remarks',
-
-      'Initiated By',
-      'Approved By',
-      'Assigned To',
-
-      'Approval Status',
-      'Approval Date',
-
-      'Repair Vendor',
-      'Expected Return Date',
-      'Repair Cost',
-
-      'Replacement Asset ID',
-      'Replacement Date',
-
-      'Scrap Reason',
-      'Scrap Date',
-
-      'Call ID',
-      'Allocation ID',
-      'Return ID',
-      'Replacement ID',
-
-      'Created By',
-      'Created Date Audit',
-      'Updated By',
-      'Updated Date',
-
-      'Status',
+      row.updatedBy || '',
+      row.updatedDate || '',
     ];
 
-    const csvRows: string[] = [];
-    csvRows.push(headers.join(','));
+    csvRows.push(rowData.join(','));
+  });
 
-    /* ================= SAMPLE ROW (IMPORTANT 🔥) ================= */
-    const sampleRow = [
-      'ASC-001',
-      'ASC-001',
-      this.getTodayDate(),
-      this.getTodayDate(),
+  /* ================= CREATE FILE ================= */
+  const csvString = '\ufeff' + csvRows.join('\n');
 
-      'A-1001',
-      'Dell Laptop',
-      'Laptop',
-      'SN123456',
+  const blob = new Blob([csvString], {
+    type: 'text/csv;charset=utf-8;',
+  });
 
-      'Active',
-      'Under Repair',
+  const url = window.URL.createObjectURL(blob);
 
-      'Hardware Issue',
-      'Fan not working',
+  const a = document.createElement('a');
+  a.href = url;
 
-      'EMP001',
-      'MGR001',
-      'ENG001',
+  const today = new Date().toISOString().split('T')[0];
+  a.download = `Asset_Status_Change_Sample_${today}.csv`;
 
-      'Pending',
-      '',
+  a.click();
 
-      'ABC Vendor',
-      this.getTodayDate(),
-      '1500',
-
-      '',
-      '',
-
-      '',
-      '',
-
-      'CALL001',
-      'ALLOC001',
-      '',
-      '',
-
-      'Admin',
-      this.getTodayDate(),
-      '',
-      '',
-
-      'Active',
-    ];
-
-    csvRows.push(sampleRow.join(','));
-
-    /* ================= OPTIONAL: ADD EXISTING DATA ================= */
-    this.tableData.forEach((row: TableRow) => {
-      const rowData = [
-        row.assetStatusChangeId || '',
-        row.assetStatusChangeCode || '',
-        row.assetStatusCreatedDate || '',
-        row.assetStatusChangeDate || '',
-
-        row.assetId || '',
-        row.assetName || '',
-        row.assetType || '',
-        row.assetSerialNumber || '',
-
-        row.assetCurrentStatus || '',
-        row.assetNewStatus || '',
-
-        row.assetStatusChangeReason || '',
-        row.assetStatusChangeRemarks || '',
-
-        row.assetChangeInitiatedBy || '',
-        row.assetChangeApprovedBy || '',
-        row.assetStatusChangeAssignedTo || '',
-
-        row.approvalStatus || '',
-        row.approvalDate || '',
-
-        row.assetRepairVendor || '',
-        row.assetExpectedReturnDate || '',
-        row.repairCost ?? '',
-
-        row.replacementAssetId || '',
-        row.replacementDate || '',
-
-        row.scrapReason || '',
-        row.scrapDate || '',
-
-        row.callId || '',
-        row.allocationId || '',
-        row.returnId || '',
-        row.replacementId || '',
-
-        row.createdBy || '',
-        row.createdDate || '',
-        row.updatedBy || '',
-        row.updatedDate || '',
-
-        row.assetStatus || '',
-      ];
-
-      csvRows.push(rowData.join(','));
-    });
-
-    /* ================= CREATE FILE ================= */
-    const csvString = '\ufeff' + csvRows.join('\n'); // UTF-8 BOM fix
-
-    const blob = new Blob([csvString], {
-      type: 'text/csv;charset=utf-8;',
-    });
-
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-
-    const today = new Date().toISOString().split('T')[0];
-    a.download = `Asset_Status_Change_Sample_${today}.csv`;
-
-    a.click();
-
-    window.URL.revokeObjectURL(url);
-  }
-
+  window.URL.revokeObjectURL(url);
+}
   //bulk export
   // ---------------- Component Variables ----------------
   startDate: string = '';
@@ -2530,7 +2206,7 @@ th {
     const end = this.endDate ? this.parseDDMMYYYY(this.endDate) : null;
 
     const filteredData = this.tableData.filter((row) => {
-      const rowDate = this.parseDDMMYYYY(row.assetStatusCreatedDate);
+      const rowDate = this.parseDDMMYYYY(row.createdDate);
       if (!rowDate) return false;
 
       const includeStart = start && rowDate.getTime() === start.getTime();
@@ -2562,445 +2238,374 @@ th {
   }
 
   // ---------------- CSV Export ----------------
-  exportCSVfile(data: TableRow[]) {
-    if (!data || data.length === 0) {
-      this.toast.warning('No data available to export!', '', 3000);
-      return;
-    }
+exportCSVfile(data: any[]) {
 
-    const today = new Date();
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+  if (!data || data.length === 0) {
+    this.toast.warning('No data available to export!', '', 3000);
+    return;
+  }
 
-    const csvRows: string[] = [];
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
 
-    /* ================= HEADER INFO ================= */
-    csvRows.push(this.headCompanyName || 'Company Name');
-    csvRows.push(`Date:,${formattedDate}`);
-    csvRows.push(`Total Records:,${data.length}`);
-    csvRows.push('');
+  const csvRows: string[] = [];
 
-    /* ================= HEADERS ================= */
-    const headers = [
+  /* ================= HEADER INFO ================= */
+  csvRows.push(this.headCompanyName || 'Company Name');
+  csvRows.push(`Date:,${formattedDate}`);
+  csvRows.push(`Total Records:,${data.length}`);
+  csvRows.push('');
+
+  /* ================= HEADERS (CLEAN) ================= */
+  const headers = [
+    'Status Change ID',
+    'Change Number',
+    'Change Date',
+
+    'Asset ID',
+    'Serial Number',
+
+    'Old Status',
+    'New Status',
+
+    'Reason',
+    'Description',
+
+    'Allocation ID',
+    'Call Logging ID',
+    'Replacement ID',
+
+    'Changed By',
+    'Condition',
+
+    'Remarks',
+
+    'Created By',
+    'Created Date',
+
+    'Updated By',
+    'Updated Date',
+  ];
+
+  csvRows.push(headers.join(','));
+
+  /* ================= SAFE VALUE ================= */
+  const safe = (val: any) => {
+    if (val === null || val === undefined) return '';
+    const str = String(val).replace(/"/g, '""');
+    return `"${str}"`;
+  };
+
+  /* ================= DATA ================= */
+  data.forEach((row: any) => {
+
+    const rowData = [
+      safe(row.statusChangeId),
+      safe(row.changeNumber),
+      safe(row.changeDate),
+
+      safe(row.assetId),
+      safe(row.assetSerialNumber),
+
+      safe(row.oldStatus),
+      safe(row.newStatus),
+
+      safe(row.reasonForStatusChange),
+      safe(row.description),
+
+      safe(row.allocationId),
+      safe(row.callLoggingId),
+      safe(row.replacementId),
+
+      safe(row.changedBy),
+      safe(row.assetCondition),
+
+      safe(row.remarks),
+
+      safe(row.createdBy),
+      safe(row.createdDate),
+
+      safe(row.updatedBy),
+      safe(row.updatedDate),
+    ];
+
+    csvRows.push(rowData.join(','));
+  });
+
+  /* ================= CREATE FILE ================= */
+  const csvString = '\ufeff' + csvRows.join('\n');
+
+  const blob = new Blob([csvString], {
+    type: 'text/csv;charset=utf-8;',
+  });
+
+  const fileName = `Asset_Status_Change_Report_${today.toISOString().split('T')[0]}.csv`;
+
+  saveAs(blob, fileName);
+}
+
+  // ---------------- Excel Export ----------------
+exportExcelfile(data: any[]) {
+
+  if (!data || data.length === 0) {
+    this.toast.warning('No data available to export!', '', 3000);
+    return;
+  }
+
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+
+  /* ================= SHEET DATA ================= */
+  const wsData = [
+    [this.headCompanyName || 'Company Name'],
+    ['Date:', formattedDate],
+    ['Total Records:', data.length],
+    [],
+
+    /* HEADERS (CLEAN) */
+    [
       'Status Change ID',
-      'Status Change Code',
-      'Created Date',
+      'Change Number',
       'Change Date',
 
       'Asset ID',
-      'Asset Name',
-      'Asset Type',
       'Serial Number',
 
-      'Current Status',
+      'Old Status',
       'New Status',
 
-      'Change Reason',
-      'Remarks',
+      'Reason',
+      'Description',
 
-      'Initiated By',
-      'Approved By',
-      'Assigned To',
-
-      'Approval Status',
-      'Approval Date',
-
-      'Repair Vendor',
-      'Expected Return Date',
-      'Repair Cost',
-
-      'Replacement Asset ID',
-      'Replacement Date',
-
-      'Scrap Reason',
-      'Scrap Date',
-
-      'Call ID',
       'Allocation ID',
-      'Return ID',
+      'Call Logging ID',
       'Replacement ID',
 
+      'Changed By',
+      'Condition',
+
+      'Remarks',
+
       'Created By',
-      'Created Date Audit',
+      'Created Date',
+
       'Updated By',
       'Updated Date',
+    ],
+  ];
 
-      'Status',
-    ];
+  /* ================= DATA ================= */
+  data.forEach((row: any) => {
+    wsData.push([
 
-    csvRows.push(headers.join(','));
+      row.statusChangeId || '',
+      row.changeNumber || '',
+      row.changeDate || '',
 
-    /* ================= SAFE CSV VALUE FUNCTION 🔥 ================= */
-    const safe = (val: any) => {
-      if (val === null || val === undefined) return '';
-      const str = String(val).replace(/"/g, '""');
-      return `"${str}"`; // 🔥 wrap to avoid comma issues
-    };
+      row.assetId || '',
+      row.assetSerialNumber || '',
 
-    /* ================= DATA ================= */
-    data.forEach((row: TableRow) => {
-      const rowData = [
-        safe(row.assetStatusChangeId),
-        safe(row.assetStatusChangeCode),
-        safe(row.assetStatusCreatedDate),
-        safe(row.assetStatusChangeDate),
+      row.oldStatus || '',
+      row.newStatus || '',
 
-        safe(row.assetId),
-        safe(row.assetName),
-        safe(row.assetType),
-        safe(row.assetSerialNumber),
+      row.reasonForStatusChange || '',
+      row.description || '',
 
-        safe(row.assetCurrentStatus),
-        safe(row.assetNewStatus),
+      row.allocationId || '',
+      row.callLoggingId || '',
+      row.replacementId || '',
 
-        safe(row.assetStatusChangeReason),
-        safe(row.assetStatusChangeRemarks),
+      row.changedBy || '',
+      row.assetCondition || '',
 
-        safe(row.assetChangeInitiatedBy),
-        safe(row.assetChangeApprovedBy),
-        safe(row.assetStatusChangeAssignedTo),
+      row.remarks || '',
 
-        safe(row.approvalStatus),
-        safe(row.approvalDate),
+      row.createdBy || '',
+      row.createdDate || '',
 
-        safe(row.assetRepairVendor),
-        safe(row.assetExpectedReturnDate),
-        safe(row.repairCost ?? ''),
+      row.updatedBy || '',
+      row.updatedDate || '',
+    ]);
+  });
 
-        safe(row.replacementAssetId),
-        safe(row.replacementDate),
+  /* ================= CREATE SHEET ================= */
+  const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
 
-        safe(row.scrapReason),
-        safe(row.scrapDate),
+  /* ================= AUTO COLUMN WIDTH ================= */
+  const headerRow = wsData[4];
 
-        safe(row.callId),
-        safe(row.allocationId),
-        safe(row.returnId),
-        safe(row.replacementId),
+  worksheet['!cols'] = headerRow.map((col, i) => ({
+    wch: Math.max(
+      String(col).length + 5,
+      ...data.map((row: any) =>
+        String(Object.values(row)[i] || '').length + 2
+      )
+    ),
+  }));
 
-        safe(row.createdBy),
-        safe(row.createdDate),
-        safe(row.updatedBy),
-        safe(row.updatedDate),
+  /* ================= WORKBOOK ================= */
+  const workbook: XLSX.WorkBook = XLSX.utils.book_new();
 
-        safe(row.assetStatus),
-      ];
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    'Asset Status Change Report'
+  );
 
-      csvRows.push(rowData.join(','));
-    });
+  /* ================= FILE EXPORT ================= */
+  const excelBuffer: any = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
 
-    /* ================= CREATE FILE ================= */
-    const csvString = '\ufeff' + csvRows.join('\n'); // UTF-8 BOM
+  const blob = new Blob([excelBuffer], {
+    type: 'application/octet-stream',
+  });
 
-    const blob = new Blob([csvString], {
-      type: 'text/csv;charset=utf-8;',
-    });
+  const fileName = `Asset_Status_Change_Report_${
+    today.toISOString().split('T')[0]
+  }.xlsx`;
 
-    const fileName = `Asset_Status_Change_Report_${today.toISOString().split('T')[0]}.csv`;
-
-    saveAs(blob, fileName);
-  }
-
-  // ---------------- Excel Export ----------------
-  exportExcelfile(data: TableRow[]) {
-    if (!data || data.length === 0) {
-      this.toast.warning('No data available to export!', '', 3000);
-      return;
-    }
-
-    const today = new Date();
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
-
-    /* ================= SHEET DATA ================= */
-    const wsData = [
-      [this.headCompanyName || 'Company Name'],
-      ['Date:', formattedDate],
-      ['Total Records:', data.length],
-      [],
-
-      /* HEADERS */
-      [
-        'Status Change ID',
-        'Status Change Code',
-        'Created Date',
-        'Change Date',
-
-        'Asset ID',
-        'Asset Name',
-        'Asset Type',
-        'Serial Number',
-
-        'Current Status',
-        'New Status',
-
-        'Change Reason',
-        'Remarks',
-
-        'Initiated By',
-        'Approved By',
-        'Assigned To',
-
-        'Approval Status',
-        'Approval Date',
-
-        'Repair Vendor',
-        'Expected Return Date',
-        'Repair Cost',
-
-        'Replacement Asset ID',
-        'Replacement Date',
-
-        'Scrap Reason',
-        'Scrap Date',
-
-        'Call ID',
-        'Allocation ID',
-        'Return ID',
-        'Replacement ID',
-
-        'Created By',
-        'Created Date Audit',
-        'Updated By',
-        'Updated Date',
-
-        'Status',
-      ],
-    ];
-
-    /* ================= DATA ================= */
-    data.forEach((row: TableRow) => {
-      wsData.push([
-        row.assetStatusChangeId || '',
-        row.assetStatusChangeCode || '',
-        row.assetStatusCreatedDate || '',
-        row.assetStatusChangeDate || '',
-
-        row.assetId || '',
-        row.assetName || '',
-        row.assetType || '',
-        row.assetSerialNumber || '',
-
-        row.assetCurrentStatus || '',
-        row.assetNewStatus || '',
-
-        row.assetStatusChangeReason || '',
-        row.assetStatusChangeRemarks || '',
-
-        row.assetChangeInitiatedBy || '',
-        row.assetChangeApprovedBy || '',
-        row.assetStatusChangeAssignedTo || '',
-
-        row.approvalStatus || '',
-        row.approvalDate || '',
-
-        row.assetRepairVendor || '',
-        row.assetExpectedReturnDate || '',
-        row.repairCost ?? '',
-
-        row.replacementAssetId || '',
-        row.replacementDate || '',
-
-        row.scrapReason || '',
-        row.scrapDate || '',
-
-        row.callId || '',
-        row.allocationId || '',
-        row.returnId || '',
-        row.replacementId || '',
-
-        row.createdBy || '',
-        row.createdDate || '',
-        row.updatedBy || '',
-        row.updatedDate || '',
-
-        row.assetStatus || '',
-      ]);
-    });
-
-    /* ================= CREATE SHEET ================= */
-    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
-
-    /* ================= AUTO COLUMN WIDTH 🔥 ================= */
-    worksheet['!cols'] = wsData[4].map((col, i) => ({
-      wch: Math.max(
-        col.length + 5,
-        ...data.map((row) => String(Object.values(row)[i] || '').length + 2),
-      ),
-    }));
-
-    /* ================= WORKBOOK ================= */
-    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      'Asset Status Change Report',
-    );
-
-    /* ================= FILE EXPORT ================= */
-    const excelBuffer: any = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
-    });
-
-    const blob = new Blob([excelBuffer], {
-      type: 'application/octet-stream',
-    });
-
-    const fileName = `Asset_Status_Change_Report_${
-      today.toISOString().split('T')[0]
-    }.xlsx`;
-
-    saveAs(blob, fileName);
-  }
+  saveAs(blob, fileName);
+}
   // ---------------- PDF Export ----------------
-  exportPDFfile(data: TableRow[]) {
-    if (!data || data.length === 0) {
-      this.showToast('No data available to export!', 'warning');
-      return;
-    }
+exportPDFfile(data: any[]) {
 
-    const doc = new jsPDF('l', 'pt', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const today = new Date().toLocaleDateString('en-GB');
-
-    /* ================= HEADER ================= */
-    const title = 'Asset Status Change Report';
-
-    doc.setFontSize(20);
-    doc.setTextColor(0, 70, 140);
-    doc.text(title, pageWidth / 2, 40, { align: 'center' });
-
-    // underline
-    doc.setDrawColor(0, 70, 140);
-    doc.setLineWidth(1);
-    doc.line(
-      pageWidth / 2 - doc.getTextWidth(title) / 2,
-      45,
-      pageWidth / 2 + doc.getTextWidth(title) / 2,
-      45,
-    );
-
-    /* ================= SUB HEADER ================= */
-    doc.setFontSize(11);
-    doc.setTextColor(0, 0, 0);
-
-    doc.text(this.headCompanyName || 'Company Name', 40, 70);
-    doc.text(`Date: ${today}`, pageWidth - 40, 70, { align: 'right' });
-    doc.text(`Total Records: ${data.length}`, 40, 85);
-
-    /* ================= TABLE ================= */
-    autoTable(doc, {
-      startY: 100,
-
-      head: [
-        [
-          'ID',
-          'Code',
-          'Created',
-          'Change',
-
-          'Asset ID',
-          'Asset Name',
-          'Type',
-          'Serial',
-
-          'Current',
-          'New',
-
-          'Reason',
-          'Remarks',
-
-          'Initiated',
-          'Approved',
-          'Assigned',
-
-          'Approval',
-
-          'Vendor',
-          'Return',
-          'Cost',
-
-          'Replace',
-          'Scrap',
-
-          'Status',
-        ],
-      ],
-
-      body: data.map((row: TableRow) => [
-        row.assetStatusChangeId || '',
-        row.assetStatusChangeCode || '',
-        row.assetStatusCreatedDate || '',
-        row.assetStatusChangeDate || '',
-
-        row.assetId || '',
-        row.assetName || '',
-        row.assetType || '',
-        row.assetSerialNumber || '',
-
-        row.assetCurrentStatus || '',
-        row.assetNewStatus || '',
-
-        row.assetStatusChangeReason || '',
-        row.assetStatusChangeRemarks || '',
-
-        row.assetChangeInitiatedBy || '',
-        row.assetChangeApprovedBy || '',
-        row.assetStatusChangeAssignedTo || '',
-
-        row.approvalStatus || '',
-
-        row.assetRepairVendor || '',
-        row.assetExpectedReturnDate || '',
-        row.repairCost ?? '',
-
-        row.replacementAssetId || '',
-        row.scrapReason || '',
-
-        row.assetStatus || '',
-      ]),
-
-      theme: 'grid',
-
-      styles: {
-        fontSize: 7,
-        cellPadding: 3,
-        overflow: 'linebreak',
-        halign: 'center',
-        valign: 'middle',
-      },
-
-      headStyles: {
-        fillColor: [0, 92, 179],
-        textColor: 255,
-        fontStyle: 'bold',
-      },
-
-      alternateRowStyles: {
-        fillColor: [245, 245, 245], // zebra
-      },
-
-      margin: { left: 20, right: 20 },
-
-      didDrawPage: (dataArg) => {
-        /* ================= FOOTER ================= */
-        const pageCount = (doc as any).internal.getNumberOfPages();
-        const pageSize = doc.internal.pageSize;
-
-        doc.setFontSize(8);
-        doc.text(
-          `Page ${dataArg.pageNumber} of ${pageCount}`,
-          pageWidth - 40,
-          pageSize.height - 10,
-        );
-      },
-    });
-
-    /* ================= SAVE ================= */
-    const fileName = `Asset_Status_Change_Report_${
-      new Date().toISOString().split('T')[0]
-    }.pdf`;
-
-    doc.save(fileName);
+  if (!data || data.length === 0) {
+    this.showToast('No data available to export!', 'warning');
+    return;
   }
+
+  const doc = new jsPDF('l', 'pt', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const today = new Date().toLocaleDateString('en-GB');
+
+  /* ================= HEADER ================= */
+  const title = 'Asset Status Change Report';
+
+  doc.setFontSize(20);
+  doc.setTextColor(0, 70, 140);
+  doc.text(title, pageWidth / 2, 40, { align: 'center' });
+
+  // underline
+  doc.setDrawColor(0, 70, 140);
+  doc.setLineWidth(1);
+  doc.line(
+    pageWidth / 2 - doc.getTextWidth(title) / 2,
+    45,
+    pageWidth / 2 + doc.getTextWidth(title) / 2,
+    45
+  );
+
+  /* ================= SUB HEADER ================= */
+  doc.setFontSize(11);
+  doc.setTextColor(0, 0, 0);
+
+  doc.text(this.headCompanyName || 'Company Name', 40, 70);
+  doc.text(`Date: ${today}`, pageWidth - 40, 70, { align: 'right' });
+  doc.text(`Total Records: ${data.length}`, 40, 85);
+
+  /* ================= TABLE ================= */
+  autoTable(doc, {
+
+    startY: 100,
+
+    head: [[
+      'ID',
+      'Number',
+      'Date',
+
+      'Asset ID',
+      'Serial',
+
+      'Old Status',
+      'New Status',
+
+      'Reason',
+      'Description',
+
+      'Allocation',
+      'Call',
+      'Replacement',
+
+      'Changed By',
+      'Condition',
+
+      'Remarks',
+
+      'Created',
+      'Updated'
+    ]],
+
+    body: data.map((row: any) => [
+
+      row.statusChangeId || '',
+      row.changeNumber || '',
+      row.changeDate || '',
+
+      row.assetId || '',
+      row.assetSerialNumber || '',
+
+      row.oldStatus || '',
+      row.newStatus || '',
+
+      row.reasonForStatusChange || '',
+      row.description || '',
+
+      row.allocationId || '',
+      row.callLoggingId || '',
+      row.replacementId || '',
+
+      row.changedBy || '',
+      row.assetCondition || '',
+
+      row.remarks || '',
+
+      row.createdDate || '',
+      row.updatedDate || '',
+    ]),
+
+    theme: 'grid',
+
+    styles: {
+      fontSize: 7,
+      cellPadding: 3,
+      overflow: 'linebreak',
+      halign: 'center',
+      valign: 'middle',
+    },
+
+    headStyles: {
+      fillColor: [0, 92, 179],
+      textColor: 255,
+      fontStyle: 'bold',
+    },
+
+    alternateRowStyles: {
+      fillColor: [245, 245, 245],
+    },
+
+    margin: { left: 20, right: 20 },
+
+    didDrawPage: (dataArg) => {
+
+      const pageCount = (doc as any).internal.getNumberOfPages();
+      const pageSize = doc.internal.pageSize;
+
+      doc.setFontSize(8);
+      doc.text(
+        `Page ${dataArg.pageNumber} of ${pageCount}`,
+        pageWidth - 40,
+        pageSize.height - 10
+      );
+    },
+  });
+
+  /* ================= SAVE ================= */
+  const fileName = `Asset_Status_Change_Report_${
+    new Date().toISOString().split('T')[0]
+  }.pdf`;
+
+  doc.save(fileName);
+}
 }

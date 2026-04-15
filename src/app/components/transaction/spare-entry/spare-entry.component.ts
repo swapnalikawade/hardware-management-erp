@@ -63,44 +63,58 @@ import { CommonService } from '../../../services/common/common-service';
 import { CommonModule } from '@angular/common';
 (pdfjsLib as any).GlobalWorkerOptions.workerSrc =
   'node_modules/pdfjs-dist/build/pdf.worker.min.js';
- interface TableRow {
+export interface TableRow {
 
+  // 🔹 Primary Key
   spareEntryId: string;
+
+  // 🔹 Basic Info
   spareEntryNumber: string;
 
+  // 🔹 Dates
   entryDate: string;
 
+  // 🔹 Mapping IDs
   callLoggingId: string;
   assetId: string;
 
+  // 🔹 Spare Details
   sparePartId: string;
   sparePartName: string;
   sparePartCode: string;
 
   category: string;
 
-  quantity: number;
-  unitPrice: number;
-  totalCost: number;
+  // 🔹 Quantity & Cost (⚠️ nullable safe)
+  quantity: number | null;
+  unitPrice: number | null;
+  totalCost: number | null;
 
+  // 🔹 Vendor Info
   vendorName: string;
   purchaseReferenceNo: string;
 
+  // 🔹 Spare Type
   spareType: string;
   replacementType: string;
 
+  // 🔹 Engineer
   engineerName: string;
+
   replacementDate: string;
 
+  // 🔹 Status
   spareStatus: 'Active' | 'Inactive';
 
+  // 🔹 Remarks
   remarks: string;
 
+  // 🔹 Audit
   createdBy: string;
-  createdDate?: string;
+  createdDate: string | null;
 
-  updatedBy?: string;
-  updatedDate?: string;
+  updatedBy: string;
+  updatedDate: string | null;
 }
 @Component({
   selector: 'app-spare-entry',
@@ -172,7 +186,7 @@ export class SpareEntryComponent implements OnInit {
     this.loadAssets();
     this.loadAssetTypes();
     this.loadSpareEntry();
-    this.loadCallList();
+    this.loadCallLoggingList();
 
     this.filteredData = [...this.tableData];
   }
@@ -195,9 +209,10 @@ private initializeForm(): void {
 
       category: '',
 
-      quantity: 0,
-      unitPrice: 0,
-      totalCost: 0,
+      // ✅ nullable fields
+      quantity: null,
+      unitPrice: null,
+      totalCost: null,
 
       vendorName: '',
       purchaseReferenceNo: '',
@@ -213,12 +228,12 @@ private initializeForm(): void {
       remarks: '',
 
       createdBy: this.loginId || '',
-      createdDate: this.currentDate || '',
+      createdDate: this.currentDate || null,
 
       updatedBy: '',
-      updatedDate: '',
+      updatedDate: null,
 
-      // 🔥 IMPORTANT (FORM BINDING)
+      // 🔥 FORM BINDING OBJECT (same as interface)
       newRecord: {
         spareEntryId: '',
         spareEntryNumber: '',
@@ -234,9 +249,9 @@ private initializeForm(): void {
 
         category: '',
 
-        quantity: 0,
-        unitPrice: 0,
-        totalCost: 0,
+        quantity: null,
+        unitPrice: null,
+        totalCost: null,
 
         vendorName: '',
         purchaseReferenceNo: '',
@@ -252,10 +267,10 @@ private initializeForm(): void {
         remarks: '',
 
         createdBy: this.loginId || '',
-        createdDate: this.currentDate || '',
+        createdDate: this.currentDate || null,
 
         updatedBy: '',
-        updatedDate: ''
+        updatedDate: null
       }
     }
   ];
@@ -304,19 +319,16 @@ private initializeForm(): void {
     return '';
   }
 
-  loadCallList(): void {
-    if (!this.loginId) {
-      console.warn('Login ID missing');
-      return;
-    }
+  loadCallLoggingList(): void {
+    if (!this.loginId) return;
 
     this.commonService.fetchAllCallLoggingByLoginId(this.loginId).subscribe({
-      next: (res: any) => {
-        this.callList = res.data || res || [];
-        console.log('CALL LIST:', this.callList);
+      next: (res: any[]) => {
+        this.callList = res;
+        console.log('Call List Loaded:', this.callList);
       },
-      error: () => {
-        this.callList = [];
+      error: (err) => {
+        console.error('Call Logging Load Error:', err);
       },
     });
   }
@@ -350,7 +362,7 @@ private initializeForm(): void {
       form.spareEntryunitCost = selectedSpare.unitCost || 0;
       form.spareEntrystockAvailable = selectedSpare.stock || 0;
 
-      this.calculateTotal();
+      this.calculateTotal(index);
     }
   }
   tabs = [
@@ -368,15 +380,17 @@ private initializeForm(): void {
     },
     { key: 'help', label: 'Help', icon: 'bi bi-question-circle-fill' },
   ];
-  calculateTotal() {
-    const r = this.forms[0]; // ✅ FIX
+calculateTotal(index: number) {
 
-    r.spareEntrytotalCost =
-      (r.spareEntryquantityUsed || 0) * (r.spareEntryunitCost || 0);
+  const r = this.forms[index];
 
-    r.spareEntrystockAfterEntry =
-      (r.spareEntrystockAvailable || 0) - (r.spareEntryquantityUsed || 0);
-  }
+  const qty = Number(r.quantity) || 0;
+  const unit = Number(r.unitPrice) || 0;
+
+  // ✅ Total Cost
+  r.totalCost = qty * unit;
+
+}
 
   toastMessage: string | null = null;
   toastType: string = 'success';
@@ -941,9 +955,9 @@ newRecord: TableRow = {
   category: '',
 
   /* ========= COST ========= */
-  quantity: 0,
-  unitPrice: 0,
-  totalCost: 0,
+  quantity: null,
+  unitPrice: null,
+  totalCost: null,
 
   /* ========= VENDOR ========= */
   vendorName: '',
@@ -965,10 +979,10 @@ newRecord: TableRow = {
 
   /* ========= AUDIT ========= */
   createdBy: this.loginId || '',
-  createdDate: this.currentDate || '',
+  createdDate: this.currentDate || null,
 
   updatedBy: '',
-  updatedDate: ''
+  updatedDate: null
 };
   // --------------------------
   // STATE VARIABLES
@@ -1005,9 +1019,9 @@ onEdit(row: TableRow, index: number) {
 
       category: row.category,
 
-      quantity: row.quantity,
-      unitPrice: row.unitPrice,
-      totalCost: row.totalCost,
+      quantity: row.quantity ?? null,
+      unitPrice: row.unitPrice ?? null,
+      totalCost: row.totalCost ?? null,
 
       vendorName: row.vendorName,
       purchaseReferenceNo: row.purchaseReferenceNo,
@@ -1023,16 +1037,49 @@ onEdit(row: TableRow, index: number) {
       remarks: row.remarks,
 
       createdBy: row.createdBy,
-      createdDate: row.createdDate,
+      createdDate: row.createdDate ?? null,
 
       updatedBy: this.loginId || '',
-      updatedDate: this.currentDate,
+      updatedDate: this.currentDate || null,
 
-      // 🔥 IMPORTANT (FORM BINDING)
+      // 🔥 SAFE FORM BINDING
       newRecord: {
-        ...row,
+        spareEntryId: row.spareEntryId,
+        spareEntryNumber: row.spareEntryNumber,
+
+        entryDate: row.entryDate,
+
+        callLoggingId: row.callLoggingId,
+        assetId: row.assetId,
+
+        sparePartId: row.sparePartId,
+        sparePartName: row.sparePartName,
+        sparePartCode: row.sparePartCode,
+
+        category: row.category,
+
+        quantity: row.quantity ?? null,
+        unitPrice: row.unitPrice ?? null,
+        totalCost: row.totalCost ?? null,
+
+        vendorName: row.vendorName,
+        purchaseReferenceNo: row.purchaseReferenceNo,
+
+        spareType: row.spareType,
+        replacementType: row.replacementType,
+
+        engineerName: row.engineerName,
+        replacementDate: row.replacementDate,
+
+        spareStatus: row.spareStatus,
+
+        remarks: row.remarks,
+
+        createdBy: row.createdBy,
+        createdDate: row.createdDate ?? null,
+
         updatedBy: this.loginId || '',
-        updatedDate: this.currentDate
+        updatedDate: this.currentDate || null
       }
     }
   ];
@@ -1042,15 +1089,14 @@ onEdit(row: TableRow, index: number) {
   // --------------------------
 saveAllRecords() {
 
-  // ---------------- VALIDATION ----------------
+  // ✅ VALIDATION (FIXED)
   const invalid = this.forms.some(
     (f) =>
-      !f.newRecord.spareEntryNumber?.trim() ||
-      !f.newRecord.entryDate ||
-      !f.newRecord.callLoggingId ||
-      !f.newRecord.assetId ||
-      !f.newRecord.sparePartName ||
-      f.newRecord.quantity == null
+      !f.entryDate ||
+      !f.callLoggingId ||
+      !f.assetId ||
+      !f.sparePartName ||
+      f.quantity == null
   );
 
   if (invalid) {
@@ -1059,119 +1105,53 @@ saveAllRecords() {
     return;
   }
 
-  // ---------------- EDIT MODE ----------------
-  if (this.isEditMode && this.editIndex !== null) {
+  // 🔥 COMMON MAPPER
+  const mapForm = (form: any) => ({
 
-    const form = this.forms[0].newRecord;
+    spareEntryId: form.spareEntryId,
+    spareEntryNumber: form.spareEntryNumber,
 
-    const payload = {
-      spareEntryId: form.spareEntryId,
-      spareEntryNumber: form.spareEntryNumber,
+    entryDate: form.entryDate,
+    callLoggingId: form.callLoggingId,
+    assetId: form.assetId,
 
-      entryDate: form.entryDate,
-      callLoggingId: form.callLoggingId,
-      assetId: form.assetId,
+    sparePartId: form.sparePartId,
+    sparePartName: form.sparePartName,
+    sparePartCode: form.sparePartCode,
 
-      sparePartId: form.sparePartId,
-      sparePartName: form.sparePartName,
-      sparePartCode: form.sparePartCode,
+    category: form.category,
 
-      category: form.category,
+    quantity: form.quantity ?? null,
+    unitPrice: form.unitPrice ?? null,
+    totalCost: form.totalCost ?? null,
 
-      quantity: form.quantity,
-      unitPrice: form.unitPrice,
-      totalCost: form.totalCost,
+    vendorName: form.vendorName,
+    purchaseReferenceNo: form.purchaseReferenceNo,
 
-      vendorName: form.vendorName,
-      purchaseReferenceNo: form.purchaseReferenceNo,
+    spareType: form.spareType,
+    replacementType: form.replacementType,
 
-      spareType: form.spareType,
-      replacementType: form.replacementType,
+    engineerName: form.engineerName,
+    replacementDate: form.replacementDate,
 
-      engineerName: form.engineerName,
-      replacementDate: form.replacementDate,
+    spareStatus: form.spareStatus,
 
-      spareStatus: form.spareStatus,
+    remarks: form.remarks,
 
-      remarks: form.remarks,
+    createdBy: this.loginId || '',
+    createdDate: this.currentDate || null,
 
-      createdBy: form.createdBy,
-      createdDate: form.createdDate,
-
-      updatedBy: this.loginId || '',
-      updatedDate: this.currentDate
-    };
-
-    this.commonService
-      .updateSpareEntry(form.spareEntryId, this.loginId, payload)
-      .subscribe({
-        next: () => {
-          this.toast.success('Spare Entry Updated!', 'success', 4000);
-          this.resetAfterSave();
-          this.loadSpareEntry();
-        },
-        error: () => {
-          this.toast.danger('Update failed!', 'error', 4000);
-        },
-      });
-
-    return;
-  }
+    updatedBy: null,
+    updatedDate: null
+  });
 
   // ---------------- ADD MODE ----------------
-  const payload = this.forms.map((f) => {
-
-    const form = f.newRecord;
-
-    return {
-      spareEntryNumber: form.spareEntryNumber,
-
-      entryDate: form.entryDate,
-      callLoggingId: form.callLoggingId,
-      assetId: form.assetId,
-
-      sparePartId: form.sparePartId,
-      sparePartName: form.sparePartName,
-      sparePartCode: form.sparePartCode,
-
-      category: form.category,
-
-      quantity: form.quantity,
-      unitPrice: form.unitPrice,
-      totalCost: form.totalCost,
-
-      vendorName: form.vendorName,
-      purchaseReferenceNo: form.purchaseReferenceNo,
-
-      spareType: form.spareType,
-      replacementType: form.replacementType,
-
-      engineerName: form.engineerName,
-      replacementDate: form.replacementDate,
-
-      spareStatus: form.spareStatus,
-
-      remarks: form.remarks,
-
-      createdBy: this.loginId || '',
-      createdDate: this.currentDate,
-
-      updatedBy: null,
-      updatedDate: null
-    };
-  });
+  const payload = this.forms.map((f) => mapForm(f));
 
   console.log('SPARE ENTRY PAYLOAD 👉', payload);
 
   this.commonService.submit_multiple_spare_entry(payload).subscribe({
-    next: (res) => {
-
-      if (res?.duplicateMessages?.length) {
-        res.duplicateMessages.forEach((msg: string) =>
-          this.toast.warning(msg, 'warning', 4000)
-        );
-      }
-
+    next: () => {
       this.toast.success('Spare Entry Added Successfully!', 'success', 4000);
       this.resetAfterSave();
       this.loadSpareEntry();
@@ -1199,9 +1179,10 @@ resetAfterSave() {
 
       category: '',
 
-      quantity: 0,
-      unitPrice: 0,
-      totalCost: 0,
+      // ✅ NULL SAFE
+      quantity: null,
+      unitPrice: null,
+      totalCost: null,
 
       vendorName: '',
       purchaseReferenceNo: '',
@@ -1217,12 +1198,12 @@ resetAfterSave() {
       remarks: '',
 
       createdBy: this.loginId || '',
-      createdDate: this.currentDate || '',
+      createdDate: this.currentDate || null,
 
       updatedBy: '',
-      updatedDate: '',
+      updatedDate: null,
 
-      // 🔥 FORM BINDING
+      // 🔥 FORM BINDING (same as interface)
       newRecord: {
         spareEntryId: '',
         spareEntryNumber: '',
@@ -1238,9 +1219,9 @@ resetAfterSave() {
 
         category: '',
 
-        quantity: 0,
-        unitPrice: 0,
-        totalCost: 0,
+        quantity: null,
+        unitPrice: null,
+        totalCost: null,
 
         vendorName: '',
         purchaseReferenceNo: '',
@@ -1256,10 +1237,10 @@ resetAfterSave() {
         remarks: '',
 
         createdBy: this.loginId || '',
-        createdDate: this.currentDate || '',
+        createdDate: this.currentDate || null,
 
         updatedBy: '',
-        updatedDate: ''
+        updatedDate: null
       }
     }
   ];
@@ -1306,9 +1287,10 @@ addForm() {
 
     category: '',
 
-    quantity: 0,
-    unitPrice: 0,
-    totalCost: 0,
+    // ✅ NULL SAFE
+    quantity: null,
+    unitPrice: null,
+    totalCost: null,
 
     vendorName: '',
     purchaseReferenceNo: '',
@@ -1324,10 +1306,10 @@ addForm() {
     remarks: '',
 
     createdBy: this.loginId || '',
-    createdDate: today,
+    createdDate: today || null,
 
     updatedBy: '',
-    updatedDate: '',
+    updatedDate: null,
 
     // 🔥 FORM BINDING
     newRecord: {
@@ -1345,9 +1327,9 @@ addForm() {
 
       category: '',
 
-      quantity: 0,
-      unitPrice: 0,
-      totalCost: 0,
+      quantity: null,
+      unitPrice: null,
+      totalCost: null,
 
       vendorName: '',
       purchaseReferenceNo: '',
@@ -1363,14 +1345,13 @@ addForm() {
       remarks: '',
 
       createdBy: this.loginId || '',
-      createdDate: today,
+      createdDate: today || null,
 
       updatedBy: '',
-      updatedDate: ''
+      updatedDate: null
     }
   });
 }
-
   // --------------------------
   // CANCEL / RESET FORM
   // --------------------------
@@ -1401,9 +1382,10 @@ cancelRecord(form?: NgForm, index?: number) {
 
       category: '',
 
-      quantity: 0,
-      unitPrice: 0,
-      totalCost: 0,
+      // ✅ NULL SAFE
+      quantity: null,
+      unitPrice: null,
+      totalCost: null,
 
       vendorName: '',
       purchaseReferenceNo: '',
@@ -1420,10 +1402,10 @@ cancelRecord(form?: NgForm, index?: number) {
 
       // ✅ KEEP LOGIN
       createdBy: this.loginId || '',
-      createdDate: currentDate,
+      createdDate: currentDate || null,
 
       updatedBy: '',
-      updatedDate: '',
+      updatedDate: null,
 
       // 🔥 FORM BINDING
       newRecord: {
@@ -1441,9 +1423,9 @@ cancelRecord(form?: NgForm, index?: number) {
 
         category: '',
 
-        quantity: 0,
-        unitPrice: 0,
-        totalCost: 0,
+        quantity: null,
+        unitPrice: null,
+        totalCost: null,
 
         vendorName: '',
         purchaseReferenceNo: '',
@@ -1459,10 +1441,10 @@ cancelRecord(form?: NgForm, index?: number) {
         remarks: '',
 
         createdBy: this.loginId || '',
-        createdDate: currentDate,
+        createdDate: currentDate || null,
 
         updatedBy: '',
-        updatedDate: ''
+        updatedDate: null
       }
     };
   }

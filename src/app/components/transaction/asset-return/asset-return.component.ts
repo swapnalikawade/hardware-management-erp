@@ -61,40 +61,50 @@ import { NgToastService } from 'ng-angular-popup';
 import { AuthService } from '../../../services/auth/auth-service';
 import { CommonService } from '../../../services/common/common-service';
 
-interface TableRow {
-  assetreturnEntryId: string;
+export interface TableRow {
 
-  /* ================= RETURN DETAILS ================= */
-  assetreturnDate: string; // YYYY-MM-DD (LocalDate → string)
-  assetreturnType: string;
-  assetreturnStatus: string;
+  /* ========= PRIMARY ========= */
+  returnId: string;
+  returnNumber: string;
 
-  /* ================= ALLOCATION DETAILS ================= */
+  /* ========= REFERENCES ========= */
   allocationId: string;
-  allocationDate: string; // YYYY-MM-DD
-  allocationLocation: string;
-  /* ================= ASSET DETAILS ================= */
+  employeeId: string;
+  departmentId: string;
+  location: string;
+
+  /* ========= ASSET ========= */
   assetId: string;
-  assetName: string;
-  assetType: string;
-  assetMake: string;
-  assetModel: string;
-  serialNumber: string;
+  assetSerialNumber: string;
 
-  /* ================= RETURNED BY DETAILS ================= */
-  returnedBy: string;
-  department: string;
+  /* ========= DATES ========= */
+  expectedReturnDate: string;   // YYYY-MM-DD
+  actualReturnDate: string;     // YYYY-MM-DD
 
-  assetConditionOnReturn: string;
-  workingStatus: 'Working' | 'Not Working';
-  inspectionDate: string; // YYYY-MM-DD
-  amcStatus: 'Under AMC' | 'AMC Closed' | 'Out of AMC';
-  storeLocation: string;
+  /* ========= CONDITION ========= */
+  conditionAtReturn: string;
+  damageDetails: string;
 
-  /* ================= SYSTEM / RECORD STATUS ================= */
-  status: 'Active' | 'Inactive';
-  loginId: string;
-  createdDate: string; // YYYY-MM-DD
+  /* ========= PENALTY ========= */
+  penaltyApplicable: 'Yes' | 'No';
+  penaltyAmount: number;
+  reasonForPenalty: string;
+
+  /* ========= VERIFICATION ========= */
+  verifiedBy: string;
+  verificationDate: string;     // YYYY-MM-DD
+
+  /* ========= STATUS ========= */
+  returnStatus: 'Active' | 'Inactive';
+
+  /* ========= REMARKS ========= */
+  remarks: string;
+
+  /* ========= AUDIT ========= */
+  createdBy: string;
+  createdDate: string;          // YYYY-MM-DD
+  updatedBy: string;
+  updatedDate: string;          // YYYY-MM-DD;
 }
 
 @Component({
@@ -121,7 +131,7 @@ export class AssetReturnComponent {
   assetMakes: any[] = [];
   assetTypes: any[] = [];
   departments: any[] = [];
-
+employees: any[] = [];
   loading: any = false;
 
   tableData: TableRow[] = [];
@@ -163,73 +173,109 @@ export class AssetReturnComponent {
     this.initializeForm();
     this.loadAssetReturns();
     this.loadDepartments();
+    this.loadEmployees();
     this.loadAssetTypes();
     this.loadAssetMakes();
     this.loadAssets();
 
     this.filteredData = [...this.tableData];
   }
+onEmployeeChange(index: number) {
+  const empId = this.forms[index].newRecord.employeeId;
 
-  private initializeForm(): void {
-    this.forms = [
-      {
-        newRecord: {
-          assetreturnEntryId: '0',
+  const emp = this.employees.find(e => e.employeeId === empId);
 
-          assetreturnDate: this.currentDate,
-          assetreturnType: 'Asset Return',
-          assetreturnStatus: 'Returned',
-
-          allocationId: '',
-          allocationDate: this.currentDate,
-          allocationLocation: '',
-
-          assetId: '',
-          assetName: '',
-          assetType: '',
-          assetMake: '',
-          assetModel: '',
-          serialNumber: '',
-
-          returnedBy: 'Employee',
-          department: '',
-
-          assetConditionOnReturn: 'Good',
-          workingStatus: 'Working',
-          inspectionDate: this.currentDate,
-          amcStatus: 'Under AMC',
-          storeLocation: '',
-
-          status: 'Active',
-          loginId: this.loginId,
-          createdDate: this.currentDate,
-        },
-      },
-    ];
+  if (emp) {
+    this.forms[index].newRecord.departmentId = emp.departmentId; // 🔥 AUTO FILL
   }
+}
+private initializeForm(): void {
+  this.forms = [
+    {
+      newRecord: {
+
+        /* ========= PRIMARY ========= */
+        returnId: '0',
+        returnNumber: '',
+
+        /* ========= REFERENCES ========= */
+        allocationId: '',
+        employeeId: '',
+        departmentId: '',
+        location: '',
+
+        /* ========= ASSET ========= */
+        assetId: '',
+        assetSerialNumber: '',
+
+        /* ========= DATES ========= */
+        expectedReturnDate: this.currentDate,
+        actualReturnDate: this.currentDate,
+
+        /* ========= CONDITION ========= */
+        conditionAtReturn: 'Good',
+        damageDetails: '',
+
+        /* ========= PENALTY ========= */
+        penaltyApplicable: 'No',
+        penaltyAmount: 0,
+        reasonForPenalty: '',
+
+        /* ========= VERIFICATION ========= */
+        verifiedBy: '',
+        verificationDate: this.currentDate,
+
+        /* ========= STATUS ========= */
+        returnStatus: 'Active',
+
+        /* ========= REMARKS ========= */
+        remarks: '',
+
+        /* ========= AUDIT ========= */
+        createdBy: this.loginId,
+        createdDate: this.currentDate,
+        updatedBy: '',
+        updatedDate: this.currentDate,
+      },
+    },
+  ];
+}
 
   get editHeading(): string {
     if (this.isEditMode && this.editIndex !== null) {
       return (
         'Update Asset Return Details (ID: ' +
-        this.tableData[this.editIndex].assetreturnEntryId +
+        this.tableData[this.editIndex].returnId +
         ')'
       );
     }
     return '';
   }
   loadDepartments(): void {
-    this.commonService.fetchAllDepartmentByCompany(this.loginId).subscribe({
-      next: (res: any[]) => {
-        console.log('Department API:', res);
-
-        this.departments = res.map((d: any) => ({
-          departmentName: d.departmentName || d.name || d.department,
-        }));
+    this.commonService.fetchAllDepartments().subscribe({
+      next: (res: any) => {
+        console.log('Department API Response:', res);
+        this.departments = res;
       },
-      error: (err) => console.error(err),
+      error: (err) => {
+        console.error('Department API Error:', err);
+      },
     });
   }
+
+loadEmployees(): void {
+  this.commonService.fetchAllEmployee()
+    .subscribe({
+      next: (res: any[]) => {
+        console.log('Employee API Response:', res);
+
+        this.employees = res;   // ✅ CORRECT
+      },
+      error: (err) => {
+        console.error('Employee API Error:', err);
+      }
+    });
+}
   assetList: any[] = [];
 
   loadAssets() {
@@ -240,80 +286,91 @@ export class AssetReturnComponent {
       },
     });
   }
-  onAssetChange(index: number) {
-    const selectedId = this.forms[index].newRecord.assetId;
+onAssetChange(index: number) {
+  const selectedId = this.forms[index].newRecord.assetId;
 
-    const asset = this.assetList.find((a) => a.assetId === selectedId);
+  const asset = this.assetList.find(a => a.assetId === selectedId);
 
-    if (asset) {
-      this.forms[index].newRecord.assetName = asset.assetName;
-      this.forms[index].newRecord.assetType = asset.assetType;
-      this.forms[index].newRecord.assetMake = asset.assetMake;
-      this.forms[index].newRecord.assetModel = asset.assetModel;
-      this.forms[index].newRecord.serialNumber = asset.serialNumber;
-    }
+  if (asset) {
+
+    // ✅ BASIC AUTO FILL
+    this.forms[index].newRecord.assetSerialNumber = asset.serialNumber;
+
+    // 🔥 NEW LOGIC (IMPORTANT)
+    this.forms[index].newRecord.employeeId = asset.employeeId;
+    this.forms[index].newRecord.departmentId = asset.departmentId;
+    this.forms[index].newRecord.location = asset.location;
   }
-  loadAssetReturns(): void {
-    if (!this.loginId) return;
+}
+loadAssetReturns(): void {
+  if (!this.loginId) return;
 
-    this.commonService.fetchAllAssetReturnsByCompany(this.loginId).subscribe({
-      next: (res: any) => {
-        console.log('🔥 API RESPONSE:', res); // DEBUG
+  this.commonService.fetchAllAssetReturnsByLoginId(this.loginId).subscribe({
+    next: (res: any) => {
 
-        const list = Array.isArray(res) ? res : res?.data || [];
+      console.log('🔥 API RESPONSE:', res);
 
-        this.tableData = list.map((item: any) => ({
-          assetreturnEntryId: item.assetreturnEntryId ?? '',
+      const list = Array.isArray(res) ? res : res?.data || [];
 
-          /* ================= RETURN DETAILS ================= */
-          assetreturnDate: item.assetreturnDate ?? '',
-          assetreturnType: item.assetreturnType ?? '',
-          assetreturnStatus: item.assetreturnStatus ?? '',
+      this.tableData = list.map((item: any) => ({
 
-          /* ================= ALLOCATION DETAILS ================= */
-          allocationId: item.allocationId || item.allocation_id || '',
-          allocationDate: item.allocationDate || item.allocation_date || '',
-          allocationLocation:
-            item.allocationLocation ||
-            item.location ||
-            item.allocation_location ||
-            '',
+        /* ========= PRIMARY ========= */
+        returnId: item.returnId ?? '',
+        returnNumber: item.returnNumber ?? '',
 
-          /* ================= ASSET DETAILS ================= */
-          assetId: item.assetId || item.asset_id || '',
-          assetName: item.assetName || item.asset_name || '',
-          assetType: item.assetType || item.asset_type || '',
-          assetMake: item.assetMake || item.asset_make || '',
-          assetModel: item.assetModel || item.asset_model || '',
-          serialNumber: item.serialNumber || item.serial_number || '',
+        /* ========= REFERENCES ========= */
+        allocationId: item.allocationId ?? '',
+        employeeId: item.employeeId ?? '',
+        departmentId: item.departmentId ?? '',
+        location: item.location ?? '',
 
-          /* ================= RETURNED BY DETAILS ================= */
-          returnedBy: item.returnedBy ?? '',
-          department: item.department ?? '',
+        /* ========= ASSET ========= */
+        assetId: item.assetId ?? '',
+        assetSerialNumber: item.assetSerialNumber ?? '',
 
-          /* ================= INSPECTION & AMC ================= */
-          assetConditionOnReturn: item.assetConditionOnReturn ?? '',
-          workingStatus: item.workingStatus ?? 'Working',
-          inspectionDate: item.inspectionDate ?? '',
-          amcStatus: item.amcStatus ?? 'Under AMC',
-          storeLocation: item.storeLocation ?? '',
+        /* ========= DATES ========= */
+        expectedReturnDate: item.expectedReturnDate ?? '',
+        actualReturnDate: item.actualReturnDate ?? '',
 
-          /* ================= SYSTEM ================= */
-          status: item.status ?? item.recordStatus ?? 'Active',
-          loginId: item.loginId ?? this.loginId,
-          createdDate: item.createdDate ?? '',
-        }));
+        /* ========= CONDITION ========= */
+        conditionAtReturn: item.conditionAtReturn ?? '',
+        damageDetails: item.damageDetails ?? '',
 
-        console.log('✅ FINAL TABLE DATA:', this.tableData); // DEBUG
+        /* ========= PENALTY ========= */
+        penaltyApplicable: item.penaltyApplicable ?? 'No',
+        penaltyAmount: item.penaltyAmount ?? 0,
+        reasonForPenalty: item.reasonForPenalty ?? '',
 
-        this.filteredData = [...this.tableData];
-      },
+        /* ========= VERIFICATION ========= */
+        verifiedBy: item.verifiedBy ?? '',
+        verificationDate: item.verificationDate ?? '',
 
-      error: (err) => {
-        console.error('❌ Asset Return API Error:', err);
-      },
-    });
-  }
+        /* ========= STATUS ========= */
+        returnStatus: item.returnStatus ?? 'Active',
+
+        /* ========= REMARKS ========= */
+        remarks: item.remarks ?? '',
+
+        /* ========= AUDIT ========= */
+        createdBy: item.createdBy ?? '',
+        createdDate: item.createdDate ?? '',
+        updatedBy: item.updatedBy ?? '',
+        updatedDate: item.updatedDate ?? '',
+      }));
+
+      console.log('✅ FINAL TABLE DATA:', this.tableData);
+
+      this.filteredData = [...this.tableData];
+      this.currentPage = 1;
+
+      this.cdr.detectChanges();
+    },
+
+    error: (err) => {
+      console.error('❌ API Error:', err);
+    },
+  });
+}
 
   loadAssetMakes(): void {
     if (!this.loginId) return;
@@ -460,15 +517,15 @@ export class AssetReturnComponent {
     if (!confirmed) return;
 
     // ✅ Correct field name
-    const ids: string[] = this.selectedRows.map(
-      (row) => row.assetreturnEntryId,
-    );
+ const ids: string[] = this.selectedRows.map(
+  (row) => row.returnId,
+);
 
     this.commonService.deleteMultipleAssetReturns(ids).subscribe({
       next: () => {
         // ✅ Remove deleted rows
         this.tableData = this.tableData.filter(
-          (row) => !ids.includes(row.assetreturnEntryId),
+          (row) => !ids.includes(row.returnId),
         );
 
         this.filteredData = [...this.tableData];
@@ -512,70 +569,83 @@ export class AssetReturnComponent {
     this.filteredData = sorted;
   }
 
-  exportExcel() {
-    if (!this.filteredData || this.filteredData.length === 0) {
-      this.toast.warning('No data available to export!', 'WARNING', 4000);
-      return;
-    }
-
-    // ✅ Correct mapping as per interface
-    const exportData = this.filteredData.map((row) => ({
-      Return_ID: row.assetreturnEntryId,
-      Return_Date: row.assetreturnDate,
-      Return_Type: row.assetreturnType,
-      Return_Status: row.assetreturnStatus,
-
-      Allocation_ID: row.allocationId,
-      Allocation_Date: row.allocationDate,
-      Allocation_Location: row.allocationLocation,
-
-      Asset_ID: row.assetId,
-      Asset_Name: row.assetName,
-      Asset_Type: row.assetType,
-      Asset_Make: row.assetMake,
-      Asset_Model: row.assetModel,
-      Serial_Number: row.serialNumber,
-
-      Returned_By: row.returnedBy,
-      Department: row.department,
-
-      Inspection_Date: row.inspectionDate,
-      Asset_Condition_On_Return: row.assetConditionOnReturn,
-      Working_Status: row.workingStatus,
-
-      AMC_Status: row.amcStatus,
-      Store_Location: row.storeLocation,
-
-      Record_Status: row.status,
-      Login_Id: row.loginId,
-      Created_Date: row.createdDate,
-    }));
-
-    // Create worksheet
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-
-    // Auto column width
-    worksheet['!cols'] = Object.keys(exportData[0]).map(() => ({
-      wch: 22,
-    }));
-
-    // Create workbook
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Asset_Return_Report');
-
-    // Download Excel
-    XLSX.writeFile(workbook, 'Asset_Return_Report.xlsx');
+exportExcel() {
+  if (!this.filteredData || this.filteredData.length === 0) {
+    this.toast.warning('No data available to export!', 'WARNING', 4000);
+    return;
   }
 
-  exportDoc() {
-    if (!this.filteredData || this.filteredData.length === 0) {
-      this.toast.warning('No data available to export!', 'WARNING', 4000);
-      return;
-    }
+  const exportData = this.filteredData.map((row) => ({
 
-    const currentDate = new Date().toLocaleDateString();
+    /* ========= PRIMARY ========= */
+    Return_ID: row.returnId,
+    Return_Number: row.returnNumber,
 
-    let content = `
+    /* ========= REFERENCES ========= */
+    Allocation_ID: row.allocationId,
+    Employee_ID: row.employeeId,
+    Department_ID: row.departmentId,
+    Location: row.location,
+
+    /* ========= ASSET ========= */
+    Asset_ID: row.assetId,
+    Asset_Serial_Number: row.assetSerialNumber,
+
+    /* ========= DATES ========= */
+    Expected_Return_Date: row.expectedReturnDate,
+    Actual_Return_Date: row.actualReturnDate,
+
+    /* ========= CONDITION ========= */
+    Condition_At_Return: row.conditionAtReturn,
+    Damage_Details: row.damageDetails,
+
+    /* ========= PENALTY ========= */
+    Penalty_Applicable: row.penaltyApplicable,
+    Penalty_Amount: row.penaltyAmount,
+    Reason_For_Penalty: row.reasonForPenalty,
+
+    /* ========= VERIFICATION ========= */
+    Verified_By: row.verifiedBy,
+    Verification_Date: row.verificationDate,
+
+    /* ========= STATUS ========= */
+    Return_Status: row.returnStatus,
+
+    /* ========= REMARKS ========= */
+    Remarks: row.remarks,
+
+    /* ========= AUDIT ========= */
+    Created_By: row.createdBy,
+    Created_Date: row.createdDate,
+    Updated_By: row.updatedBy,
+    Updated_Date: row.updatedDate,
+  }));
+
+  // Create worksheet
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+  // Auto column width
+  worksheet['!cols'] = Object.keys(exportData[0]).map(() => ({
+    wch: 22,
+  }));
+
+  // Create workbook
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Asset_Return_Report');
+
+  // Download Excel
+  XLSX.writeFile(workbook, 'Asset_Return_Report.xlsx');
+}
+
+exportDoc() {
+  if (!this.filteredData || this.filteredData.length === 0) {
+    this.toast.warning('No data available to export!', 'WARNING', 4000);
+    return;
+  }
+
+  const currentDate = new Date().toLocaleDateString();
+
+  let content = `
 <html xmlns:o="urn:schemas-microsoft-com:office:office"
       xmlns:w="urn:schemas-microsoft-com:office:word"
       xmlns="http://www.w3.org/TR/REC-html40">
@@ -637,7 +707,7 @@ th {
 </tr>
 
 <tr>
-<td class="title">Asset Return Report – AMC Call Logging</td>
+<td class="title">Asset Return Report</td>
 </tr>
 </table>
 
@@ -645,185 +715,185 @@ th {
 
 <tr>
 <th>Return ID</th>
-<th>Return Date</th>
-<th>Return Type</th>
-<th>Return Status</th>
+<th>Return Number</th>
 <th>Allocation ID</th>
-<th>Allocation Date</th>
+<th>Employee ID</th>
+<th>Department ID</th>
 <th>Location</th>
 <th>Asset ID</th>
-<th>Asset Name</th>
-<th>Asset Type</th>
-<th>Make</th>
-<th>Model</th>
 <th>Serial Number</th>
-<th>Returned By</th>
-<th>Department</th>
-<th>Inspection Date</th>
+<th>Expected Date</th>
+<th>Actual Date</th>
 <th>Condition</th>
-<th>Working Status</th>
-<th>AMC Status</th>
-<th>Store Location</th>
+<th>Damage Details</th>
+<th>Penalty</th>
+<th>Penalty Amount</th>
+<th>Reason</th>
+<th>Verified By</th>
+<th>Verification Date</th>
 <th>Status</th>
+<th>Remarks</th>
+<th>Created By</th>
 <th>Created Date</th>
 </tr>
 `;
 
-    this.filteredData.forEach((row: TableRow) => {
-      content += `
+  this.filteredData.forEach((row: TableRow) => {
+    content += `
 <tr>
-<td>${row.assetreturnEntryId || ''}</td>
-<td>${row.assetreturnDate || ''}</td>
-<td>${row.assetreturnType || ''}</td>
-<td>${row.assetreturnStatus || ''}</td>
+<td>${row.returnId || ''}</td>
+<td>${row.returnNumber || ''}</td>
 
 <td>${row.allocationId || ''}</td>
-<td>${row.allocationDate || ''}</td>
-<td>${row.allocationLocation || ''}</td>
+<td>${row.employeeId || ''}</td>
+<td>${row.departmentId || ''}</td>
+<td>${row.location || ''}</td>
 
 <td>${row.assetId || ''}</td>
-<td>${row.assetName || ''}</td>
-<td>${row.assetType || ''}</td>
-<td>${row.assetMake || ''}</td>
-<td>${row.assetModel || ''}</td>
-<td>${row.serialNumber || ''}</td>
+<td>${row.assetSerialNumber || ''}</td>
 
-<td>${row.returnedBy || ''}</td>
-<td>${row.department || ''}</td>
+<td>${row.expectedReturnDate || ''}</td>
+<td>${row.actualReturnDate || ''}</td>
 
-<td>${row.inspectionDate || ''}</td>
-<td>${row.assetConditionOnReturn || ''}</td>
-<td>${row.workingStatus || ''}</td>
+<td>${row.conditionAtReturn || ''}</td>
+<td>${row.damageDetails || ''}</td>
 
-<td>${row.amcStatus || ''}</td>
-<td>${row.storeLocation || ''}</td>
+<td>${row.penaltyApplicable || ''}</td>
+<td>${row.penaltyAmount || 0}</td>
+<td>${row.reasonForPenalty || ''}</td>
 
-<td>${row.status || ''}</td>
+<td>${row.verifiedBy || ''}</td>
+<td>${row.verificationDate || ''}</td>
+
+<td>${row.returnStatus || ''}</td>
+<td>${row.remarks || ''}</td>
+
+<td>${row.createdBy || ''}</td>
 <td>${row.createdDate || ''}</td>
 </tr>
 `;
-    });
+  });
 
-    content += `
+  content += `
 </table>
 </div>
 </body>
 </html>
 `;
 
-    const blob = new Blob(['\ufeff', content], {
-      type: 'application/msword',
-    });
+  const blob = new Blob(['\ufeff', content], {
+    type: 'application/msword',
+  });
 
-    saveAs(blob, 'Asset_Return_Report.doc');
-  }
+  saveAs(blob, 'Asset_Return_Report.doc');
+}
 
-  exportPDF() {
-    const doc = new jsPDF('l', 'mm', 'a4'); // Landscape A4
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const currentDate = new Date().toLocaleDateString('en-GB');
+ exportPDF() {
+  const doc = new jsPDF('l', 'mm', 'a4'); // Landscape A4
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const currentDate = new Date().toLocaleDateString('en-GB');
 
-    /* ================= HEADER ================= */
+  /* ================= HEADER ================= */
 
-    doc.setFontSize(10);
-    doc.text(`Date: ${currentDate}`, 10, 12);
+  doc.setFontSize(10);
+  doc.text(`Date: ${currentDate}`, 10, 12);
 
-    doc.setFontSize(18);
-    doc.text('Asset Return Report – AMC Call Logging', pageWidth / 2, 12, {
-      align: 'center',
-    });
+  doc.setFontSize(16);
+  doc.text('Asset Return Report', pageWidth / 2, 12, {
+    align: 'center',
+  });
 
-    /* ================= TABLE ================= */
+  /* ================= TABLE ================= */
 
-    autoTable(doc, {
-      startY: 20,
+  autoTable(doc, {
+    startY: 20,
 
-      styles: {
-        fontSize: 8,
-        cellPadding: 2,
-        halign: 'left',
-        valign: 'middle',
-        lineColor: [0, 0, 0],
-        lineWidth: 0.2,
-      },
+    styles: {
+      fontSize: 7,
+      cellPadding: 2,
+      halign: 'left',
+      valign: 'middle',
+      lineColor: [0, 0, 0],
+      lineWidth: 0.2,
+    },
 
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: '#ffffff',
-        halign: 'center',
-      },
+    headStyles: {
+      fillColor: [41, 128, 185],
+      textColor: '#ffffff',
+      halign: 'center',
+    },
 
-      tableWidth: 'auto',
+    tableWidth: 'auto',
 
-      head: [
-        [
-          'Return ID',
-          'Return Date',
-          'Return Type',
-          'Return Status',
-          'Allocation ID',
-          'Allocation Date',
-          'Location',
-          'Asset ID',
-          'Asset Name',
-          'Asset Type',
-          'Make',
-          'Model',
-          'Serial Number',
-          'Returned By',
-          'Department',
-          'Inspection Date',
-          'Condition',
-          'Working Status',
-          'AMC Status',
-          'Store Location',
-          'Status',
-          'Created Date',
-        ],
+    head: [
+      [
+        'Return ID',
+        'Return No',
+        'Allocation ID',
+        'Employee ID',
+        'Department',
+        'Location',
+        'Asset ID',
+        'Serial No',
+        'Expected Date',
+        'Actual Date',
+        'Condition',
+        'Damage',
+        'Penalty',
+        'Penalty Amt',
+        'Reason',
+        'Verified By',
+        'Verification Date',
+        'Status',
+        'Remarks',
+        'Created By',
+        'Created Date',
       ],
+    ],
 
-      body: this.filteredData.map((row: TableRow) => [
-        row.assetreturnEntryId || '',
-        row.assetreturnDate || '',
-        row.assetreturnType || '',
-        row.assetreturnStatus || '',
+    body: this.filteredData.map((row: TableRow) => [
+      row.returnId || '',
+      row.returnNumber || '',
 
-        row.allocationId || '',
-        row.allocationDate || '',
-        row.allocationLocation || '',
+      row.allocationId || '',
+      row.employeeId || '',
+      row.departmentId || '',
+      row.location || '',
 
-        row.assetId || '',
-        row.assetName || '',
-        row.assetType || '',
-        row.assetMake || '',
-        row.assetModel || '',
-        row.serialNumber || '',
+      row.assetId || '',
+      row.assetSerialNumber || '',
 
-        row.returnedBy || '',
-        row.department || '',
+      row.expectedReturnDate || '',
+      row.actualReturnDate || '',
 
-        row.inspectionDate || '',
-        row.assetConditionOnReturn || '',
-        row.workingStatus || '',
+      row.conditionAtReturn || '',
+      row.damageDetails || '',
 
-        row.amcStatus || '',
-        row.storeLocation || '',
+      row.penaltyApplicable || '',
+      row.penaltyAmount ?? 0,
+      row.reasonForPenalty || '',
 
-        row.status || '',
-        row.createdDate || '',
-      ]),
+      row.verifiedBy || '',
+      row.verificationDate || '',
 
-      didDrawCell: (data) => {
-        doc.setDrawColor(0);
-        doc.setLineWidth(0.3);
-        doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height);
-      },
-    });
+      row.returnStatus || '',
+      row.remarks || '',
 
-    /* ================= SAVE ================= */
+      row.createdBy || '',
+      row.createdDate || '',
+    ]),
 
-    doc.save('Asset_Return_Report.pdf');
-  }
+    didDrawCell: (data) => {
+      doc.setDrawColor(0);
+      doc.setLineWidth(0.3);
+      doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height);
+    },
+  });
+
+  /* ================= SAVE ================= */
+
+  doc.save('Asset_Return_Report.pdf');
+}
 
   //pagination
   // Pagination Variables
@@ -866,44 +936,51 @@ th {
   // --------------------------
   // INITIAL RECORD STRUCTURE
   // --------------------------
-  newRecord: TableRow = {
-    /* ================= PRIMARY KEY ================= */
-    assetreturnEntryId: '', // backend generated
+newRecord: TableRow = {
 
-    /* ================= RETURN DETAILS ================= */
-    assetreturnDate: this.getTodayDate(),
-    assetreturnType: 'Asset Return',
-    assetreturnStatus: 'Returned',
+  /* ========= PRIMARY ========= */
+  returnId: '',                 // backend generate
+  returnNumber: '',
 
-    /* ================= ALLOCATION DETAILS ================= */
-    allocationId: '',
-    allocationDate: '',
-    allocationLocation: '',
+  /* ========= REFERENCES ========= */
+  allocationId: '',
+  employeeId: '',
+  departmentId: '',
+  location: '',
 
-    /* ================= ASSET DETAILS ================= */
-    assetId: '',
-    assetName: '',
-    assetType: '',
-    assetMake: '',
-    assetModel: '',
-    serialNumber: '',
+  /* ========= ASSET ========= */
+  assetId: '',
+  assetSerialNumber: '',
 
-    /* ================= RETURNED BY DETAILS ================= */
-    returnedBy: 'Employee',
-    department: '',
+  /* ========= DATES ========= */
+  expectedReturnDate: this.getTodayDate(),
+  actualReturnDate: this.getTodayDate(),
 
-    /* ================= INSPECTION & AMC ================= */
-    inspectionDate: '',
-    assetConditionOnReturn: 'Good',
-    workingStatus: 'Working',
-    amcStatus: 'Under AMC',
-    storeLocation: '',
+  /* ========= CONDITION ========= */
+  conditionAtReturn: 'Good',
+  damageDetails: '',
 
-    /* ================= SYSTEM / RECORD STATUS ================= */
-    status: 'Active',
-    loginId: this.loginId || '',
-    createdDate: this.getTodayDate(),
-  };
+  /* ========= PENALTY ========= */
+  penaltyApplicable: 'No',
+  penaltyAmount: 0,
+  reasonForPenalty: '',
+
+  /* ========= VERIFICATION ========= */
+  verifiedBy: '',
+  verificationDate: this.getTodayDate(),
+
+  /* ========= STATUS ========= */
+  returnStatus: 'Active',
+
+  /* ========= REMARKS ========= */
+  remarks: '',
+
+  /* ========= AUDIT ========= */
+  createdBy: this.loginId || '',
+  createdDate: this.getTodayDate(),
+  updatedBy: '',
+  updatedDate: this.getTodayDate(),
+};
 
   // --------------------------
   // STATE VARIABLES
@@ -931,27 +1008,27 @@ th {
   // --------------------------
   // ADD NEW FORM
   // --------------------------
-  addForm() {
-    if (this.isEditMode) return;
+addForm() {
+  if (this.isEditMode) return;
 
-    this.forms.push({
-      newRecord: {
-        ...this.newRecord,
+  this.forms.push({
+    newRecord: {
+      ...this.newRecord,
 
-        // ✅ correct field name
-        assetreturnEntryId: '0', // backend generate
+      /* ========= PRIMARY ========= */
+      returnId: '0', // backend generate
 
-        // ✅ correct date field
-        createdDate: this.getTodayDate(),
+      /* ========= AUDIT ========= */
+      createdBy: this.loginId || '',
+      createdDate: this.getTodayDate(),
+      updatedBy: '',
+      updatedDate: this.getTodayDate(),
+    },
+  });
 
-        // (optional but safe)
-        loginId: this.loginId || '',
-      },
-    });
-
-    this.activeForm = this.forms.length - 1;
-    this.showErrors = false;
-  }
+  this.activeForm = this.forms.length - 1;
+  this.showErrors = false;
+}
 
   // --------------------------
   // REMOVE FORM
@@ -968,150 +1045,205 @@ th {
   // SAVE RECORD (SINGLE OR MULTIPLE)
   // --------------------------
 
-  saveAllRecords(form?: NgForm) {
-    this.showErrors = true;
+saveAllRecords(form?: NgForm) {
+  this.showErrors = true;
 
-    // ================= VALIDATION =================
-    if (form) {
-      Object.keys(form.controls).forEach((key) => {
-        form.controls[key].markAsTouched();
-        form.controls[key].markAsDirty();
-      });
-    }
-
-    if (form && !form.valid) return;
-
-    // ================= EDIT MODE =================
-    if (this.isEditMode && this.editIndex !== -1) {
-      const formData = this.forms[0].newRecord;
-
-      const payload = {
-        assetreturnDate: formData.assetreturnDate || this.getTodayDate(),
-        assetreturnType: 'Asset Return',
-        assetreturnStatus: formData.assetreturnStatus || 'Returned',
-
-        allocationId: formData.allocationId || '',
-        allocationDate: formData.allocationDate || this.getTodayDate(),
-        allocationLocation: formData.allocationLocation || '',
-
-        assetId: formData.assetId || '',
-        assetName: formData.assetName || '',
-        assetType: formData.assetType || '',
-        assetMake: formData.assetMake || '',
-        assetModel: formData.assetModel || '',
-        serialNumber: formData.serialNumber || '',
-
-        returnedBy: formData.returnedBy || 'Employee',
-        department: formData.department || '',
-
-        inspectionDate: formData.inspectionDate || this.getTodayDate(),
-        assetConditionOnReturn: formData.assetConditionOnReturn || 'Good',
-        workingStatus: formData.workingStatus || 'Working',
-        amcStatus: formData.amcStatus || 'Under AMC',
-        storeLocation: formData.storeLocation || '',
-
-        status: formData.status || 'Active',
-
-        loginId: this.loginId,
-
-        // ✅ IMPORTANT FIX
-        createdDate: formData.createdDate || this.getTodayDate(),
-      };
-
-      const assetreturnEntryId =
-        this.tableData[this.editIndex].assetreturnEntryId;
-
-      this.commonService
-        .updateAssetReturn(assetreturnEntryId, this.loginId, payload)
-        .subscribe({
-          next: () => {
-            this.toast.success('Updated successfully', 'SUCCESS', 4000);
-            this.resetAfterSave();
-            this.loadAssetReturns();
-          },
-          error: () => {
-            this.toast.danger('Update failed!', 'ERROR', 4000);
-          },
-        });
-
-      return;
-    }
-
-    // ================= ADD MODE =================
-    const payload = this.forms.map((f) => ({
-      assetreturnDate: f.newRecord.assetreturnDate || this.getTodayDate(),
-      assetreturnType: 'Asset Return',
-      assetreturnStatus: f.newRecord.assetreturnStatus || 'Returned',
-
-      allocationId: f.newRecord.allocationId || '',
-      allocationDate: f.newRecord.allocationDate || this.getTodayDate(),
-      allocationLocation: f.newRecord.allocationLocation || '',
-
-      assetId: f.newRecord.assetId || '',
-      assetName: f.newRecord.assetName || '',
-      assetType: f.newRecord.assetType || '',
-      assetMake: f.newRecord.assetMake || '',
-      assetModel: f.newRecord.assetModel || '',
-      serialNumber: f.newRecord.serialNumber || '',
-
-      returnedBy: f.newRecord.returnedBy || 'Employee',
-      department: f.newRecord.department || '',
-
-      inspectionDate: f.newRecord.inspectionDate || this.getTodayDate(),
-      assetConditionOnReturn: f.newRecord.assetConditionOnReturn || 'Good',
-      workingStatus: f.newRecord.workingStatus || 'Working',
-      amcStatus: f.newRecord.amcStatus || 'Under AMC',
-      storeLocation: f.newRecord.storeLocation || '',
-
-      status: f.newRecord.status || 'Active',
-
-      loginId: this.loginId,
-
-      // ✅ IMPORTANT FIX
-      createdDate: f.newRecord.createdDate || this.getTodayDate(),
-    }));
-
-    this.commonService.submitAssetReturn(payload).subscribe({
-      next: () => {
-        this.toast.success('Saved successfully', 'SUCCESS', 4000);
-        this.resetAfterSave();
-        this.loadAssetReturns();
-      },
-      error: () => {
-        this.toast.danger('Save failed!', 'ERROR', 4000);
-      },
+  // ================= VALIDATION =================
+  if (form) {
+    Object.keys(form.controls).forEach((key) => {
+      form.controls[key].markAsTouched();
+      form.controls[key].markAsDirty();
     });
   }
-  resetAfterSave() {
-    this.forms = [
-      {
-        newRecord: {
-          ...this.newRecord,
 
-          // ✅ reset ID for new entry
-          assetreturnEntryId: '0',
+  if (form && !form.valid) return;
 
-          // ✅ reset dates properly
-          assetreturnDate: this.getTodayDate(),
-          createdDate: this.getTodayDate(),
+  // ================= EDIT MODE =================
+  if (this.isEditMode && this.editIndex !== -1) {
+    const formData = this.forms[0].newRecord;
 
-          // ✅ ensure loginId
-          loginId: this.loginId || '',
+    const payload = {
+
+      /* ========= PRIMARY ========= */
+      returnId: formData.returnId || '',
+
+      /* ========= REFERENCES ========= */
+      allocationId: formData.allocationId || '',
+      employeeId: formData.employeeId || '',
+      departmentId: formData.departmentId || '',
+      location: formData.location || '',
+
+      /* ========= ASSET ========= */
+      assetId: formData.assetId || '',
+      assetSerialNumber: formData.assetSerialNumber || '',
+
+      /* ========= DATES ========= */
+      expectedReturnDate: formData.expectedReturnDate || this.getTodayDate(),
+      actualReturnDate: formData.actualReturnDate || this.getTodayDate(),
+
+      /* ========= CONDITION ========= */
+      conditionAtReturn: formData.conditionAtReturn || 'Good',
+      damageDetails: formData.damageDetails || '',
+
+      /* ========= PENALTY ========= */
+      penaltyApplicable: formData.penaltyApplicable || 'No',
+      penaltyAmount: formData.penaltyAmount ?? 0,
+      reasonForPenalty: formData.reasonForPenalty || '',
+
+      /* ========= VERIFICATION ========= */
+      verifiedBy: formData.verifiedBy || '',
+      verificationDate: formData.verificationDate || this.getTodayDate(),
+
+      /* ========= STATUS ========= */
+      returnStatus: formData.returnStatus || 'Active',
+
+      /* ========= REMARKS ========= */
+      remarks: formData.remarks || '',
+
+      /* ========= AUDIT ========= */
+      createdBy: formData.createdBy || this.loginId,
+      createdDate: formData.createdDate || this.getTodayDate(),
+      updatedBy: this.loginId,
+      updatedDate: this.getTodayDate(),
+    };
+
+    const returnId = this.tableData[this.editIndex].returnId;
+
+    this.commonService
+      .updateAssetReturn(returnId, this.loginId, payload)
+      .subscribe({
+        next: () => {
+          this.toast.success('Updated successfully', 'SUCCESS', 4000);
+          this.resetAfterSave();
+          this.loadAssetReturns();
         },
-      },
-    ];
+        error: () => {
+          this.toast.danger('Update failed!', 'ERROR', 4000);
+        },
+      });
 
-    // ✅ refresh table view
-    this.filteredData = [...this.tableData];
-
-    // ✅ reset flags
-    this.showErrors = false;
-    this.isEditMode = false;
-    this.editIndex = -1;
-
-    // ✅ go back to list tab
-    this.activeTab = 'details';
+    return;
   }
+
+  // ================= ADD MODE =================
+  const payload = this.forms.map((f) => ({
+
+    /* ========= PRIMARY ========= */
+    returnId: f.newRecord.returnId || '',
+
+    /* ========= REFERENCES ========= */
+    allocationId: f.newRecord.allocationId || '',
+    employeeId: f.newRecord.employeeId || '',
+    departmentId: f.newRecord.departmentId || '',
+    location: f.newRecord.location || '',
+
+    /* ========= ASSET ========= */
+    assetId: f.newRecord.assetId || '',
+    assetSerialNumber: f.newRecord.assetSerialNumber || '',
+
+    /* ========= DATES ========= */
+    expectedReturnDate: f.newRecord.expectedReturnDate || this.getTodayDate(),
+    actualReturnDate: f.newRecord.actualReturnDate || this.getTodayDate(),
+
+    /* ========= CONDITION ========= */
+    conditionAtReturn: f.newRecord.conditionAtReturn || 'Good',
+    damageDetails: f.newRecord.damageDetails || '',
+
+    /* ========= PENALTY ========= */
+    penaltyApplicable: f.newRecord.penaltyApplicable || 'No',
+    penaltyAmount: f.newRecord.penaltyAmount ?? 0,
+    reasonForPenalty: f.newRecord.reasonForPenalty || '',
+
+    /* ========= VERIFICATION ========= */
+    verifiedBy: f.newRecord.verifiedBy || '',
+    verificationDate: f.newRecord.verificationDate || this.getTodayDate(),
+
+    /* ========= STATUS ========= */
+    returnStatus: f.newRecord.returnStatus || 'Active',
+
+    /* ========= REMARKS ========= */
+    remarks: f.newRecord.remarks || '',
+
+    /* ========= AUDIT ========= */
+    createdBy: this.loginId,
+    createdDate: f.newRecord.createdDate || this.getTodayDate(),
+    updatedBy: '',
+    updatedDate: this.getTodayDate(),
+  }));
+
+  this.commonService.submitAssetReturn(payload).subscribe({
+    next: () => {
+      this.toast.success('Saved successfully', 'SUCCESS', 4000);
+      this.resetAfterSave();
+      this.loadAssetReturns();
+    },
+    error: () => {
+      this.toast.danger('Save failed!', 'ERROR', 4000);
+    },
+  });
+}
+resetAfterSave() {
+  this.forms = [
+    {
+      newRecord: {
+
+        /* ========= PRIMARY ========= */
+        returnId: '0',
+        returnNumber: '',
+
+        /* ========= REFERENCES ========= */
+        allocationId: '',
+        employeeId: '',
+        departmentId: '',
+        location: '',
+
+        /* ========= ASSET ========= */
+        assetId: '',
+        assetSerialNumber: '',
+
+        /* ========= DATES ========= */
+        expectedReturnDate: this.getTodayDate(),
+        actualReturnDate: this.getTodayDate(),
+
+        /* ========= CONDITION ========= */
+        conditionAtReturn: 'Good',
+        damageDetails: '',
+
+        /* ========= PENALTY ========= */
+        penaltyApplicable: 'No',
+        penaltyAmount: 0,
+        reasonForPenalty: '',
+
+        /* ========= VERIFICATION ========= */
+        verifiedBy: '',
+        verificationDate: this.getTodayDate(),
+
+        /* ========= STATUS ========= */
+        returnStatus: 'Active',
+
+        /* ========= REMARKS ========= */
+        remarks: '',
+
+        /* ========= AUDIT ========= */
+        createdBy: this.loginId || '',
+        createdDate: this.getTodayDate(),
+        updatedBy: '',
+        updatedDate: this.getTodayDate(),
+      },
+    },
+  ];
+
+  // ✅ refresh table view
+  this.filteredData = [...this.tableData];
+
+  // ✅ reset flags
+  this.showErrors = false;
+  this.isEditMode = false;
+  this.editIndex = -1;
+
+  // ✅ go back to list tab
+  this.activeTab = 'details';
+}
   // --------------------------
   // CANCEL / RESET FORM
   // --------------------------
@@ -1124,56 +1256,63 @@ th {
   // --------------------------
   // EDIT EXISTING ROW
   // --------------------------
-  onEdit(row: any, index: number) {
-    console.log('Edit Row:', row); // 🔥 debug
+ onEdit(row: any, index: number) {
+  console.log('Edit Row:', row);
 
-    this.activeTab = 'newRecord';
-    this.isEditMode = true;
-    this.editIndex = index;
+  this.activeTab = 'newRecord';
+  this.isEditMode = true;
+  this.editIndex = index;
 
-    this.forms = [
-      {
-        newRecord: {
-          // RETURN
-          assetreturnEntryId: row.assetreturnEntryId,
-          assetreturnDate: row.assetreturnDate,
-          assetreturnType: row.assetreturnType,
-          assetreturnStatus: row.assetreturnStatus,
+  this.forms = [
+    {
+      newRecord: {
 
-          // ALLOCATION
-          allocationId: row.allocationId || '',
-          allocationDate: row.allocationDate || this.getTodayDate(),
-          allocationLocation: row.allocationLocation || '',
+        /* ========= PRIMARY ========= */
+        returnId: row.returnId || '',
+        returnNumber: row.returnNumber || '',
 
-          // ASSET
-          assetId: row.assetId || '',
-          assetName: row.assetName || '',
-          assetType: row.assetType || '',
-          assetMake: row.assetMake || '',
-          assetModel: row.assetModel || '',
-          serialNumber: row.serialNumber || '',
+        /* ========= REFERENCES ========= */
+        allocationId: row.allocationId || '',
+        employeeId: row.employeeId || '',
+        departmentId: row.departmentId || '',
+        location: row.location || '',
 
-          // RETURNED
-          returnedBy: row.returnedBy || 'Employee',
-          department: row.department || '',
+        /* ========= ASSET ========= */
+        assetId: row.assetId || '',
+        assetSerialNumber: row.assetSerialNumber || '',
 
-          // INSPECTION
-          inspectionDate: row.inspectionDate || this.getTodayDate(),
-          assetConditionOnReturn: row.assetConditionOnReturn || 'Good',
-          workingStatus: row.workingStatus || 'Working',
+        /* ========= DATES ========= */
+        expectedReturnDate: row.expectedReturnDate || this.getTodayDate(),
+        actualReturnDate: row.actualReturnDate || this.getTodayDate(),
 
-          // AMC
-          amcStatus: row.amcStatus || 'Under AMC',
-          storeLocation: row.storeLocation || '',
+        /* ========= CONDITION ========= */
+        conditionAtReturn: row.conditionAtReturn || 'Good',
+        damageDetails: row.damageDetails || '',
 
-          // SYSTEM
-          status: row.status || 'Active',
-          loginId: row.loginId,
-          createdDate: row.createdDate || this.getTodayDate(),
-        },
+        /* ========= PENALTY ========= */
+        penaltyApplicable: row.penaltyApplicable || 'No',
+        penaltyAmount: row.penaltyAmount ?? 0,
+        reasonForPenalty: row.reasonForPenalty || '',
+
+        /* ========= VERIFICATION ========= */
+        verifiedBy: row.verifiedBy || '',
+        verificationDate: row.verificationDate || this.getTodayDate(),
+
+        /* ========= STATUS ========= */
+        returnStatus: row.returnStatus || 'Active',
+
+        /* ========= REMARKS ========= */
+        remarks: row.remarks || '',
+
+        /* ========= AUDIT ========= */
+        createdBy: row.createdBy || this.loginId,
+        createdDate: row.createdDate || this.getTodayDate(),
+        updatedBy: this.loginId,
+        updatedDate: this.getTodayDate(),
       },
-    ];
-  }
+    },
+  ];
+}
   //bulk export date format
   startDateError: string = '';
   endDateError: string = '';
@@ -1320,539 +1459,443 @@ th {
   csvRecords: any[] = [];
 
   // Convert CSV → JSON and store in tableData
-  parseCSV(csv: string) {
-    const lines = csv
-      .split('\n')
-      .map((l) => l.trim())
-      .filter((l) => l);
+ parseCSV(csv: string) {
+  const lines = csv
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l);
 
-    if (lines.length <= 1) {
-      this.showToast('CSV has no data', 'warning');
-      return;
+  if (lines.length <= 1) {
+    this.showToast('CSV has no data', 'warning');
+    return;
+  }
+
+  /* ================= HEADER MAPPING ================= */
+
+  const mapHeader = (h: string) => {
+    switch (h.toLowerCase()) {
+      case 'return id':
+        return 'returnId';
+
+      case 'return number':
+        return 'returnNumber';
+
+      case 'allocation id':
+        return 'allocationId';
+
+      case 'employee id':
+        return 'employeeId';
+
+      case 'department id':
+        return 'departmentId';
+
+      case 'location':
+        return 'location';
+
+      case 'asset id':
+        return 'assetId';
+
+      case 'serial number':
+        return 'assetSerialNumber';
+
+      case 'expected return date':
+        return 'expectedReturnDate';
+
+      case 'actual return date':
+        return 'actualReturnDate';
+
+      case 'condition':
+        return 'conditionAtReturn';
+
+      case 'damage details':
+        return 'damageDetails';
+
+      case 'penalty applicable':
+        return 'penaltyApplicable';
+
+      case 'penalty amount':
+        return 'penaltyAmount';
+
+      case 'reason':
+        return 'reasonForPenalty';
+
+      case 'verified by':
+        return 'verifiedBy';
+
+      case 'verification date':
+        return 'verificationDate';
+
+      case 'status':
+        return 'returnStatus';
+
+      case 'remarks':
+        return 'remarks';
+
+      case 'created by':
+        return 'createdBy';
+
+      case 'created date':
+        return 'createdDate';
+
+      default:
+        return h;
     }
+  };
 
-    /* ================= HEADER MAPPING ================= */
+  const csvHeaders = lines[0].split(',').map((h) => mapHeader(h.trim()));
 
-    const mapHeader = (h: string) => {
-      switch (h.toLowerCase()) {
-        case 'return id':
-          return 'assetreturnEntryId';
+  const results: TableRow[] = [];
 
-        case 'return date':
-          return 'assetreturnDate';
+  /* ================= ROW PARSING ================= */
 
-        case 'return status':
-          return 'assetreturnStatus';
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(',');
 
-        case 'allocation id':
-          return 'allocationId';
+    const obj: any = {};
 
-        case 'allocation date':
-          return 'allocationDate';
+    csvHeaders.forEach((h, idx) => {
+      obj[h] = values[idx] ? values[idx].trim() : '';
+    });
 
-        case 'allocation location':
-          return 'allocationLocation';
+    const newRecord: TableRow = {
 
-        case 'asset id':
-          return 'assetId';
+      /* ========= PRIMARY ========= */
+      returnId:
+        obj['returnId'] ||
+        `RET-${String(this.tableData.length + results.length + 1).padStart(3, '0')}`,
+      returnNumber: obj['returnNumber'] || '',
 
-        case 'asset name':
-          return 'assetName';
+      /* ========= REFERENCES ========= */
+      allocationId: obj['allocationId'] || '',
+      employeeId: obj['employeeId'] || '',
+      departmentId: obj['departmentId'] || '',
+      location: obj['location'] || '',
 
-        case 'asset type':
-          return 'assetType';
+      /* ========= ASSET ========= */
+      assetId: obj['assetId'] || '',
+      assetSerialNumber: obj['assetSerialNumber'] || '',
 
-        case 'make':
-          return 'assetMake';
+      /* ========= DATES ========= */
+      expectedReturnDate: obj['expectedReturnDate'] || this.getTodayDate(),
+      actualReturnDate: obj['actualReturnDate'] || this.getTodayDate(),
 
-        case 'model':
-          return 'assetModel';
+      /* ========= CONDITION ========= */
+      conditionAtReturn: obj['conditionAtReturn'] || 'Good',
+      damageDetails: obj['damageDetails'] || '',
 
-        case 'serial number':
-          return 'serialNumber';
+      /* ========= PENALTY ========= */
+      penaltyApplicable: obj['penaltyApplicable'] || 'No',
+      penaltyAmount: obj['penaltyAmount']
+        ? Number(obj['penaltyAmount'])
+        : 0,
+      reasonForPenalty: obj['reasonForPenalty'] || '',
 
-        case 'returned by':
-          return 'returnedBy';
+      /* ========= VERIFICATION ========= */
+      verifiedBy: obj['verifiedBy'] || '',
+      verificationDate: obj['verificationDate'] || this.getTodayDate(),
 
-        case 'department':
-          return 'department';
+      /* ========= STATUS ========= */
+      returnStatus: obj['returnStatus'] || 'Active',
 
-        case 'inspection date':
-          return 'inspectionDate';
+      /* ========= REMARKS ========= */
+      remarks: obj['remarks'] || '',
 
-        case 'asset condition on return':
-          return 'assetConditionOnReturn';
-
-        case 'working status':
-          return 'workingStatus';
-
-        case 'amc status':
-          return 'amcStatus';
-
-        case 'store location':
-          return 'storeLocation';
-
-        case 'record status':
-          return 'status';
-
-        case 'created date':
-          return 'createdDate';
-
-        default:
-          return h;
-      }
+      /* ========= AUDIT ========= */
+      createdBy: obj['createdBy'] || this.loginId,
+      createdDate: obj['createdDate'] || this.getTodayDate(),
+      updatedBy: '',
+      updatedDate: this.getTodayDate(),
     };
 
-    const csvHeaders = lines[0].split(',').map((h) => mapHeader(h.trim()));
+    results.push(newRecord);
+  }
 
-    const results: TableRow[] = [];
+  /* ================= MERGE DATA ================= */
 
-    /* ================= ROW PARSING ================= */
+  this.tableData = [...this.tableData, ...results];
+  this.filteredData = [...this.tableData];
+  this.currentPage = 1;
 
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',');
+  this.cdr.detectChanges();
 
-      const obj: any = {};
+  this.showToast('Asset Return CSV imported successfully!', 'success');
+}
+  // ---------------- Excel Parsing ----------------
+readExcel(file: File) {
+  const reader = new FileReader();
 
-      csvHeaders.forEach((h, idx) => {
-        obj[h] = values[idx] ? values[idx].trim() : '';
-      });
+  reader.onload = () => {
+    const workbook = XLSX.read(reader.result, { type: 'binary' });
 
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+
+    const json = XLSX.utils.sheet_to_json<any>(sheet);
+
+    json.forEach((obj, i) => {
       const newRecord: TableRow = {
-        /* ================= PRIMARY KEY ================= */
-        assetreturnEntryId:
-          obj['assetreturnEntryId'] ||
-          `RET-${String(this.tableData.length + results.length + 1).padStart(3, '0')}`,
 
-        /* ================= RETURN DETAILS ================= */
-        assetreturnDate: obj['assetreturnDate'] || this.getTodayDate(),
-        assetreturnType: 'Asset Return',
-        assetreturnStatus: obj['assetreturnStatus'] || 'Returned',
+        /* ========= PRIMARY ========= */
+        returnId:
+          obj['Return ID'] ||
+          `RET-${String(this.tableData.length + i + 1).padStart(3, '0')}`,
+        returnNumber: obj['Return Number'] || '',
 
-        /* ================= ALLOCATION DETAILS ================= */
-        allocationId: obj['allocationId'] || '',
-        allocationDate: obj['allocationDate'] || '',
-        allocationLocation: obj['allocationLocation'] || '',
+        /* ========= REFERENCES ========= */
+        allocationId: obj['Allocation ID'] || '',
+        employeeId: obj['Employee ID'] || '',
+        departmentId: obj['Department ID'] || '',
+        location: obj['Location'] || '',
 
-        /* ================= ASSET DETAILS ================= */
-        assetId: obj['assetId'] || '',
-        assetName: obj['assetName'] || '',
-        assetType: obj['assetType'] || '',
-        assetMake: obj['assetMake'] || '',
-        assetModel: obj['assetModel'] || '',
-        serialNumber: obj['serialNumber'] || '',
+        /* ========= ASSET ========= */
+        assetId: obj['Asset ID'] || '',
+        assetSerialNumber: obj['Serial Number'] || '',
 
-        /* ================= RETURNED BY DETAILS ================= */
-        returnedBy: obj['returnedBy'] || 'Employee',
-        department: obj['department'] || '',
+        /* ========= DATES ========= */
+        expectedReturnDate:
+          obj['Expected Return Date'] || this.getTodayDate(),
+        actualReturnDate:
+          obj['Actual Return Date'] || this.getTodayDate(),
 
-        /* ================= INSPECTION & AMC ================= */
-        inspectionDate: obj['inspectionDate'] || '',
-        assetConditionOnReturn: obj['assetConditionOnReturn'] || 'Good',
-        workingStatus: obj['workingStatus'] || 'Working',
-        amcStatus: obj['amcStatus'] || 'Under AMC',
-        storeLocation: obj['storeLocation'] || '',
+        /* ========= CONDITION ========= */
+        conditionAtReturn: obj['Condition'] || 'Good',
+        damageDetails: obj['Damage Details'] || '',
 
-        /* ================= SYSTEM / RECORD STATUS ================= */
-        status: obj['status'] || 'Active',
-        loginId: this.loginId || '',
-        createdDate: obj['createdDate'] || this.getTodayDate(),
+        /* ========= PENALTY ========= */
+        penaltyApplicable: obj['Penalty Applicable'] || 'No',
+        penaltyAmount: obj['Penalty Amount']
+          ? Number(obj['Penalty Amount'])
+          : 0,
+        reasonForPenalty: obj['Reason'] || '',
+
+        /* ========= VERIFICATION ========= */
+        verifiedBy: obj['Verified By'] || '',
+        verificationDate:
+          obj['Verification Date'] || this.getTodayDate(),
+
+        /* ========= STATUS ========= */
+        returnStatus:
+          obj['Status'] === 'Inactive' ? 'Inactive' : 'Active',
+
+        /* ========= REMARKS ========= */
+        remarks: obj['Remarks'] || '',
+
+        /* ========= AUDIT ========= */
+        createdBy: this.loginId || '',
+        createdDate: obj['Created Date'] || this.getTodayDate(),
+        updatedBy: '',
+        updatedDate: this.getTodayDate(),
       };
 
-      results.push(newRecord);
-    }
+      this.tableData.push(newRecord);
+    });
 
-    /* ================= MERGE DATA ================= */
+    /* ================= REFRESH TABLE ================= */
 
-    this.tableData = [...this.tableData, ...results];
     this.filteredData = [...this.tableData];
     this.currentPage = 1;
 
     this.cdr.detectChanges();
 
-    this.showToast('Asset Return CSV imported successfully!', 'success');
-  }
+    this.showToast('Asset Return Excel imported successfully!', 'success');
+  };
 
-  // ---------------- Excel Parsing ----------------
-  readExcel(file: File) {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const workbook = XLSX.read(reader.result, { type: 'binary' });
-
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-
-      const json = XLSX.utils.sheet_to_json<any>(sheet);
-
-      json.forEach((obj, i) => {
-        const newRecord: TableRow = {
-          /* ================= PRIMARY KEY ================= */
-          assetreturnEntryId:
-            obj['Return ID'] ||
-            `RET-${String(this.tableData.length + i + 1).padStart(3, '0')}`,
-
-          /* ================= RETURN DETAILS ================= */
-          assetreturnDate: obj['Return Date'] || this.getTodayDate(),
-          assetreturnType: 'Asset Return',
-          assetreturnStatus: obj['Return Status'] || 'Returned',
-
-          /* ================= ALLOCATION DETAILS ================= */
-          allocationId: obj['Allocation ID'] || '',
-          allocationDate: obj['Allocation Date'] || '',
-          allocationLocation: obj['Allocation Location'] || '',
-
-          /* ================= ASSET DETAILS ================= */
-          assetId: obj['Asset ID'] || '',
-          assetName: obj['Asset Name'] || '',
-          assetType: obj['Asset Type'] || '',
-          assetMake: obj['Make'] || '',
-          assetModel: obj['Model'] || '',
-          serialNumber: obj['Serial Number'] || '',
-
-          /* ================= RETURNED BY ================= */
-          returnedBy: obj['Returned By'] || 'Employee',
-          department: obj['Department'] || '',
-
-          /* ================= INSPECTION ================= */
-          inspectionDate: obj['Inspection Date'] || '',
-          assetConditionOnReturn: obj['Asset Condition On Return'] || 'Good',
-
-          workingStatus:
-            obj['Working Status'] === 'Not Working' ? 'Not Working' : 'Working',
-
-          /* ================= AMC ================= */
-          amcStatus: ['Under AMC', 'AMC Closed', 'Out of AMC'].includes(
-            obj['AMC Status'],
-          )
-            ? obj['AMC Status']
-            : 'Under AMC',
-
-          storeLocation: obj['Store Location'] || '',
-
-          /* ================= SYSTEM ================= */
-          status: obj['Record Status'] === 'Inactive' ? 'Inactive' : 'Active',
-          loginId: this.loginId || '',
-          createdDate: obj['Created Date'] || this.getTodayDate(),
-        };
-
-        this.tableData.push(newRecord);
-      });
-
-      /* ================= REFRESH TABLE ================= */
-
-      this.filteredData = [...this.tableData];
-      this.currentPage = 1;
-
-      this.cdr.detectChanges();
-
-      this.showToast('Asset Return Excel imported successfully!', 'success');
-    };
-
-    reader.readAsBinaryString(file);
-  }
+  reader.readAsBinaryString(file);
+}
 
   // ---------------- TXT Parsing ----------------
-  readTXT(file: File) {
-    const reader = new FileReader();
+ readTXT(file: File) {
+  const reader = new FileReader();
 
-    reader.onload = () => {
-      const text = reader.result as string;
+  reader.onload = () => {
+    const text = reader.result as string;
 
-      const lines = text
-        .split(/\r?\n/)
-        .map((line) => line.trim())
-        .filter((line) => line !== '');
+    const lines = text
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line !== '');
 
-      lines.forEach((line, idx) => {
-        const cols = line.split(',').map((c) => c.trim());
+    lines.forEach((line, idx) => {
+      const cols = line.split(',').map((c) => c.trim());
 
-        // ✅ Ensure enough columns (now 22 fields)
-        while (cols.length < 22) cols.push('');
+      // ✅ Ensure enough columns (now ~20+ fields)
+      while (cols.length < 20) cols.push('');
 
-        const newRecord: TableRow = {
-          /* ================= PRIMARY KEY ================= */
-          assetreturnEntryId:
-            cols[0] ||
-            `RET-${String(this.tableData.length + idx + 1).padStart(3, '0')}`,
+      const newRecord: TableRow = {
 
-          /* ================= RETURN DETAILS ================= */
-          assetreturnDate: cols[1] || this.getTodayDate(),
-          assetreturnType: 'Asset Return',
-          assetreturnStatus: cols[2] || 'Returned',
+        /* ========= PRIMARY ========= */
+        returnId:
+          cols[0] ||
+          `RET-${String(this.tableData.length + idx + 1).padStart(3, '0')}`,
+        returnNumber: cols[1] || '',
 
-          /* ================= ALLOCATION DETAILS ================= */
-          allocationId: cols[3] || '',
-          allocationDate: cols[4] || '',
-          allocationLocation: cols[5] || '',
+        /* ========= REFERENCES ========= */
+        allocationId: cols[2] || '',
+        employeeId: cols[3] || '',
+        departmentId: cols[4] || '',
+        location: cols[5] || '',
 
-          /* ================= ASSET DETAILS ================= */
-          assetId: cols[6] || '',
-          assetName: cols[7] || '',
-          assetType: cols[8] || '',
-          assetMake: cols[9] || '',
-          assetModel: cols[10] || '',
-          serialNumber: cols[11] || '',
+        /* ========= ASSET ========= */
+        assetId: cols[6] || '',
+        assetSerialNumber: cols[7] || '',
 
-          /* ================= RETURNED BY ================= */
-          returnedBy: cols[12] === 'Client' ? 'Client' : 'Employee',
-          department: cols[13] || '',
+        /* ========= DATES ========= */
+        expectedReturnDate: cols[8] || this.getTodayDate(),
+        actualReturnDate: cols[9] || this.getTodayDate(),
 
-          /* ================= INSPECTION ================= */
-          inspectionDate: cols[14] || '',
-          assetConditionOnReturn: ['Good', 'Damaged', 'Broken'].includes(
-            cols[15],
-          )
-            ? cols[15]
+        /* ========= CONDITION ========= */
+        conditionAtReturn: ['Good', 'Damaged', 'Broken'].includes(cols[10])
+          ? cols[10]
+          : 'Good',
+        damageDetails: cols[11] || '',
+
+        /* ========= PENALTY ========= */
+        penaltyApplicable: cols[12] === 'Yes' ? 'Yes' : 'No',
+        penaltyAmount: cols[13] ? Number(cols[13]) : 0,
+        reasonForPenalty: cols[14] || '',
+
+        /* ========= VERIFICATION ========= */
+        verifiedBy: cols[15] || '',
+        verificationDate: cols[16] || this.getTodayDate(),
+
+        /* ========= STATUS ========= */
+        returnStatus: cols[17] === 'Inactive' ? 'Inactive' : 'Active',
+
+        /* ========= REMARKS ========= */
+        remarks: cols[18] || '',
+
+        /* ========= AUDIT ========= */
+        createdBy: this.loginId || '',
+        createdDate: cols[19] || this.getTodayDate(),
+        updatedBy: '',
+        updatedDate: this.getTodayDate(),
+      };
+
+      this.tableData.push(newRecord);
+    });
+
+    /* ================= REFRESH TABLE ================= */
+
+    this.filteredData = [...this.tableData];
+    this.currentPage = 1;
+
+    this.cdr.detectChanges();
+
+    this.showToast('Asset Return TXT imported successfully!', 'success');
+  };
+
+  reader.readAsText(file);
+}
+  // ---------------- DOCX Parsing (mammoth.js) ----------------
+
+  async readDOCX(file: File) {
+  const reader = new FileReader();
+
+  reader.onload = async () => {
+    try {
+      const arrayBuffer = reader.result as ArrayBuffer;
+
+      /* ================= DOCX → HTML ================= */
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+      const html = result.value;
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      const table = doc.querySelector('table');
+
+      if (!table) {
+        this.showToast('No table found in DOCX!', 'warning');
+        return;
+      }
+
+      const rows = table.querySelectorAll('tr');
+
+      const newRecords: TableRow[] = [];
+
+      rows.forEach((row, rowIndex) => {
+        if (rowIndex === 0) return; // skip header
+
+        const cells = Array.from(row.querySelectorAll('td')).map(
+          (cell) => cell.textContent?.trim() || '',
+        );
+
+        while (cells.length < 20) cells.push('');
+
+        const record: TableRow = {
+
+          /* ========= PRIMARY ========= */
+          returnId:
+            cells[0] ||
+            `RET-${String(
+              this.tableData.length + newRecords.length + 1
+            ).padStart(3, '0')}`,
+          returnNumber: cells[1] || '',
+
+          /* ========= REFERENCES ========= */
+          allocationId: cells[2] || '',
+          employeeId: cells[3] || '',
+          departmentId: cells[4] || '',
+          location: cells[5] || '',
+
+          /* ========= ASSET ========= */
+          assetId: cells[6] || '',
+          assetSerialNumber: cells[7] || '',
+
+          /* ========= DATES ========= */
+          expectedReturnDate: cells[8] || this.getTodayDate(),
+          actualReturnDate: cells[9] || this.getTodayDate(),
+
+          /* ========= CONDITION ========= */
+          conditionAtReturn: ['Good', 'Damaged', 'Broken'].includes(cells[10])
+            ? cells[10]
             : 'Good',
+          damageDetails: cells[11] || '',
 
-          workingStatus: cols[16] === 'Not Working' ? 'Not Working' : 'Working',
+          /* ========= PENALTY ========= */
+          penaltyApplicable: cells[12] === 'Yes' ? 'Yes' : 'No',
+          penaltyAmount: cells[13] ? Number(cells[13]) : 0,
+          reasonForPenalty: cells[14] || '',
 
-          /* ================= AMC ================= */
-          amcStatus: ['Under AMC', 'AMC Closed', 'Out of AMC'].includes(
-            cols[17],
-          )
-            ? (cols[17] as 'Under AMC' | 'AMC Closed' | 'Out of AMC')
-            : 'Under AMC',
-          storeLocation: cols[18] || '',
+          /* ========= VERIFICATION ========= */
+          verifiedBy: cells[15] || '',
+          verificationDate: cells[16] || this.getTodayDate(),
 
-          /* ================= SYSTEM ================= */
-          status: cols[19] === 'Inactive' ? 'Inactive' : 'Active',
-          loginId: this.loginId || '',
-          createdDate: cols[20] || this.getTodayDate(),
+          /* ========= STATUS ========= */
+          returnStatus: cells[17] === 'Inactive' ? 'Inactive' : 'Active',
+
+          /* ========= REMARKS ========= */
+          remarks: cells[18] || '',
+
+          /* ========= AUDIT ========= */
+          createdBy: this.loginId || '',
+          createdDate: cells[19] || this.getTodayDate(),
+          updatedBy: '',
+          updatedDate: this.getTodayDate(),
         };
 
-        this.tableData.push(newRecord);
+        newRecords.push(record);
       });
 
-      /* ================= REFRESH TABLE ================= */
-
+      /* ================= MERGE DATA ================= */
+      this.tableData = [...this.tableData, ...newRecords];
       this.filteredData = [...this.tableData];
       this.currentPage = 1;
 
       this.cdr.detectChanges();
 
-      this.showToast('Asset Return TXT imported successfully!', 'success');
-    };
-
-    reader.readAsText(file);
-  }
-
-  // ---------------- DOCX Parsing (mammoth.js) ----------------
-  async readDOCX(file: File) {
-    const reader = new FileReader();
-
-    reader.onload = async () => {
-      try {
-        const arrayBuffer = reader.result as ArrayBuffer;
-
-        /* ================= DOCX → HTML ================= */
-        const result = await mammoth.convertToHtml({ arrayBuffer });
-        const html = result.value;
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        const table = doc.querySelector('table');
-
-        if (!table) {
-          this.showToast('No table found in DOCX!', 'warning');
-          return;
-        }
-
-        const rows = table.querySelectorAll('tr');
-
-        const newRecords: TableRow[] = [];
-
-        rows.forEach((row, rowIndex) => {
-          if (rowIndex === 0) return;
-
-          const cells = Array.from(row.querySelectorAll('td')).map(
-            (cell) => cell.textContent?.trim() || '',
-          );
-
-          while (cells.length < 21) cells.push('');
-
-          const record: TableRow = {
-            /* ================= PRIMARY KEY ================= */
-            assetreturnEntryId:
-              cells[0] ||
-              `RET-${String(
-                this.tableData.length + newRecords.length + 1,
-              ).padStart(3, '0')}`,
-
-            /* ================= RETURN DETAILS ================= */
-            assetreturnDate: cells[1] || this.getTodayDate(),
-            assetreturnType: 'Asset Return',
-            assetreturnStatus: cells[2] || 'Returned',
-
-            /* ================= ALLOCATION ================= */
-            allocationId: cells[3] || '',
-            allocationDate: cells[4] || '',
-            allocationLocation: cells[5] || '',
-
-            /* ================= ASSET ================= */
-            assetId: cells[6] || '',
-            assetName: cells[7] || '',
-            assetType: cells[8] || '',
-            assetMake: cells[9] || '',
-            assetModel: cells[10] || '',
-            serialNumber: cells[11] || '',
-
-            /* ================= RETURNED BY ================= */
-            returnedBy: cells[12] === 'Client' ? 'Client' : 'Employee',
-            department: cells[13] || '',
-
-            /* ================= INSPECTION ================= */
-            inspectionDate: cells[14] || '',
-            assetConditionOnReturn: ['Good', 'Damaged', 'Broken'].includes(
-              cells[15],
-            )
-              ? (cells[15] as 'Good' | 'Damaged' | 'Broken')
-              : 'Good',
-
-            workingStatus:
-              cells[16] === 'Not Working' ? 'Not Working' : 'Working',
-
-            /* ================= AMC ================= */
-            amcStatus: ['Under AMC', 'AMC Closed', 'Out of AMC'].includes(
-              cells[17],
-            )
-              ? (cells[17] as 'Under AMC' | 'AMC Closed' | 'Out of AMC')
-              : 'Under AMC',
-
-            /* ✅ MISSING FIELD FIX */
-            storeLocation: cells[18] || '',
-
-            /* ================= SYSTEM ================= */
-            status: cells[19] === 'Inactive' ? 'Inactive' : 'Active',
-            loginId: this.loginId || '',
-            createdDate: cells[20] || this.getTodayDate(),
-          };
-
-          newRecords.push(record);
-        });
-
-        /* ================= MERGE DATA ================= */
-        this.tableData = [...this.tableData, ...newRecords];
-        this.filteredData = [...this.tableData];
-        this.currentPage = 1;
-
-        this.cdr.detectChanges();
-
-        this.showToast(
-          `${newRecords.length} Asset Return records imported successfully!`,
-          'success',
-        );
-      } catch (error) {
-        console.error('DOCX Parse Error:', error);
-        this.showToast('Failed to read DOCX file!', 'error');
-      }
-    };
-
-    reader.readAsArrayBuffer(file);
-  }
-  downloadSampleCSV() {
-    if (!this.tableData || this.tableData.length === 0) {
-      this.showToast('No data available to download!', 'warning');
-      return;
-    }
-
-    /* ================= CSV HEADERS ================= */
-
-    const headers = [
-      'Return ID',
-      'Return Date',
-      'Return Status',
-
-      'Allocation ID',
-      'Allocation Date',
-      'Allocation Location',
-
-      'Asset ID',
-      'Asset Name',
-      'Asset Type',
-      'Make',
-      'Model',
-      'Serial Number',
-
-      'Returned By',
-      'Department',
-
-      'Inspection Date',
-      'Asset Condition On Return',
-      'Working Status',
-
-      'AMC Status',
-      'Store Location',
-
-      'Record Status',
-      'Login ID',
-      'Created Date',
-    ];
-
-    const csvRows: string[] = [];
-
-    // Header row
-    csvRows.push(headers.join(','));
-
-    /* ================= DATA ROWS ================= */
-
-    this.tableData.forEach((row: TableRow) => {
-      const rowData = [
-        row.assetreturnEntryId || '',
-        row.assetreturnDate || '',
-        row.assetreturnStatus || '',
-
-        row.allocationId || '',
-        row.allocationDate || '',
-        row.allocationLocation || '',
-
-        row.assetId || '',
-        row.assetName || '',
-        row.assetType || '',
-        row.assetMake || '',
-        row.assetModel || '',
-        row.serialNumber || '',
-
-        row.returnedBy || '',
-        row.department || '',
-
-        row.inspectionDate || '',
-        row.assetConditionOnReturn || '',
-        row.workingStatus || '',
-
-        row.amcStatus || '',
-        row.storeLocation || '',
-
-        row.status || '',
-        row.loginId || '',
-        row.createdDate || '',
-      ];
-
-      // Escape commas safely
-      csvRows.push(
-        rowData.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(','),
+      this.showToast(
+        `${newRecords.length} Asset Return records imported successfully!`,
+        'success'
       );
-    });
+    } catch (error) {
+      console.error('DOCX Parse Error:', error);
+      this.showToast('Failed to read DOCX file!', 'error');
+    }
+  };
 
-    /* ================= DOWNLOAD ================= */
-
-    const csvString = csvRows.join('\n');
-
-    const blob = new Blob([csvString], {
-      type: 'text/csv;charset=utf-8;',
-    });
-
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Asset_Return_Sample.csv';
-    a.click();
-
-    window.URL.revokeObjectURL(url);
-  }
+  reader.readAsArrayBuffer(file);
+}
 
   //bulk export
   // ---------------- Component Variables ----------------
@@ -1954,376 +1997,515 @@ th {
         this.showToast('Invalid file type selected!', 'error');
     }
   }
+downloadSampleCSV() {
 
-  // ---------------- CSV Export ----------------
-  exportCSVfile(data: TableRow[]) {
-    const today = new Date();
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+  /* ================= HEADERS ================= */
+  const headers = [
+    'Return ID',
+    'Return Number',
 
-    const csvRows: string[] = [];
+    'Allocation ID',
+    'Employee ID',
+    'Department ID',
+    'Location',
 
-    /* ================= HEADER ================= */
+    'Asset ID',
+    'Serial Number',
 
-    csvRows.push(this.headCompanyName || 'AMC Call Logging');
-    csvRows.push(`Date:,${formattedDate}`);
-    csvRows.push('');
+    'Expected Return Date',
+    'Actual Return Date',
 
-    /* ================= CSV COLUMNS ================= */
+    'Condition',
+    'Damage Details',
 
-    const headers = [
-      'Return ID',
-      'Return Date',
-      'Return Status',
+    'Penalty Applicable',
+    'Penalty Amount',
+    'Reason',
 
-      'Allocation ID',
-      'Allocation Date',
-      'Allocation Location',
+    'Verified By',
+    'Verification Date',
 
-      'Asset ID',
-      'Asset Name',
-      'Asset Type',
-      'Make',
-      'Model',
-      'Serial Number',
+    'Return Status',
+    'Remarks',
 
-      'Returned By',
-      'Department',
+    'Created By',
+    'Created Date',
+    'Updated By',
+    'Updated Date',
+  ];
 
-      'Inspection Date',
-      'Asset Condition On Return',
-      'Working Status',
+  const csvRows: string[] = [];
+  csvRows.push(headers.join(','));
 
-      'AMC Status',
-      'Store Location',
+  /* ================= SAMPLE ROW (🔥 IMPORTANT) ================= */
+  const sampleRow = [
+    'RET-001',
+    'RETNO-001',
 
-      'Record Status',
-      'Login ID',
-      'Created Date',
+    'ALLOC-001',
+    'EMP-001',
+    'DEP-001',
+    'Mumbai',
+
+    'A-1001',
+    'SN123456',
+
+    this.getTodayDate(),
+    this.getTodayDate(),
+
+    'Good',
+    '',
+
+    'No',
+    '0',
+    '',
+
+    'Admin',
+    this.getTodayDate(),
+
+    'Active',
+    'No issues',
+
+    this.loginId || 'Admin',
+    this.getTodayDate(),
+    '',
+    '',
+  ];
+
+  csvRows.push(sampleRow.join(','));
+
+  /* ================= OPTIONAL: EXISTING DATA ================= */
+  this.tableData.forEach((row: TableRow) => {
+    const rowData = [
+      row.returnId || '',
+      row.returnNumber || '',
+
+      row.allocationId || '',
+      row.employeeId || '',
+      row.departmentId || '',
+      row.location || '',
+
+      row.assetId || '',
+      row.assetSerialNumber || '',
+
+      row.expectedReturnDate || '',
+      row.actualReturnDate || '',
+
+      row.conditionAtReturn || '',
+      row.damageDetails || '',
+
+      row.penaltyApplicable || '',
+      row.penaltyAmount ?? 0,
+      row.reasonForPenalty || '',
+
+      row.verifiedBy || '',
+      row.verificationDate || '',
+
+      row.returnStatus || '',
+      row.remarks || '',
+
+      row.createdBy || '',
+      row.createdDate || '',
+      row.updatedBy || '',
+      row.updatedDate || '',
     ];
 
-    csvRows.push(headers.join(','));
+    csvRows.push(rowData.join(','));
+  });
 
-    /* ================= DATA ROWS ================= */
+  /* ================= DOWNLOAD ================= */
+  const csvString = '\ufeff' + csvRows.join('\n');
 
-    data.forEach((row: TableRow) => {
-      const rowData = [
-        row.assetreturnEntryId || '',
-        row.assetreturnDate || '',
-        row.assetreturnStatus || '',
+  const blob = new Blob([csvString], {
+    type: 'text/csv;charset=utf-8;',
+  });
 
-        row.allocationId || '',
-        row.allocationDate || '',
-        row.allocationLocation || '',
+  const url = window.URL.createObjectURL(blob);
 
-        row.assetId || '',
-        row.assetName || '',
-        row.assetType || '',
-        row.assetMake || '',
-        row.assetModel || '',
-        row.serialNumber || '',
+  const a = document.createElement('a');
+  a.href = url;
 
-        row.returnedBy || '',
-        row.department || '',
+  const today = new Date().toISOString().split('T')[0];
+  a.download = `Asset_Return_Sample_${today}.csv`;
 
-        row.inspectionDate || '',
-        row.assetConditionOnReturn || '',
-        row.workingStatus || '',
+  a.click();
 
-        row.amcStatus || '',
-        row.storeLocation || '',
+  window.URL.revokeObjectURL(url);
+}
+  // ---------------- CSV Export ----------------
+exportCSVfile(data: TableRow[]) {
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
 
-        row.status || '',
-        row.loginId || '',
-        row.createdDate || '',
-      ];
+  const csvRows: string[] = [];
 
-      csvRows.push(
-        rowData.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(','),
-      );
-    });
+  /* ================= HEADER ================= */
 
-    /* ================= DOWNLOAD ================= */
+  csvRows.push(this.headCompanyName || 'Asset Return Report');
+  csvRows.push(`Date:,${formattedDate}`);
+  csvRows.push('');
 
-    const blob = new Blob([csvRows.join('\n')], {
-      type: 'text/csv;charset=utf-8;',
-    });
+  /* ================= CSV COLUMNS ================= */
 
-    saveAs(blob, 'Filtered_Asset_Return_Report.csv');
-  }
+  const headers = [
+    'Return ID',
+    'Return Number',
+
+    'Allocation ID',
+    'Employee ID',
+    'Department ID',
+    'Location',
+
+    'Asset ID',
+    'Serial Number',
+
+    'Expected Return Date',
+    'Actual Return Date',
+
+    'Condition',
+    'Damage Details',
+
+    'Penalty Applicable',
+    'Penalty Amount',
+    'Reason',
+
+    'Verified By',
+    'Verification Date',
+
+    'Status',
+    'Remarks',
+
+    'Created By',
+    'Created Date',
+  ];
+
+  csvRows.push(headers.join(','));
+
+  /* ================= DATA ROWS ================= */
+
+  data.forEach((row: TableRow) => {
+    const rowData = [
+      row.returnId || '',
+      row.returnNumber || '',
+
+      row.allocationId || '',
+      row.employeeId || '',
+      row.departmentId || '',
+      row.location || '',
+
+      row.assetId || '',
+      row.assetSerialNumber || '',
+
+      row.expectedReturnDate || '',
+      row.actualReturnDate || '',
+
+      row.conditionAtReturn || '',
+      row.damageDetails || '',
+
+      row.penaltyApplicable || '',
+      row.penaltyAmount ?? 0,
+      row.reasonForPenalty || '',
+
+      row.verifiedBy || '',
+      row.verificationDate || '',
+
+      row.returnStatus || '',
+      row.remarks || '',
+
+      row.createdBy || '',
+      row.createdDate || '',
+    ];
+
+    csvRows.push(
+      rowData.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(',')
+    );
+  });
+
+  /* ================= DOWNLOAD ================= */
+
+  const blob = new Blob([csvRows.join('\n')], {
+    type: 'text/csv;charset=utf-8;',
+  });
+
+  saveAs(blob, 'Filtered_Asset_Return_Report.csv');
+}
 
   // ---------------- Excel Export ----------------
-  exportExcelfile(data: TableRow[]) {
-    const today = new Date();
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+ exportExcelfile(data: TableRow[]) {
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
 
-    /* ================= EXCEL ROW DATA ================= */
+  /* ================= EXCEL ROW DATA ================= */
 
-    const wsData: any[][] = [
-      [this.headCompanyName || 'AMC Call Logging'],
-      this.userName ? ['Email:', this.userName] : [],
-      ['Date:', formattedDate],
-      [],
+  const wsData: any[][] = [
+    [this.headCompanyName || 'Asset Return Report'],
+    this.userName ? ['User:', this.userName] : [],
+    ['Date:', formattedDate],
+    [],
 
+    [
+      'Return ID',
+      'Return Number',
+
+      'Allocation ID',
+      'Employee ID',
+      'Department ID',
+      'Location',
+
+      'Asset ID',
+      'Serial Number',
+
+      'Expected Return Date',
+      'Actual Return Date',
+
+      'Condition',
+      'Damage Details',
+
+      'Penalty Applicable',
+      'Penalty Amount',
+      'Reason',
+
+      'Verified By',
+      'Verification Date',
+
+      'Status',
+      'Remarks',
+
+      'Created By',
+      'Created Date',
+    ],
+  ];
+
+  /* ================= DATA ROWS ================= */
+
+  data.forEach((row: TableRow) => {
+    wsData.push([
+      row.returnId || '',
+      row.returnNumber || '',
+
+      row.allocationId || '',
+      row.employeeId || '',
+      row.departmentId || '',
+      row.location || '',
+
+      row.assetId || '',
+      row.assetSerialNumber || '',
+
+      row.expectedReturnDate || '',
+      row.actualReturnDate || '',
+
+      row.conditionAtReturn || '',
+      row.damageDetails || '',
+
+      row.penaltyApplicable || '',
+      row.penaltyAmount ?? 0,
+      row.reasonForPenalty || '',
+
+      row.verifiedBy || '',
+      row.verificationDate || '',
+
+      row.returnStatus || '',
+      row.remarks || '',
+
+      row.createdBy || '',
+      row.createdDate || '',
+    ]);
+  });
+
+  /* ================= CREATE WORKSHEET ================= */
+
+  const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
+
+  /* ================= COLUMN WIDTH ================= */
+
+  worksheet['!cols'] = [
+    { wch: 16 }, // Return ID
+    { wch: 18 }, // Return Number
+
+    { wch: 16 }, // Allocation ID
+    { wch: 16 }, // Employee ID
+    { wch: 18 }, // Department ID
+    { wch: 18 }, // Location
+
+    { wch: 14 }, // Asset ID
+    { wch: 20 }, // Serial Number
+
+    { wch: 18 }, // Expected Date
+    { wch: 18 }, // Actual Date
+
+    { wch: 20 }, // Condition
+    { wch: 22 }, // Damage Details
+
+    { wch: 18 }, // Penalty Applicable
+    { wch: 16 }, // Penalty Amount
+    { wch: 22 }, // Reason
+
+    { wch: 18 }, // Verified By
+    { wch: 20 }, // Verification Date
+
+    { wch: 14 }, // Status
+    { wch: 22 }, // Remarks
+
+    { wch: 18 }, // Created By
+    { wch: 18 }, // Created Date
+  ];
+
+  /* ================= CREATE WORKBOOK ================= */
+
+  const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Asset Return Report');
+
+  /* ================= DOWNLOAD ================= */
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
+
+  const blob = new Blob([excelBuffer], {
+    type: 'application/octet-stream',
+  });
+
+  saveAs(blob, 'Filtered_Asset_Return_Report.xlsx');
+}
+  // ---------------- PDF Export ----------------
+exportPDFfile(data: TableRow[]) {
+  if (!data || data.length === 0) {
+    this.showToast('No data available to export!', 'warning');
+    return;
+  }
+
+  const doc = new jsPDF('l', 'pt', 'a4'); // Landscape
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  const title = 'Asset Return Report';
+
+  doc.setFontSize(18);
+  doc.setTextColor(0, 70, 140);
+  doc.text(title, pageWidth / 2, 40, { align: 'center' });
+
+  doc.setDrawColor(0, 70, 140);
+  doc.setLineWidth(1);
+
+  doc.line(
+    pageWidth / 2 - doc.getTextWidth(title) / 2,
+    45,
+    pageWidth / 2 + doc.getTextWidth(title) / 2,
+    45,
+  );
+
+  /* ================= SUB HEADER ================= */
+
+  const topY = 70;
+
+  doc.setFontSize(11);
+  doc.setTextColor(0, 0, 0);
+
+  doc.text(this.headCompanyName || 'Asset Return', 40, topY);
+
+  if (this.userName) {
+    doc.text(this.userName, 40, topY + 14);
+  }
+
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 40, topY, {
+    align: 'right',
+  });
+
+  /* ================= TABLE ================= */
+
+  autoTable(doc, {
+    startY: topY + 30,
+
+    head: [
       [
         'Return ID',
-        'Return Date',
-        'Return Status',
+        'Return No',
 
         'Allocation ID',
-        'Allocation Date',
-        'Allocation Location',
+        'Employee ID',
+        'Department ID',
+        'Location',
 
         'Asset ID',
-        'Asset Name',
-        'Asset Type',
-        'Make',
-        'Model',
-        'Serial Number',
+        'Serial No',
 
-        'Returned By',
-        'Department',
+        'Expected Date',
+        'Actual Date',
 
-        'Inspection Date',
-        'Asset Condition On Return',
-        'Working Status',
+        'Condition',
+        'Damage',
 
-        'AMC Status',
-        'Store Location',
+        'Penalty',
+        'Penalty Amt',
+        'Reason',
 
-        'Record Status',
-        'Login ID',
+        'Verified By',
+        'Verification Date',
+
+        'Status',
+        'Remarks',
+
+        'Created By',
         'Created Date',
       ],
-    ];
+    ],
 
-    /* ================= DATA ROWS ================= */
+    body: data.map((row: TableRow) => [
+      row.returnId || '',
+      row.returnNumber || '',
 
-    data.forEach((row: TableRow) => {
-      wsData.push([
-        row.assetreturnEntryId || '',
-        row.assetreturnDate || '',
-        row.assetreturnStatus || '',
+      row.allocationId || '',
+      row.employeeId || '',
+      row.departmentId || '',
+      row.location || '',
 
-        row.allocationId || '',
-        row.allocationDate || '',
-        row.allocationLocation || '',
+      row.assetId || '',
+      row.assetSerialNumber || '',
 
-        row.assetId || '',
-        row.assetName || '',
-        row.assetType || '',
-        row.assetMake || '',
-        row.assetModel || '',
-        row.serialNumber || '',
+      row.expectedReturnDate || '',
+      row.actualReturnDate || '',
 
-        row.returnedBy || '',
-        row.department || '',
+      row.conditionAtReturn || '',
+      row.damageDetails || '',
 
-        row.inspectionDate || '',
-        row.assetConditionOnReturn || '',
-        row.workingStatus || '',
+      row.penaltyApplicable || '',
+      row.penaltyAmount ?? 0,
+      row.reasonForPenalty || '',
 
-        row.amcStatus || '',
-        row.storeLocation || '',
+      row.verifiedBy || '',
+      row.verificationDate || '',
 
-        row.status || '',
-        row.loginId || '',
-        row.createdDate || '',
-      ]);
-    });
+      row.returnStatus || '',
+      row.remarks || '',
 
-    /* ================= CREATE WORKSHEET ================= */
+      row.createdBy || '',
+      row.createdDate || '',
+    ]),
 
-    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
+    theme: 'grid',
+    tableWidth: 'auto',
 
-    /* ================= COLUMN WIDTH ================= */
+    styles: {
+      fontSize: 7,
+      cellPadding: 3,
+      overflow: 'linebreak',
+      halign: 'center',
+      valign: 'middle',
+    },
 
-    worksheet['!cols'] = [
-      { wch: 16 }, // Return ID
-      { wch: 14 }, // Return Date
-      { wch: 14 }, // Return Status
+    headStyles: {
+      fillColor: [0, 92, 179],
+      textColor: 255,
+      fontStyle: 'bold',
+      halign: 'center',
+    },
 
-      { wch: 16 }, // Allocation ID
-      { wch: 14 }, // Allocation Date
-      { wch: 20 }, // Allocation Location
+    margin: { left: 20, right: 20 },
+    pageBreak: 'auto',
+  });
 
-      { wch: 14 }, // Asset ID
-      { wch: 22 }, // Asset Name
-      { wch: 16 }, // Asset Type
-      { wch: 16 }, // Make
-      { wch: 16 }, // Model
-      { wch: 20 }, // Serial Number
+  /* ================= SAVE ================= */
 
-      { wch: 14 }, // Returned By
-      { wch: 18 }, // Department
-
-      { wch: 18 }, // Inspection Date
-      { wch: 24 }, // Condition
-      { wch: 18 }, // Working Status
-
-      { wch: 18 }, // AMC Status
-      { wch: 22 }, // Store Location
-
-      { wch: 14 }, // Record Status
-      { wch: 18 }, // Login ID
-      { wch: 18 }, // Created Date
-    ];
-
-    /* ================= CREATE WORKBOOK ================= */
-
-    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Asset Return Report');
-
-    /* ================= DOWNLOAD ================= */
-
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
-    });
-
-    const blob = new Blob([excelBuffer], {
-      type: 'application/octet-stream',
-    });
-
-    saveAs(blob, 'Filtered_Asset_Return_Report.xlsx');
-  }
-  // ---------------- PDF Export ----------------
-  exportPDFfile(data: TableRow[]) {
-    if (!data || data.length === 0) {
-      this.showToast('No data available to export!', 'warning');
-      return;
-    }
-
-    const doc = new jsPDF('l', 'pt', 'a4'); // Landscape
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    /* ================= HEADER TITLE ================= */
-
-    const title = 'Asset Return Report – AMC Call Logging';
-
-    doc.setFontSize(20);
-    doc.setTextColor(0, 70, 140);
-    doc.text(title, pageWidth / 2, 40, { align: 'center' });
-
-    doc.setDrawColor(0, 70, 140);
-    doc.setLineWidth(1);
-
-    doc.line(
-      pageWidth / 2 - doc.getTextWidth(title) / 2,
-      45,
-      pageWidth / 2 + doc.getTextWidth(title) / 2,
-      45,
-    );
-
-    /* ================= SUB HEADER ================= */
-
-    const topY = 70;
-
-    doc.setFontSize(11);
-    doc.setTextColor(0, 0, 0);
-
-    doc.text(this.headCompanyName || 'AMC Call Logging', 40, topY);
-
-    if (this.userName) {
-      doc.text(this.userName, 40, topY + 14);
-    }
-
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 40, topY, {
-      align: 'right',
-    });
-
-    /* ================= TABLE ================= */
-
-    autoTable(doc, {
-      startY: topY + 30,
-
-      head: [
-        [
-          'Return ID',
-          'Return Date',
-          'Return Status',
-
-          'Allocation ID',
-          'Allocation Date',
-          'Location',
-
-          'Asset ID',
-          'Asset Name',
-          'Asset Type',
-          'Make',
-          'Model',
-          'Serial Number',
-
-          'Returned By',
-          'Department',
-
-          'Inspection Date',
-          'Condition',
-          'Working Status',
-
-          'AMC Status',
-          'Store Location',
-
-          'Record Status',
-          'Login ID',
-          'Created Date',
-        ],
-      ],
-
-      body: data.map((row: TableRow) => [
-        row.assetreturnEntryId || '',
-        row.assetreturnDate || '',
-        row.assetreturnStatus || '',
-
-        row.allocationId || '',
-        row.allocationDate || '',
-        row.allocationLocation || '',
-
-        row.assetId || '',
-        row.assetName || '',
-        row.assetType || '',
-        row.assetMake || '',
-        row.assetModel || '',
-        row.serialNumber || '',
-
-        row.returnedBy || '',
-        row.department || '',
-
-        row.inspectionDate || '',
-        row.assetConditionOnReturn || '',
-        row.workingStatus || '',
-
-        row.amcStatus || '',
-        row.storeLocation || '',
-
-        row.status || '',
-        row.loginId || '',
-        row.createdDate || '',
-      ]),
-
-      theme: 'grid',
-      tableWidth: 'auto',
-
-      styles: {
-        fontSize: 8,
-        cellPadding: 3,
-        overflow: 'linebreak',
-        halign: 'center',
-        valign: 'middle',
-      },
-
-      headStyles: {
-        fillColor: [0, 92, 179],
-        textColor: 255,
-        fontStyle: 'bold',
-        halign: 'center',
-      },
-
-      margin: { left: 20, right: 20 },
-      pageBreak: 'auto',
-    });
-
-    /* ================= SAVE ================= */
-
-    doc.save('Filtered_Asset_Return_Report.pdf');
-  }
+  doc.save('Filtered_Asset_Return_Report.pdf');
+}
 }

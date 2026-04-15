@@ -67,32 +67,52 @@ import { CommonService } from '../../../services/common/common-service';
   'node_modules/pdfjs-dist/build/pdf.worker.min.js';
 
 export interface TableRow {
-  // Primary Key
-  callLogId: string;
+
+  // 🔹 Primary Key
+  callLoggingId: string;
+
+  // 🔹 Basic Info
   departmentId: string;
+  employeeId: string;
 
-  // Client Info
-  EmployeeId: string;
-  EmployeeName: string;
-  ContactNumber: string;
-  // Asset Info
-
+  // 🔹 Contact Info
+  contactNumber: string;
   emailAddress: string;
   location: string;
+
+  // 🔹 Asset Info
   assetId: string;
-  assetName: string;
+
+  // 🔹 Problem Info
+  problemCategory: string;
   problemType: string;
   problemDescription: string;
-  callPriority: string;
-  // StatucallPrioritys
-  callStatus: 'Active' | 'Inactive';
-  assignedTechnician: string;
-  callDateTime: string;
-  remarks: string;
-  closeDate: string;
-  loginId: string;
-}
 
+  // 🔹 Call Details
+  callPriority: string;
+
+  // ✅ FIXED (Active / Inactive only)
+  callStatus: 'Active' | 'Inactive';
+
+  assignedTechnician: string;
+
+  // 🔹 Date & Time
+  callDateTime: string;
+  expectedResolutionTime: string;
+
+  // 🔹 Resolution
+  resolutionDetails: string;
+  remarks: string;
+
+  // 🔹 Closing Info
+  closeDate: string;
+  isReopened: string;
+
+  // 🔹 Audit Fields
+  createdBy: string;
+  createdDate: string;
+  updatedDate: string;
+}
 @Component({
   selector: 'app-call-logging',
   standalone: false,
@@ -174,7 +194,7 @@ callList: any[] = [];
 
     // 🗓 Initialize form & data
     this.initializeForm();
-    this.loadEmployee();
+    this.loadEmployees();
     this.loadDepartments();
     this.loadCallLogging();
     // Department dropdown
@@ -182,82 +202,104 @@ callList: any[] = [];
 
     this.filteredData = [...this.tableData];
   }
-  private initializeForm(): void {
-    this.forms = [
-      {
-        // ✅ UI Binding Fields (Form मध्ये दिसणारे)
+private initializeForm(): void {
+  this.forms = [
+    {
+      // 🔹 Primary Key
+      callLoggingId: '0',
+
+      // 🔹 Basic Info
+      departmentId: '',
+      employeeId: '',
+
+      // 🔹 Contact Info
+      contactNumber: '',
+      emailAddress: '',
+      location: '',
+
+      // 🔹 Asset Info
+      assetId: '',
+
+      // 🔹 Problem Info
+      problemCategory: '',
+      problemType: '',
+      problemDescription: '',
+
+      // 🔹 Call Details
+      callPriority: 'Low',
+      callStatus: 'Active',
+      assignedTechnician: '',
+
+      // 🔹 Date & Time
+      callDateTime: this.currentDate || '',
+      expectedResolutionTime: '',
+
+      // 🔹 Resolution
+      resolutionDetails: '',
+      remarks: '',
+
+      // 🔹 Closing Info
+      closeDate: '',
+      isReopened: 'No',
+
+      // 🔹 Audit
+      createdBy: this.loginId,
+      createdDate: this.currentDate || '',
+      updatedDate: this.currentDate || '',
+
+      // 🔥 Backend payload
+      newRecord: {
+        callLoggingId: '0',
         departmentId: '',
-
-        EmployeeId: '',
-        EmployeeName: '',
-        ContactNumber: '',
-
+        employeeId: '',
+        contactNumber: '',
         emailAddress: '',
         location: '',
-
         assetId: '',
-        assetName: '',
-
+        problemCategory: '',
         problemType: '',
         problemDescription: '',
-
         callPriority: 'Low',
         callStatus: 'Active',
-
         assignedTechnician: '',
-
         callDateTime: this.currentDate || '',
-
+        expectedResolutionTime: '',
+        resolutionDetails: '',
         remarks: '',
         closeDate: '',
-
-        loginId: this.loginId,
-
-        // ✅ Backend Payload (Designation सारखा)
-        newRecord: {
-          callLogId: '0',
-
-          departmentId: '',
-
-          EmployeeId: '',
-          EmployeeName: '',
-          ContactNumber: '',
-
-          emailAddress: '',
-          location: '',
-
-          assetId: '',
-          assetName: '',
-
-          problemType: '',
-          problemDescription: '',
-
-          callPriority: 'Low',
-          callStatus: 'Active',
-
-          assignedTechnician: '',
-
-          callDateTime: this.currentDate || '',
-
-          remarks: '',
-          closeDate: '',
-
-          loginId: this.loginId,
-        },
-      },
-    ];
-  }
-  loadDepartments(): void {
-    this.commonService.fetchAllDepartmentByCompany(this.loginId).subscribe({
-      next: (res: any[]) => {
+        isReopened: 'No',
+        createdBy: this.loginId,
+        createdDate: this.currentDate || '',
+        updatedDate: this.currentDate || ''
+      }
+    }
+  ];
+}
+   loadDepartments(): void {
+    this.commonService.fetchAllDepartments().subscribe({
+      next: (res: any) => {
+        console.log('Department API Response:', res);
         this.departments = res;
       },
-
       error: (err) => {
         console.error('Department API Error:', err);
       },
     });
   }
+
+loadEmployees(): void {
+  this.commonService.fetchAllEmployee()
+    .subscribe({
+      next: (res: any[]) => {
+        console.log('Employee API Response:', res);
+
+        this.employees = res;   // ✅ CORRECT
+      },
+      error: (err) => {
+        console.error('Employee API Error:', err);
+      }
+    });
+}
   onAssetChange(assetId: string, i: number) {
     const asset = this.assets.find((a: any) => a.assetId === assetId);
 
@@ -265,65 +307,96 @@ callList: any[] = [];
       this.forms[i].assetName = asset.assetName;
     }
   }
-  loadCallLogging(): void {
-    this.loading = true;
+  
+loadCallLogging(): void {
+  this.loading = true;
 
-    this.commonService.fetchAllCallLoggingByLoginId(this.loginId).subscribe({
-      next: (res: any[]) => {
-        this.loading = false;
+  // 🔥 FIX: loginId clean कर
+  let loginId = this.loginId;
 
-        // 🔥 CLEAN & SAFE MAPPING
-        this.tableData = (res || []).map((item) => ({
-          callLogId: item.callLogId,
+  console.log('ORIGINAL LOGIN ID:', loginId);
 
-          departmentId: item.departmentId,
-
-          // 🔥 FIX CASE ISSUE
-          EmployeeId: item.employeeId ?? item.EmployeeId ?? '',
-          EmployeeName: item.employeeName ?? item.EmployeeName ?? '',
-          ContactNumber: item.contactNumber ?? item.ContactNumber ?? '',
-
-          emailAddress: item.emailAddress ?? '',
-          location: item.location ?? '',
-
-          assetId: item.assetId ?? '',
-          assetName: item.assetName ?? '',
-
-          problemType: item.problemType ?? '',
-          problemDescription: item.problemDescription ?? '',
-
-          callPriority: item.callPriority ?? '',
-          callStatus: item.callStatus ?? '',
-
-          assignedTechnician: item.assignedTechnician ?? '',
-
-          callDateTime: item.callDateTime ?? '',
-          closeDate: item.closeDate ?? '',
-
-          remarks: item.remarks ?? '',
-          loginId: item.loginId ?? '',
-        }));
-
-        this.filteredData = [...this.tableData];
-        this.currentPage = 1;
-
-        // 🔥 DEBUG
-        console.log('FINAL TABLE DATA:', this.tableData);
-      },
-
-      error: (err) => {
-        this.loading = false;
-
-        console.error('Call Logging API Error:', err);
-
-        this.toast.danger(
-          'Failed to load call logging records!',
-          'Error',
-          4000,
-        );
-      },
-    });
+  // जर EMP002 असेल → backend ला तसंच पाठव
+  // जर EMP/2026/002 असेल → तसंच ठेव
+  if (!loginId) {
+    console.error('LOGIN ID is missing!');
+    this.loading = false;
+    return;
   }
+
+ 
+  console.log('FINAL LOGIN ID:', loginId);
+
+  this.commonService.fetchAllCallLoggingByLoginId(loginId).subscribe({
+    next: (res: any[]) => {
+      this.loading = false;
+
+      this.tableData = (res || []).map((item) => ({
+
+        // 🔹 Primary Key
+        callLoggingId: item.callLoggingId ?? '',
+
+        // 🔹 Basic Info
+        departmentId: item.departmentId ?? '',
+        employeeId: item.employeeId ?? '',
+
+        // 🔹 Contact Info
+        contactNumber: item.contactNumber ?? '',
+        emailAddress: item.emailAddress ?? '',
+        location: item.location ?? '',
+
+        // 🔹 Asset Info
+        assetId: item.assetId ?? '',
+
+        // 🔹 Problem Info
+        problemCategory: item.problemCategory ?? '',
+        problemType: item.problemType ?? '',
+        problemDescription: item.problemDescription ?? '',
+
+        // 🔹 Call Details
+        callPriority: item.callPriority ?? '',
+        callStatus: item.callStatus ?? 'Active',
+
+        assignedTechnician: item.assignedTechnician ?? '',
+
+        // 🔹 Date & Time
+        callDateTime: item.callDateTime ?? '',
+        expectedResolutionTime: item.expectedResolutionTime ?? '',
+
+        // 🔹 Resolution
+        resolutionDetails: item.resolutionDetails ?? '',
+        remarks: item.remarks ?? '',
+
+        // 🔹 Closing Info
+        closeDate: item.closeDate ?? '',
+        isReopened: item.isReopened ?? 'No',
+
+        // 🔹 Audit
+        createdBy: item.createdBy ?? '',
+        createdDate: item.createdDate ?? '',
+        updatedDate: item.updatedDate ?? ''
+
+      }));
+
+      this.filteredData = [...this.tableData];
+      this.currentPage = 1;
+
+      console.log('FINAL TABLE DATA:', this.tableData);
+    },
+
+    error: (err) => {
+      this.loading = false;
+
+      console.error('Call Logging API Error:', err);
+
+      this.toast.danger(
+        'Failed to load call logging records!',
+        'Error',
+        4000
+      );
+    },
+  });
+}
   loadAssets(): void {
     this.commonService.fetchAssetByLoginId(this.loginId).subscribe({
       next: (res: any[]) => {
@@ -334,29 +407,31 @@ callList: any[] = [];
       },
     });
   }
-  loadEmployee(): void {
-    this.commonService.fetchAllEmployeeByLoginId(this.loginId).subscribe({
-      next: (res: any[]) => {
-        this.employees = res;
+ loadEmployee(): void {
+
+  this.commonService.fetchAllEmployee()
+    .subscribe({
+      next: (res) => {
+        console.log('Employee API Response:', res);
+
+        this.tableData = res;
+        this.filteredData = [...this.tableData];
       },
       error: (err) => {
         console.error('Employee API Error:', err);
-      },
+      }
     });
+}
+ onEmployeeChange(i: number) {
+  const empId = this.forms[i].employeeId; // ✅ correct
+
+  const emp = this.employees.find((e: any) => e.employeeId === empId);
+
+  if (emp) {
+    this.forms[i].employeeId = emp.employeeId;
+    this.forms[i].contactNumber = emp.contactNumber;
   }
-  onEmployeeChange(i: number) {
-    const empId = this.forms[i].EmployeeId;
-
-    const emp = this.employees.find((e: any) => e.employeeId === empId);
-
-    if (emp) {
-      this.forms[i].EmployeeId = emp.employeeId;
-      this.forms[i].EmployeeName = emp.employeeName;
-      this.forms[i].ContactNumber = emp.contactNumber;
-    }
-
-    console.log('FORM AFTER SELECT:', this.forms[i]);
-  }
+}
   onDepartmentChange(event: any, i: number) {
     const deptId = event.target.value;
 
@@ -412,53 +487,51 @@ callList: any[] = [];
   }
   //delete selected rows
   deleteConfirm = false;
-  deleteSelectedRows(): void {
-    if (!this.selectedRows.length) {
-      this.toast.danger('No records selected to delete!', '', 4000);
-      return;
-    }
-
-    const confirmed = confirm(
-      `Are you sure you want to delete ${this.selectedRows.length} record(s)?`,
-    );
-
-    if (!confirmed) return;
-
-    // Collect Call Logging IDs
-    const ids: string[] = this.selectedRows.map((row) => row.callLogId);
-
-    const payload = {
-      loginId: this.newRecord.loginId,
-      callLogIds: ids,
-    };
-    this.commonService.deleteMultipleCallLogging(ids).subscribe({
-      next: () => {
-        // Remove deleted rows from table
-        this.tableData = this.tableData.filter(
-          (row) => !ids.includes(row.callLogId),
-        );
-
-        this.filteredData = [...this.tableData];
-
-        this.selectedRows = [];
-
-        this.currentPage = 1;
-
-        // Reload table
-        this.loadCallLogging();
-
-        this.toast.success(
-          'Selected records deleted successfully!',
-          'Success',
-          4000,
-        );
-      },
-
-      error: () => {
-        this.toast.danger('Failed to delete records!', 'Error', 4000);
-      },
-    });
+deleteSelectedRows(): void {
+  if (!this.selectedRows.length) {
+    this.toast.danger('No records selected to delete!', '', 4000);
+    return;
   }
+
+  const confirmed = confirm(
+    `Are you sure you want to delete ${this.selectedRows.length} record(s)?`
+  );
+
+  if (!confirmed) return;
+
+  // ✅ Correct field name
+  const ids: string[] = this.selectedRows.map(
+    (row) => row.callLoggingId
+  );
+
+  // ✅ Direct list send करायची (backend requirement)
+  this.commonService.deleteMultipleCallLogging(ids).subscribe({
+    next: () => {
+
+      // ✅ correct field use
+      this.tableData = this.tableData.filter(
+        (row) => !ids.includes(row.callLoggingId)
+      );
+
+      this.filteredData = [...this.tableData];
+      this.selectedRows = [];
+      this.currentPage = 1;
+
+      // reload
+      this.loadCallLogging();
+
+      this.toast.success(
+        'Selected records deleted successfully!',
+        'Success',
+        4000
+      );
+    },
+
+    error: () => {
+      this.toast.danger('Failed to delete records!', 'Error', 4000);
+    },
+  });
+}
   // Toggle select all rows
   toggleAll(event: any) {
     if (event.target.checked) {
@@ -499,96 +572,98 @@ callList: any[] = [];
     this.tableData = sorted; // keep main data updated
   }
 
-  exportExcel() {
-    if (!this.tableData || this.tableData.length === 0) {
-      this.toast.warning('No data available to export!', 'Warning', 4000);
-      return;
-    }
-
-    const exportData = this.tableData.map((row: TableRow) => ({
-      Call_ID: row.callLogId,
-
-      Department_ID: row.departmentId,
-
-      Employee_ID: row.EmployeeId,
-
-      Employee_Name: row.EmployeeName,
-
-      Contact_Number: row.ContactNumber,
-
-      Email_Address: row.emailAddress,
-
-      Location: row.location,
-
-      Asset_ID: row.assetId,
-
-      Asset_Name: row.assetName,
-
-      Problem_Type: row.problemType,
-
-      Problem_Description: row.problemDescription,
-
-      Call_Priority: row.callPriority,
-
-      Call_Status: row.callStatus,
-
-      Assigned_Technician: row.assignedTechnician,
-
-      Call_Date_Time: row.callDateTime,
-
-      Remarks: row.remarks,
-
-      Close_Date: row.closeDate,
-
-      Login_ID: row.loginId,
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-
-    // Auto column width
-    const columnWidths = Object.keys(exportData[0]).map((key) => ({
-      wch:
-        Math.max(
-          key.length,
-          ...exportData.map((row) =>
-            (row as any)[key] ? (row as any)[key].toString().length : 10,
-          ),
-        ) + 2,
-    }));
-
-    worksheet['!cols'] = columnWidths;
-
-    const workbook = XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'CallLoggingData');
-
-    const today = new Date().toISOString().split('T')[0];
-
-    XLSX.writeFile(workbook, `Call_Logging_${today}.xlsx`);
+ exportExcel() {
+  if (!this.tableData || this.tableData.length === 0) {
+    this.toast.warning('No data available to export!', 'Warning', 4000);
+    return;
   }
-  exportDoc() {
-    const currentDate = new Date().toLocaleDateString();
 
-    let content = `
+  const exportData = this.tableData.map((row: TableRow) => ({
 
+    // 🔹 Primary
+    Call_Logging_ID: row.callLoggingId,
+
+    // 🔹 Basic
+    Department_ID: row.departmentId,
+    Employee_ID: row.employeeId,
+
+    // 🔹 Contact
+    Contact_Number: row.contactNumber,
+    Email_Address: row.emailAddress,
+    Location: row.location,
+
+    // 🔹 Asset
+    Asset_ID: row.assetId,
+
+    // 🔹 Problem
+    Problem_Category: row.problemCategory,
+    Problem_Type: row.problemType,
+    Problem_Description: row.problemDescription,
+
+    // 🔹 Call Details
+    Call_Priority: row.callPriority,
+    Call_Status: row.callStatus,
+    Assigned_Technician: row.assignedTechnician,
+
+    // 🔹 Date & Time
+    Call_Date_Time: row.callDateTime,
+    Expected_Resolution_Time: row.expectedResolutionTime,
+
+    // 🔹 Resolution
+    Resolution_Details: row.resolutionDetails,
+    Remarks: row.remarks,
+
+    // 🔹 Closing
+    Close_Date: row.closeDate,
+    Is_Reopened: row.isReopened,
+
+    // 🔹 Audit
+    Created_By: row.createdBy,
+    Created_Date: row.createdDate,
+    Updated_Date: row.updatedDate,
+
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+  // ✅ Auto column width
+  const columnWidths = Object.keys(exportData[0]).map((key) => ({
+    wch:
+      Math.max(
+        key.length,
+        ...exportData.map((row) =>
+          (row as any)[key] ? (row as any)[key].toString().length : 10
+        )
+      ) + 2,
+  }));
+
+  worksheet['!cols'] = columnWidths;
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'CallLoggingData');
+
+  const today = new Date().toISOString().split('T')[0];
+
+  XLSX.writeFile(workbook, `Call_Logging_${today}.xlsx`);
+}
+ exportDoc() {
+  const currentDate = new Date().toLocaleDateString();
+
+  let content = `
 <html xmlns:o="urn:schemas-microsoft-com:office:office"
       xmlns:w="urn:schemas-microsoft-com:office:word"
       xmlns="http://www.w3.org/TR/REC-html40">
 
 <head>
-
 <meta charset="utf-8" />
-
 <title>Call Logging Report</title>
 
 <style>
-
 @page WordSection1 {
   size: 842pt 595pt;
   mso-page-orientation: landscape;
   margin: 20pt;
 }
-
 div.WordSection1 { page: WordSection1; }
 
 table{
@@ -614,165 +689,160 @@ th{
   font-size:16px;
   font-weight:bold;
 }
-
 </style>
-
 </head>
 
 <body>
-
 <div class="WordSection1">
 
 <p class="title">Call Logging Report</p>
-
 <p>Date: ${currentDate}</p>
 
 <table>
 
 <tr>
-
-<th>Call ID</th>
+<th>Call Logging ID</th>
 <th>Department ID</th>
 <th>Employee ID</th>
-<th>Employee Name</th>
 <th>Contact Number</th>
 <th>Email</th>
 <th>Location</th>
 <th>Asset ID</th>
-<th>Asset Name</th>
+<th>Problem Category</th>
 <th>Problem Type</th>
 <th>Problem Description</th>
 <th>Priority</th>
 <th>Status</th>
 <th>Assigned Technician</th>
 <th>Call Date Time</th>
+<th>Expected Resolution</th>
+<th>Resolution Details</th>
 <th>Remarks</th>
 <th>Close Date</th>
-
+<th>Reopened</th>
+<th>Created By</th>
 </tr>
 `;
 
-    this.tableData.forEach((row: TableRow) => {
-      content += `
-
+  this.tableData.forEach((row: TableRow) => {
+    content += `
 <tr>
-
-<td>${row.callLogId || ''}</td>
+<td>${row.callLoggingId || ''}</td>
 <td>${row.departmentId || ''}</td>
-<td>${row.EmployeeId || ''}</td>
-<td>${row.EmployeeName || ''}</td>
-<td>${row.ContactNumber || ''}</td>
+<td>${row.employeeId || ''}</td>
+<td>${row.contactNumber || ''}</td>
 <td>${row.emailAddress || ''}</td>
 <td>${row.location || ''}</td>
 <td>${row.assetId || ''}</td>
-<td>${row.assetName || ''}</td>
+<td>${row.problemCategory || ''}</td>
 <td>${row.problemType || ''}</td>
 <td>${row.problemDescription || ''}</td>
 <td>${row.callPriority || ''}</td>
 <td>${row.callStatus || ''}</td>
 <td>${row.assignedTechnician || ''}</td>
 <td>${row.callDateTime || ''}</td>
+<td>${row.expectedResolutionTime || ''}</td>
+<td>${row.resolutionDetails || ''}</td>
 <td>${row.remarks || ''}</td>
 <td>${row.closeDate || ''}</td>
-
+<td>${row.isReopened || ''}</td>
+<td>${row.createdBy || ''}</td>
 </tr>
 `;
-    });
+  });
 
-    content += `
-
+  content += `
 </table>
-
 </div>
-
 </body>
-
 </html>
 `;
 
-    const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
+  const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
 
-    saveAs(blob, 'Call_Logging_Report.doc');
-  }
-  exportPDF() {
-    const doc = new jsPDF('l', 'mm', 'a4');
+  saveAs(blob, 'Call_Logging_Report.doc');
+}
+exportPDF() {
+  const doc = new jsPDF('l', 'mm', 'a4');
 
-    const pageWidth = doc.internal.pageSize.getWidth();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const currentDate = new Date().toLocaleDateString();
 
-    const currentDate = new Date().toLocaleDateString();
+  doc.setFontSize(9);
+  doc.text(`Date: ${currentDate}`, 10, 10);
 
-    doc.setFontSize(9);
-    doc.text(`Date: ${currentDate}`, 10, 10);
+  doc.setFontSize(14);
+  doc.text('Call Logging Report', pageWidth / 2, 10, { align: 'center' });
 
-    doc.setFontSize(14);
-    doc.text('Call Logging Report', pageWidth / 2, 10, { align: 'center' });
+  autoTable(doc, {
+    startY: 16,
 
-    autoTable(doc, {
-      startY: 16,
+    styles: {
+      fontSize: 7,
+      cellPadding: 2,
+      valign: 'middle',
+      overflow: 'linebreak',
+    },
 
-      styles: {
-        fontSize: 8,
-        cellPadding: 2,
-        valign: 'middle',
-        overflow: 'linebreak',
-      },
+    headStyles: {
+      fillColor: [41, 128, 185],
+      textColor: 255,
+      fontSize: 8,
+      halign: 'center',
+    },
 
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: 255,
-        fontSize: 8,
-        halign: 'center',
-      },
+    tableWidth: 'auto',
+    margin: { left: 5, right: 5 },
 
-      tableWidth: 'auto',
+    head: [[
+      'Call Logging ID',
+      'Department ID',
+      'Employee ID',
+      'Contact Number',
+      'Email',
+      'Location',
+      'Asset ID',
+      'Problem Category',
+      'Problem Type',
+      'Problem Description',
+      'Priority',
+      'Status',
+      'Assigned Technician',
+      'Call Date Time',
+      'Expected Resolution',
+      'Resolution Details',
+      'Remarks',
+      'Close Date',
+      'Reopened',
+      'Created By'
+    ]],
 
-      margin: { left: 5, right: 5 },
+    body: this.tableData.map((row: TableRow) => [
+      row.callLoggingId || '',
+      row.departmentId || '',
+      row.employeeId || '',
+      row.contactNumber || '',
+      row.emailAddress || '',
+      row.location || '',
+      row.assetId || '',
+      row.problemCategory || '',
+      row.problemType || '',
+      row.problemDescription || '',
+      row.callPriority || '',
+      row.callStatus || '',
+      row.assignedTechnician || '',
+      row.callDateTime || '',
+      row.expectedResolutionTime || '',
+      row.resolutionDetails || '',
+      row.remarks || '',
+      row.closeDate || '',
+      row.isReopened || '',
+      row.createdBy || ''
+    ]),
+  });
 
-      head: [
-        [
-          'Call ID',
-          'Department ID',
-          'Employee ID',
-          'Employee Name',
-          'Contact Number',
-          'Email',
-          'Location',
-          'Asset ID',
-          'Asset Name',
-          'Problem Type',
-          'Problem Description',
-          'Priority',
-          'Status',
-          'Assigned Technician',
-          'Call Date Time',
-          'Remarks',
-          'Close Date',
-        ],
-      ],
-
-      body: this.tableData.map((row: TableRow) => [
-        row.callLogId || '',
-        row.departmentId || '',
-        row.EmployeeId || '',
-        row.EmployeeName || '',
-        row.ContactNumber || '',
-        row.emailAddress || '',
-        row.location || '',
-        row.assetId || '',
-        row.assetName || '',
-        row.problemType || '',
-        row.problemDescription || '',
-        row.callPriority || '',
-        row.callStatus || '',
-        row.assignedTechnician || '',
-        row.callDateTime || '',
-        row.remarks || '',
-        row.closeDate || '',
-      ]),
-    });
-
-    doc.save('Call_Logging_Report.pdf');
-  }
+  doc.save('Call_Logging_Report.pdf');
+}
   //pagination
   // Pagination Variables
   itemsPerPage: number = 5; // default 5
@@ -814,39 +884,50 @@ th{
   // --------------------------
   // INITIAL RECORD STRUCTURE
   // --------------------------
-  newRecord: TableRow = {
-    callLogId: '',
-    departmentId: '',
+newRecord: TableRow = {
 
-    EmployeeId: '',
-    EmployeeName: '',
+  // 🔹 Primary Key
+  callLoggingId: '',
 
-    ContactNumber: '',
+  // 🔹 Basic Info
+  departmentId: '',
+  employeeId: '',
 
-    emailAddress: '',
-    location: '',
+  // 🔹 Contact Info
+  contactNumber: '',
+  emailAddress: '',
+  location: '',
 
-    assetId: '',
-    assetName: '',
+  // 🔹 Asset Info
+  assetId: '',
 
-    problemType: '',
-    problemDescription: '',
+  // 🔹 Problem Info
+  problemCategory: '',
+  problemType: '',
+  problemDescription: '',
 
-    callPriority: 'Low',
+  // 🔹 Call Details
+  callPriority: 'Low',
+  callStatus: 'Active',
+  assignedTechnician: '',
 
-    callStatus: 'Active',
+  // 🔹 Date & Time
+callDateTime: this.currentDate,
+  expectedResolutionTime: '',
 
-    assignedTechnician: '',
+  // 🔹 Resolution
+  resolutionDetails: '',
+  remarks: '',
 
-    callDateTime: this.getTodayDate(),
+  // 🔹 Closing Info
+  closeDate: '',
+  isReopened: 'No',
 
-    remarks: '',
-
-    closeDate: '',
-
-    loginId: this.loginId,
-  };
-
+  // 🔹 Audit Fields
+  createdBy: this.loginId,
+  createdDate: this.getTodayDate(),
+  updatedDate: this.getTodayDate()
+};
   // --------------------------
   // STATE VARIABLES
   // --------------------------
@@ -870,82 +951,94 @@ th{
   // --------------------------
   // ADD NEW FORM
   // --------------------------
-  cancelRecord(form?: NgForm, index?: number) {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
+cancelRecord(form?: NgForm, index?: number) {
 
-    const currentDate = `${yyyy}-${mm}-${dd}`;
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
 
-    if (index !== undefined) {
-      this.forms[index] = {
+  const currentDate = `${yyyy}-${mm}-${dd}`;
+
+  if (index !== undefined) {
+    this.forms[index] = {
+
+      // 🔹 Primary
+      callLoggingId: '0',
+
+      // 🔹 Basic
+      departmentId: '',
+      employeeId: '',
+
+      // 🔹 Contact
+      contactNumber: '',
+      emailAddress: '',
+      location: '',
+
+      // 🔹 Asset
+      assetId: '',
+
+      // 🔹 Problem
+      problemCategory: '',
+      problemType: '',
+      problemDescription: '',
+
+      // 🔹 Call Details
+      callPriority: 'Low',
+      callStatus: 'Active',
+      assignedTechnician: '',
+
+      // 🔹 Date
+      callDateTime: currentDate,
+      expectedResolutionTime: '',
+
+      // 🔹 Resolution
+      resolutionDetails: '',
+      remarks: '',
+
+      // 🔹 Closing
+      closeDate: '',
+      isReopened: 'No',
+
+      // 🔹 Audit
+      createdBy: this.loginId,
+      createdDate: currentDate,
+      updatedDate: currentDate,
+
+      // 🔥 Backend payload
+      newRecord: {
+        callLoggingId: '0',
         departmentId: '',
-
-        EmployeeId: '',
-        EmployeeName: '',
-        ContactNumber: '',
-
+        employeeId: '',
+        contactNumber: '',
         emailAddress: '',
         location: '',
-
         assetId: '',
-        assetName: '',
-
+        problemCategory: '',
         problemType: '',
         problemDescription: '',
-
         callPriority: 'Low',
         callStatus: 'Active',
-
         assignedTechnician: '',
-
         callDateTime: currentDate,
-
+        expectedResolutionTime: '',
+        resolutionDetails: '',
         remarks: '',
         closeDate: '',
-
-        loginId: this.loginId,
-
-        // 🔥 IMPORTANT (ADD THIS)
-        newRecord: {
-          callLogId: '0',
-          departmentId: '',
-
-          EmployeeId: '',
-          EmployeeName: '',
-          ContactNumber: '',
-
-          emailAddress: '',
-          location: '',
-
-          assetId: '',
-          assetName: '',
-
-          problemType: '',
-          problemDescription: '',
-
-          callPriority: 'Low',
-          callStatus: 'Active',
-
-          assignedTechnician: '',
-
-          callDateTime: currentDate,
-
-          remarks: '',
-          closeDate: '',
-
-          loginId: this.loginId,
-        },
-      };
-    }
-
-    if (form) form.resetForm();
-
-    this.isEditMode = false;
-    this.editIndex = null;
-    this.showErrors = false;
+        isReopened: 'No',
+        createdBy: this.loginId,
+        createdDate: currentDate,
+        updatedDate: currentDate
+      }
+    };
   }
+
+  if (form) form.resetForm();
+
+  this.isEditMode = false;
+  this.editIndex = null;
+  this.showErrors = false;
+}
   // --------------------------
   // REMOVE FORM
   // --------------------------
@@ -960,121 +1053,152 @@ th{
   // --------------------------
   // SAVE RECORD (SINGLE OR MULTIPLE)
   // --------------------------
-  saveAllRecords(form?: NgForm) {
-    // ---------------- VALIDATION ----------------
-    const invalid = this.forms.some(
-      (f) =>
-        !f.departmentId?.trim() ||
-        !f.EmployeeId?.trim() ||
-        !f.ContactNumber?.trim() ||
-        !f.assetId?.trim() ||
-        !f.problemDescription?.trim() ||
-        !f.callPriority?.trim() ||
-        !f.assignedTechnician?.trim(),
-    );
+saveAllRecords(form?: NgForm) {
 
-    if (invalid) {
-      this.showErrors = true;
-      this.toast.warning('Please fill all required fields!', 'Warning', 4000);
-      return;
-    }
+  // ---------------- VALIDATION ----------------
+  const invalid = this.forms.some(
+    (f) =>
+      !f.departmentId?.trim() ||
+      !f.employeeId?.trim() ||
+      !f.contactNumber?.trim() ||
+      !f.assetId?.trim() ||
+      !f.problemDescription?.trim() ||
+      !f.callPriority?.trim() ||
+      !f.assignedTechnician?.trim()
+  );
 
-    // ---------------- EDIT MODE ----------------
-    if (this.isEditMode && this.editIndex !== null) {
-      const formData = this.forms[0];
+  if (invalid) {
+    this.showErrors = true;
+    this.toast.warning('Please fill all required fields!', 'Warning', 4000);
+    return;
+  }
 
-      const payload = {
-        ...formData, // 🔥 DIRECT COPY
+  // ---------------- EDIT MODE ----------------
+// ---------------- EDIT MODE ----------------
+if (this.isEditMode && this.editIndex !== null) {
 
-        callDateTime: new Date(formData.callDateTime).toISOString(),
-        loginId: formData.loginId || this.loginId,
-        updatedDate: this.currentDate,
-      };
+  const formData = this.forms[0];
 
-      const callLogId = this.tableData[this.editIndex].callLogId;
+  // ✅ FIX LOGIN ID FORMAT
+  const formattedLoginId = this.commonService.formatLoginId(this.loginId);
 
-      this.commonService
-        .updateCallLogging(callLogId, this.loginId, payload)
-        .subscribe({
-          next: () => {
-            this.toast.success(
-              'Call Logging Updated Successfully!',
-              'Success',
-              4000,
-            );
-            this.resetAfterSave();
-            this.loadCallLogging();
-          },
-          error: () => {
-            this.toast.danger(
-              'Update failed. Service unavailable!',
-              'Error',
-              4000,
-            );
-          },
-        });
+  console.log("CALL ID:", formData.callLoggingId);
+  console.log("LOGIN ID:", formattedLoginId);
 
-      return;
-    }
+  const payload = {
 
-    // ---------------- ADD MODE ----------------
-    const payload = this.forms.map((f) => ({
-      callLogId: f.newRecord?.callLogId || '0',
+    callLoggingId: formData.callLoggingId,
 
-      departmentId: f.departmentId,
+    departmentId: formData.departmentId,
+    employeeId: formData.employeeId,
 
-      EmployeeId: f.EmployeeId,
-      EmployeeName: f.EmployeeName,
-      ContactNumber: f.ContactNumber,
+    contactNumber: formData.contactNumber,
+    emailAddress: formData.emailAddress,
+    location: formData.location,
 
-      emailAddress: f.emailAddress,
-      location: f.location,
+    assetId: formData.assetId,
 
-      assetId: f.assetId,
-      assetName: f.assetName,
+    problemCategory: formData.problemCategory,
+    problemType: formData.problemType,
+    problemDescription: formData.problemDescription,
 
-      problemType: f.problemType,
-      problemDescription: f.problemDescription,
+    callPriority: formData.callPriority,
+    callStatus: formData.callStatus,
 
-      callPriority: f.callPriority,
-      callStatus: f.callStatus,
+    assignedTechnician: formData.assignedTechnician,
 
-      assignedTechnician: f.assignedTechnician,
+    callDateTime: formData.callDateTime,
+    expectedResolutionTime: formData.expectedResolutionTime || null,
 
-      callDateTime: new Date(f.callDateTime).toISOString(),
+    resolutionDetails: formData.resolutionDetails,
+    remarks: formData.remarks,
 
-      remarks: f.remarks,
-      closeDate: f.closeDate,
+    closeDate: formData.closeDate || null,
+    isReopened: formData.isReopened || 'No',
 
-      loginId: f.loginId || this.loginId,
-    }));
+    createdBy: formData.createdBy || formattedLoginId,
+    createdDate: formData.createdDate,
+    updatedDate: this.currentDate
+  };
 
-    // 🔥 DEBUG (once check)
-    console.log('FINAL PAYLOAD:', payload);
+  const callLoggingId = this.tableData[this.editIndex].callLoggingId;
 
-    this.commonService.submitCallLogging(payload).subscribe({
-      next: (res) => {
-        if (res?.dublicateMessages?.length) {
-          res.dublicateMessages.forEach((msg: string) =>
-            this.toast.warning(msg, 'Warning', 4000),
-          );
-        }
-
-        this.toast.success('Call Logging Added Successfully!', 'Success', 4000);
-
+  this.commonService
+    .updateCallLogging(callLoggingId, payload) // ✅ FIXED
+    .subscribe({
+      next: () => {
+        this.toast.success('Call Logging Updated Successfully!', 'Success', 4000);
         this.resetAfterSave();
         this.loadCallLogging();
       },
-
-      error: () => {
-        this.toast.danger(
-          'Save failed. Call Logging service down!',
-          'Error',
-          4000,
-        );
+      error: (err) => {
+        console.error("UPDATE ERROR:", err);
+        this.toast.danger('Update failed. Service unavailable!', 'Error', 4000);
       },
     });
-  }
+
+  return;
+}
+
+  // ---------------- ADD MODE ----------------
+ const payload = this.forms.map((f) => ({
+  callLoggingId: f.callLoggingId || '0',
+
+  departmentId: f.departmentId,
+  employeeId: f.employeeId,
+
+  contactNumber: f.contactNumber,
+  emailAddress: f.emailAddress,
+  location: f.location,
+
+  assetId: f.assetId,
+
+  problemCategory: f.problemCategory,
+  problemType: f.problemType,
+  problemDescription: f.problemDescription,
+
+  callPriority: f.callPriority,
+  callStatus: f.callStatus,
+
+  assignedTechnician: f.assignedTechnician,
+
+  // ✅ FIXED
+  callDateTime: f.callDateTime,
+  expectedResolutionTime: f.expectedResolutionTime || null,
+
+  resolutionDetails: f.resolutionDetails,
+  remarks: f.remarks,
+
+  closeDate: f.closeDate || null,
+  isReopened: f.isReopened,
+
+  createdBy: f.createdBy || this.loginId,
+  createdDate: this.currentDate,
+  updatedDate: this.currentDate
+}));
+
+  console.log('FINAL PAYLOAD:', payload);
+
+  this.commonService.submitCallLogging(payload).subscribe({
+    next: (res) => {
+
+      if (res?.dublicateMessages?.length) {
+        res.dublicateMessages.forEach((msg: string) =>
+          this.toast.warning(msg, 'Warning', 4000)
+        );
+      }
+
+      this.toast.success('Call Logging Added Successfully!', 'Success', 4000);
+
+      this.resetAfterSave();
+      this.loadCallLogging();
+    },
+
+    error: () => {
+      this.toast.danger('Save failed. Call Logging service down!', 'Error', 4000);
+    },
+  });
+}
   resetAfterSave() {
     this.initializeForm(); // ✅ BEST
 
@@ -1083,71 +1207,82 @@ th{
     this.activeTab = 'details';
     this.showErrors = false;
   }
-  addForm() {
-    if (this.isEditMode) return;
+addForm() {
+  if (this.isEditMode) return;
 
-    const currentDate = this.currentDate;
+  const currentDate = this.currentDate;
 
-    this.forms.push({
+  this.forms.push({
+
+    // 🔹 Primary
+    callLoggingId: '0',
+
+    // 🔹 Basic
+    departmentId: '',
+    employeeId: '',
+
+    // 🔹 Contact
+    contactNumber: '',
+    emailAddress: '',
+    location: '',
+
+    // 🔹 Asset
+    assetId: '',
+
+    // 🔹 Problem
+    problemCategory: '',
+    problemType: '',
+    problemDescription: '',
+
+    // 🔹 Call Details
+    callPriority: 'Low',
+    callStatus: 'Active',
+    assignedTechnician: '',
+
+    // 🔹 Date
+    callDateTime: currentDate,
+    expectedResolutionTime: '',
+
+    // 🔹 Resolution
+    resolutionDetails: '',
+    remarks: '',
+
+    // 🔹 Closing
+    closeDate: '',
+    isReopened: 'No',
+
+    // 🔹 Audit
+    createdBy: this.loginId,
+    createdDate: currentDate,
+    updatedDate: currentDate,
+
+    // 🔥 Backend payload
+    newRecord: {
+      callLoggingId: '0',
       departmentId: '',
-
-      EmployeeId: '',
-      EmployeeName: '',
-      ContactNumber: '',
-
+      employeeId: '',
+      contactNumber: '',
       emailAddress: '',
       location: '',
-
       assetId: '',
-      assetName: '',
-
+      problemCategory: '',
       problemType: '',
       problemDescription: '',
-
       callPriority: 'Low',
       callStatus: 'Active',
-
       assignedTechnician: '',
-
       callDateTime: currentDate,
-
+      expectedResolutionTime: '',
+      resolutionDetails: '',
       remarks: '',
       closeDate: '',
-
-      loginId: this.loginId,
-
-      // 🔥 MUST ADD THIS
-      newRecord: {
-        callLogId: '0',
-        departmentId: '',
-
-        EmployeeId: '',
-        EmployeeName: '',
-        ContactNumber: '',
-
-        emailAddress: '',
-        location: '',
-
-        assetId: '',
-        assetName: '',
-
-        problemType: '',
-        problemDescription: '',
-
-        callPriority: 'Low',
-        callStatus: 'Active',
-
-        assignedTechnician: '',
-
-        callDateTime: currentDate,
-
-        remarks: '',
-        closeDate: '',
-
-        loginId: this.loginId,
-      },
-    });
-  }
+      isReopened: 'No',
+      createdBy: this.loginId,
+      createdDate: currentDate,
+      updatedDate: currentDate
+    }
+  });
+}
   // --------------------------
   // CANCEL / RESET FORM
   // --------------------------
@@ -1252,7 +1387,7 @@ th{
 
     const formData = new FormData();
     formData.append('file', this.selectedFile);
-    formData.append('loginId', this.newRecord.loginId);
+    formData.append('loginId', this.newRecord.createdBy);
 
     this.commonService.uploadCallLoggingExcel(this.selectedFile).subscribe({
       next: (res: any) => {
@@ -1428,72 +1563,80 @@ th{
   // ---------------- Excel Parsing ----------------
   // ---------------- Excel Parsing ----------------
   // ---------------- Excel Parsing ----------------
-  readExcel(file: File) {
-    const reader = new FileReader();
+readExcel(file: File) {
+  const reader = new FileReader();
 
-    reader.onload = () => {
-      const workbook = XLSX.read(reader.result, { type: 'binary' });
+  reader.onload = () => {
+    const workbook = XLSX.read(reader.result, { type: 'binary' });
 
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-      const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+    const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
-      json.forEach((obj: any, i: number) => {
-        const row: TableRow = {
-          callLogId:
-            obj['Call ID'] ||
-            `CALL-${String(this.tableData.length + i + 1).padStart(3, '0')}`,
+    json.forEach((obj: any, i: number) => {
 
-          departmentId: obj['Department ID'] || '',
+      const row: TableRow = {
 
-          EmployeeId: obj['Employee ID'] || '',
+        // 🔹 Primary
+        callLoggingId:
+          obj['Call Logging ID'] ||
+          `CALL-${String(this.tableData.length + i + 1).padStart(3, '0')}`,
 
-          EmployeeName: obj['Employee Name'] || '',
+        // 🔹 Basic
+        departmentId: obj['Department ID'] || '',
+        employeeId: obj['Employee ID'] || '',
 
-          ContactNumber: obj['Contact Number'] || '',
+        // 🔹 Contact
+        contactNumber: obj['Contact Number'] || '',
+        emailAddress: obj['Email Address'] || '',
+        location: obj['Location'] || '',
 
-          emailAddress: obj['Email Address'] || '',
+        // 🔹 Asset
+        assetId: obj['Asset ID'] || '',
 
-          location: obj['Location'] || '',
+        // 🔹 Problem
+        problemCategory: obj['Problem Category'] || '',
+        problemType: obj['Problem Type'] || '',
+        problemDescription: obj['Problem Description'] || '',
 
-          assetId: obj['Asset ID'] || '',
+        // 🔹 Call Details
+        callPriority:
+          (obj['Call Priority'] as 'Low' | 'Medium' | 'High' | 'Critical') || 'Low',
 
-          assetName: obj['Asset Name'] || '',
+        callStatus:
+          (obj['Call Status'] as 'Active' | 'Inactive') || 'Active',
 
-          problemType: obj['Problem Type'] || '',
+        assignedTechnician: obj['Assigned Technician'] || '',
 
-          problemDescription: obj['Problem Description'] || '',
+        // 🔹 Date
+        callDateTime: obj['Call Date Time'] || this.getTodayDate(),
+        expectedResolutionTime: obj['Expected Resolution Time'] || '',
 
-          callPriority:
-            (obj['Call Priority'] as 'Low' | 'Medium' | 'High' | 'Critical') ||
-            'Low',
+        // 🔹 Resolution
+        resolutionDetails: obj['Resolution Details'] || '',
+        remarks: obj['Remarks'] || '',
 
-          callStatus: (obj['Call Status'] as 'Active' | 'Inactive') || 'Active',
+        // 🔹 Closing
+        closeDate: obj['Close Date'] || '',
+        isReopened: obj['Is Reopened'] || 'No',
 
-          assignedTechnician: obj['Assigned Technician'] || '',
+        // 🔹 Audit
+        createdBy: this.loginId || '',
+        createdDate: this.getTodayDate(),
+        updatedDate: this.getTodayDate()
+      };
 
-          callDateTime: obj['Call Date Time'] || this.getTodayDate(),
+      this.tableData.push(row);
+    });
 
-          remarks: obj['Remarks'] || '',
+    this.filteredData = [...this.tableData];
+    this.currentPage = 1;
 
-          closeDate: obj['Close Date'] || '',
+    this.toast.success('Excel imported successfully!', 'Success', 4000);
+  };
 
-          loginId: this.loginId || '',
-        };
-
-        this.tableData.push(row);
-      });
-
-      this.filteredData = [...this.tableData];
-
-      this.currentPage = 1;
-
-      this.toast.success('Excel imported successfully!', 'Success', 4000);
-    };
-
-    reader.readAsBinaryString(file);
-  }
-
+  reader.readAsBinaryString(file);
+}
   // ---------------- TXT Parsing ----------------
   //  readTXT(file: File) {
   //    const reader = new FileReader();
@@ -1564,153 +1707,171 @@ th{
 
   // ---------------- DOCX Parsing (mammoth.js) ----------------
   // ---------------- DOCX Parsing ----------------
-  async readDOCX(file: File) {
-    const arrayBuffer = await file.arrayBuffer();
+async readDOCX(file: File) {
 
-    const result = await mammoth.convertToHtml({ arrayBuffer });
+  const arrayBuffer = await file.arrayBuffer();
 
-    const doc = new DOMParser().parseFromString(result.value, 'text/html');
+  const result = await mammoth.convertToHtml({ arrayBuffer });
 
-    const table = doc.querySelector('table');
+  const doc = new DOMParser().parseFromString(result.value, 'text/html');
 
-    if (!table) {
-      this.toast.danger('No table found in DOCX!', 'Error', 4000);
-      return;
-    }
+  const table = doc.querySelector('table');
 
-    const rows = table.querySelectorAll('tr');
-
-    rows.forEach((row, i) => {
-      if (i === 0) return; // skip header
-
-      const cells = Array.from(row.querySelectorAll('td')).map(
-        (c) => c.textContent?.trim() || '',
-      );
-
-      // Ensure required columns
-      while (cells.length < 17) cells.push('');
-
-      const newRecord: TableRow = {
-        callLogId: `CALL-${String(this.tableData.length + i).padStart(3, '0')}`,
-
-        departmentId: cells[0] || '',
-
-        EmployeeId: cells[1] || '',
-
-        EmployeeName: cells[2] || '',
-
-        ContactNumber: cells[3] || '',
-
-        emailAddress: cells[4] || '',
-
-        location: cells[5] || '',
-
-        assetId: cells[6] || '',
-
-        assetName: cells[7] || '',
-
-        problemType: cells[8] || '',
-
-        problemDescription: cells[9] || '',
-
-        callPriority:
-          (cells[10] as 'Low' | 'Medium' | 'High' | 'Critical') || 'Low',
-
-        callStatus: (cells[11] as 'Active' | 'Inactive') || 'Active',
-
-        assignedTechnician: cells[12] || '',
-
-        callDateTime: cells[13] || this.getTodayDate(),
-
-        remarks: cells[14] || '',
-
-        closeDate: cells[15] || '',
-
-        loginId: this.newRecord.loginId || '',
-      };
-
-      this.tableData.push(newRecord);
-    });
-
-    this.filteredData = [...this.tableData];
-
-    this.currentPage = 1;
-
-    this.toast.success('DOCX table imported successfully!', 'Success', 4000);
+  if (!table) {
+    this.toast.danger('No table found in DOCX!', 'Error', 4000);
+    return;
   }
-  // ---------------- CSV Download ----------------
-  downloadSampleCSV() {
-    if (!this.tableData || this.tableData.length === 0) {
-      this.toast.warning('No data available to download!', 'Warning', 4000);
-      return;
-    }
 
-    const headers = [
-      'Call ID',
-      'Department ID',
-      'Employee ID',
-      'Employee Name',
-      'Contact Number',
-      'Email Address',
-      'Location',
-      'Asset ID',
-      'Asset Name',
-      'Problem Type',
-      'Problem Description',
-      'Call Priority',
-      'Call Status',
-      'Assigned Technician',
-      'Call Date Time',
-      'Remarks',
-      'Close Date',
+  const rows = table.querySelectorAll('tr');
+
+  rows.forEach((row, i) => {
+    if (i === 0) return; // skip header
+
+    const cells = Array.from(row.querySelectorAll('td')).map(
+      (c) => c.textContent?.trim() || ''
+    );
+
+    // 🔥 Ensure full columns (20 fields)
+    while (cells.length < 20) cells.push('');
+
+    const newRecord: TableRow = {
+
+      // 🔹 Primary
+      callLoggingId:
+        cells[0] ||
+        `CALL-${String(this.tableData.length + i).padStart(3, '0')}`,
+
+      // 🔹 Basic
+      departmentId: cells[1] || '',
+      employeeId: cells[2] || '',
+
+      // 🔹 Contact
+      contactNumber: cells[3] || '',
+      emailAddress: cells[4] || '',
+      location: cells[5] || '',
+
+      // 🔹 Asset
+      assetId: cells[6] || '',
+
+      // 🔹 Problem
+      problemCategory: cells[7] || '',
+      problemType: cells[8] || '',
+      problemDescription: cells[9] || '',
+
+      // 🔹 Call Details
+      callPriority:
+        (cells[10] as 'Low' | 'Medium' | 'High' | 'Critical') || 'Low',
+
+      callStatus:
+        (cells[11] as 'Active' | 'Inactive') || 'Active',
+
+      assignedTechnician: cells[12] || '',
+
+      // 🔹 Date
+      callDateTime: cells[13] || this.getTodayDate(),
+      expectedResolutionTime: cells[14] || '',
+
+      // 🔹 Resolution
+      resolutionDetails: cells[15] || '',
+      remarks: cells[16] || '',
+
+      // 🔹 Closing
+      closeDate: cells[17] || '',
+      isReopened: cells[18] || 'No',
+
+      // 🔹 Audit
+      createdBy: this.loginId || '',
+      createdDate: this.getTodayDate(),
+      updatedDate: this.getTodayDate()
+    };
+
+    this.tableData.push(newRecord);
+  });
+
+  this.filteredData = [...this.tableData];
+  this.currentPage = 1;
+
+  this.toast.success('DOCX table imported successfully!', 'Success', 4000);
+}
+  // ---------------- CSV Download ----------------
+ downloadSampleCSV() {
+  if (!this.tableData || this.tableData.length === 0) {
+    this.toast.warning('No data available to download!', 'Warning', 4000);
+    return;
+  }
+
+  const headers = [
+    'Call Logging ID',
+    'Department ID',
+    'Employee ID',
+    'Contact Number',
+    'Email Address',
+    'Location',
+    'Asset ID',
+    'Problem Category',
+    'Problem Type',
+    'Problem Description',
+    'Call Priority',
+    'Call Status',
+    'Assigned Technician',
+    'Call Date Time',
+    'Expected Resolution Time',
+    'Resolution Details',
+    'Remarks',
+    'Close Date',
+    'Is Reopened',
+    'Created By'
+  ];
+
+  const csvRows: string[] = [];
+
+  // Header
+  csvRows.push(headers.join(','));
+
+  // Data
+  this.tableData.forEach((row: TableRow) => {
+    const rowData = [
+      row.callLoggingId || '',
+      row.departmentId || '',
+      row.employeeId || '',
+      row.contactNumber || '',
+      row.emailAddress || '',
+      row.location || '',
+      row.assetId || '',
+      row.problemCategory || '',
+      row.problemType || '',
+      row.problemDescription || '',
+      row.callPriority || '',
+      row.callStatus || '',
+      row.assignedTechnician || '',
+      row.callDateTime || '',
+      row.expectedResolutionTime || '',
+      row.resolutionDetails || '',
+      row.remarks || '',
+      row.closeDate || '',
+      row.isReopened || '',
+      row.createdBy || ''
     ];
 
-    const csvRows: string[] = [];
+    csvRows.push(rowData.join(','));
+  });
 
-    // Header
-    csvRows.push(headers.join(','));
+  const csvString = csvRows.join('\n');
 
-    // Table Data
-    this.tableData.forEach((row: TableRow) => {
-      const rowData = [
-        row.callLogId || '',
-        row.departmentId || '',
-        row.EmployeeId || '',
-        row.EmployeeName || '',
-        row.ContactNumber || '',
-        row.emailAddress || '',
-        row.location || '',
-        row.assetId || '',
-        row.assetName || '',
-        row.problemType || '',
-        row.problemDescription || '',
-        row.callPriority || '',
-        row.callStatus || '',
-        row.assignedTechnician || '',
-        row.callDateTime || '',
-        row.remarks || '',
-        row.closeDate || '',
-      ];
+  const blob = new Blob([csvString], {
+    type: 'text/csv;charset=utf-8;',
+  });
 
-      csvRows.push(rowData.join(','));
-    });
+  const url = window.URL.createObjectURL(blob);
 
-    const csvString = csvRows.join('\n');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Call_Logging_Data.csv';
 
-    const blob = new Blob([csvString], {
-      type: 'text/csv;charset=utf-8;',
-    });
+  a.click();
 
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Call_Logging_Data.csv';
-
-    a.click();
-
-    window.URL.revokeObjectURL(url);
-  }
+  window.URL.revokeObjectURL(url);
+}
   //bulk export
   // ---------------- Component Variables ----------------
   startDate: string = '';
@@ -1800,308 +1961,325 @@ th{
 
   // ---------------- CSV Export ----------------
 
-  exportCSVfile(data: TableRow[]) {
-    const today = new Date();
+ exportCSVfile(data: TableRow[]) {
 
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
 
-    const csvRows: string[] = [];
+  const csvRows: string[] = [];
 
-    // --------------------------
-    // HEADER
-    // --------------------------
+  // --------------------------
+  // HEADER
+  // --------------------------
 
-    csvRows.push(this.headCompanyName || 'Company Name');
+  csvRows.push(this.headCompanyName || 'Company Name');
+  csvRows.push(`Date:,${formattedDate}`);
+  csvRows.push('');
 
-    csvRows.push(`Date:,${formattedDate}`);
+  const headers = [
+    'Call Logging ID',
+    'Department ID',
+    'Employee ID',
+    'Contact Number',
+    'Email Address',
+    'Location',
+    'Asset ID',
+    'Problem Category',
+    'Problem Type',
+    'Problem Description',
+    'Call Priority',
+    'Call Status',
+    'Assigned Technician',
+    'Call Date Time',
+    'Expected Resolution Time',
+    'Resolution Details',
+    'Remarks',
+    'Close Date',
+    'Is Reopened',
+    'Created By'
+  ];
 
-    csvRows.push('');
+  csvRows.push(headers.join(','));
 
-    const headers = [
-      'Call ID',
+  // --------------------------
+  // DATA ROWS
+  // --------------------------
+
+  data.forEach((row: TableRow) => {
+
+    const sanitize = (val: any) =>
+      (val || '').toString().replace(/,/g, ' ');
+
+    csvRows.push([
+      sanitize(row.callLoggingId),
+      sanitize(row.departmentId),
+      sanitize(row.employeeId),
+      sanitize(row.contactNumber),
+      sanitize(row.emailAddress),
+      sanitize(row.location),
+      sanitize(row.assetId),
+      sanitize(row.problemCategory),
+      sanitize(row.problemType),
+      sanitize(row.problemDescription),
+      sanitize(row.callPriority),
+      sanitize(row.callStatus),
+      sanitize(row.assignedTechnician),
+      sanitize(row.callDateTime),
+      sanitize(row.expectedResolutionTime),
+      sanitize(row.resolutionDetails),
+      sanitize(row.remarks),
+      sanitize(row.closeDate),
+      sanitize(row.isReopened),
+      sanitize(row.createdBy)
+    ].join(','));
+
+  });
+
+  // --------------------------
+  // SAVE CSV
+  // --------------------------
+
+  const blob = new Blob([csvRows.join('\n')], {
+    type: 'text/csv;charset=utf-8;',
+  });
+
+  saveAs(blob, 'Filtered_Call_Logging_Report.csv');
+}
+
+  // ---------------- Excel Export ----------------
+  // ---------------- Excel Export ----------------
+ exportExcelfile(data: TableRow[]) {
+
+  const today = new Date();
+  const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+
+  // --------------------------
+  // HEADER
+  // --------------------------
+
+  const wsData = [
+    [this.headCompanyName || 'Company Name'],
+    ['Date:', formattedDate],
+    [],
+    [
+      'Call Logging ID',
       'Department ID',
       'Employee ID',
-      'Employee Name',
       'Contact Number',
       'Email Address',
       'Location',
       'Asset ID',
-      'Asset Name',
+      'Problem Category',
       'Problem Type',
       'Problem Description',
       'Call Priority',
       'Call Status',
       'Assigned Technician',
       'Call Date Time',
+      'Expected Resolution Time',
+      'Resolution Details',
       'Remarks',
       'Close Date',
-    ];
+      'Is Reopened',
+      'Created By'
+    ],
+  ];
 
-    csvRows.push(headers.join(','));
+  // --------------------------
+  // DATA ROWS
+  // --------------------------
 
-    // --------------------------
-    // DATA ROWS
-    // --------------------------
+  data.forEach((row: TableRow) => {
 
-    data.forEach((row: TableRow) => {
-      csvRows.push(
-        [
-          row.callLogId || '',
-          row.departmentId || '',
-          row.EmployeeId || '',
-          row.EmployeeName || '',
-          row.ContactNumber || '',
-          row.emailAddress || '',
-          row.location || '',
-          row.assetId || '',
-          row.assetName || '',
-          row.problemType || '',
-          (row.problemDescription || '').replace(/,/g, ' '),
-          row.callPriority || '',
-          row.callStatus || '',
-          row.assignedTechnician || '',
-          row.callDateTime || '',
-          (row.remarks || '').replace(/,/g, ' '),
-          row.closeDate || '',
-        ].join(','),
-      );
-    });
+    const safe = (val: any) => val || '';
 
-    // --------------------------
-    // SAVE CSV
-    // --------------------------
+    wsData.push([
+      safe(row.callLoggingId),
+      safe(row.departmentId),
+      safe(row.employeeId),
+      safe(row.contactNumber),
+      safe(row.emailAddress),
+      safe(row.location),
+      safe(row.assetId),
+      safe(row.problemCategory),
+      safe(row.problemType),
+      safe(row.problemDescription),
+      safe(row.callPriority),
+      safe(row.callStatus),
+      safe(row.assignedTechnician),
+      safe(row.callDateTime),
+      safe(row.expectedResolutionTime),
+      safe(row.resolutionDetails),
+      safe(row.remarks),
+      safe(row.closeDate),
+      safe(row.isReopened),
+      safe(row.createdBy)
+    ]);
+  });
 
-    const blob = new Blob([csvRows.join('\n')], {
-      type: 'text/csv;charset=utf-8;',
-    });
+  // --------------------------
+  // CREATE WORKSHEET
+  // --------------------------
 
-    saveAs(blob, 'Filtered_Call_Logging_Report.csv');
-  }
+  const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
 
-  // ---------------- Excel Export ----------------
-  // ---------------- Excel Export ----------------
-  exportExcelfile(data: TableRow[]) {
-    const today = new Date();
-    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+  worksheet['!cols'] = wsData[3].map((h: any) => ({
+    wch: Math.max(String(h).length + 2, 20),
+  }));
 
-    // --------------------------
-    // HEADER
-    // --------------------------
+  // --------------------------
+  // CREATE WORKBOOK
+  // --------------------------
 
-    const wsData = [
-      [this.headCompanyName || 'Company Name'],
+  const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Filtered Call Logs');
 
-      ['Date:', formattedDate],
+  // --------------------------
+  // SAVE FILE
+  // --------------------------
 
-      [],
+  const excelBuffer: any = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
 
-      [
-        'Call ID',
-        'Department ID',
-        'Employee ID',
-        'Employee Name',
-        'Contact Number',
-        'Email Address',
-        'Location',
-        'Asset ID',
-        'Asset Name',
-        'Problem Type',
-        'Problem Description',
-        'Call Priority',
-        'Call Status',
-        'Assigned Technician',
-        'Call Date Time',
-        'Remarks',
-        'Close Date',
-      ],
-    ];
+  const blob = new Blob([excelBuffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
 
-    // --------------------------
-    // DATA ROWS
-    // --------------------------
-
-    data.forEach((row: TableRow) => {
-      wsData.push([
-        row.callLogId || '',
-        row.departmentId || '',
-        row.EmployeeId || '',
-        row.EmployeeName || '',
-        row.ContactNumber || '',
-        row.emailAddress || '',
-        row.location || '',
-        row.assetId || '',
-        row.assetName || '',
-        row.problemType || '',
-        row.problemDescription || '',
-        row.callPriority || '',
-        row.callStatus || '',
-        row.assignedTechnician || '',
-        row.callDateTime || '',
-        row.remarks || '',
-        row.closeDate || '',
-      ]);
-    });
-
-    // --------------------------
-    // CREATE WORKSHEET
-    // --------------------------
-
-    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
-
-    worksheet['!cols'] = wsData[3].map((h: any) => ({
-      wch: Math.max(String(h).length + 2, 20),
-    }));
-
-    // --------------------------
-    // CREATE WORKBOOK
-    // --------------------------
-
-    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Filtered Call Logs');
-
-    // --------------------------
-    // SAVE FILE
-    // --------------------------
-
-    const excelBuffer: any = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
-    });
-
-    const blob = new Blob([excelBuffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    });
-
-    saveAs(blob, 'Filtered_Call_Logging_Report.xlsx');
-  }
+  saveAs(blob, 'Filtered_Call_Logging_Report.xlsx');
+}
 
   // ---------------- PDF Export ----------------
-  exportPDFfile(data: TableRow[]) {
-    if (!data || data.length === 0) {
-      this.showToast('No data available to export!', 'warning');
-      return;
-    }
+exportPDFfile(data: TableRow[]) {
 
-    const doc = new jsPDF('l', 'pt', 'a4');
-
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    // --------------------------
-    // TITLE
-    // --------------------------
-
-    const title = 'Filtered Call Logging Records';
-
-    doc.setFontSize(20);
-    doc.setTextColor(0, 70, 140);
-
-    doc.text(title, pageWidth / 2, 50, { align: 'center' });
-
-    doc.setDrawColor(0, 70, 140);
-    doc.setLineWidth(1);
-
-    doc.line(
-      pageWidth / 2 - doc.getTextWidth(title) / 2,
-      55,
-      pageWidth / 2 + doc.getTextWidth(title) / 2,
-      55,
-    );
-
-    // --------------------------
-    // SUBTITLE
-    // --------------------------
-
-    const topY = 85;
-
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-
-    doc.text(this.headCompanyName || 'Company Name', 40, topY);
-
-    doc.text(new Date().toLocaleDateString(), pageWidth - 40, topY, {
-      align: 'right',
-    });
-
-    // --------------------------
-    // TABLE
-    // --------------------------
-
-    autoTable(doc, {
-      startY: topY + 25,
-
-      head: [
-        [
-          'Call ID',
-          'Department ID',
-          'Employee ID',
-          'Employee Name',
-          'Contact Number',
-          'Email',
-          'Location',
-          'Asset ID',
-          'Asset Name',
-          'Problem Type',
-          'Problem Description',
-          'Priority',
-          'Status',
-          'Assigned Technician',
-          'Call Date Time',
-          'Remarks',
-          'Close Date',
-        ],
-      ],
-
-      body: data.map((row: TableRow) => [
-        row.callLogId || '',
-        row.departmentId || '',
-        row.EmployeeId || '',
-        row.EmployeeName || '',
-        row.ContactNumber || '',
-        row.emailAddress || '',
-        row.location || '',
-        row.assetId || '',
-        row.assetName || '',
-        row.problemType || '',
-        row.problemDescription || '',
-        row.callPriority || '',
-        row.callStatus || '',
-        row.assignedTechnician || '',
-        row.callDateTime || '',
-        row.remarks || '',
-        row.closeDate || '',
-      ]),
-
-      theme: 'grid',
-
-      tableWidth: 'auto',
-
-      styles: {
-        fontSize: 8,
-        cellPadding: 3,
-        overflow: 'linebreak',
-        halign: 'center',
-        valign: 'middle',
-      },
-
-      headStyles: {
-        fillColor: [0, 92, 179],
-        textColor: 255,
-        fontStyle: 'bold',
-        halign: 'center',
-      },
-
-      margin: { left: 20, right: 20 },
-
-      pageBreak: 'auto',
-    });
-
-    // --------------------------
-    // SAVE
-    // --------------------------
-
-    doc.save('Filtered_Call_Logging_Report.pdf');
+  if (!data || data.length === 0) {
+    this.showToast('No data available to export!', 'warning');
+    return;
   }
+
+  const doc = new jsPDF('l', 'pt', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  // --------------------------
+  // TITLE
+  // --------------------------
+
+  const title = 'Filtered Call Logging Records';
+
+  doc.setFontSize(20);
+  doc.setTextColor(0, 70, 140);
+  doc.text(title, pageWidth / 2, 50, { align: 'center' });
+
+  doc.setDrawColor(0, 70, 140);
+  doc.setLineWidth(1);
+  doc.line(
+    pageWidth / 2 - doc.getTextWidth(title) / 2,
+    55,
+    pageWidth / 2 + doc.getTextWidth(title) / 2,
+    55
+  );
+
+  // --------------------------
+  // SUBTITLE
+  // --------------------------
+
+  const topY = 85;
+
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+
+  doc.text(this.headCompanyName || 'Company Name', 40, topY);
+
+  doc.text(new Date().toLocaleDateString(), pageWidth - 40, topY, {
+    align: 'right',
+  });
+
+  // --------------------------
+  // TABLE
+  // --------------------------
+
+  autoTable(doc, {
+    startY: topY + 25,
+
+    head: [[
+      'Call Logging ID',
+      'Department ID',
+      'Employee ID',
+      'Contact Number',
+      'Email',
+      'Location',
+      'Asset ID',
+      'Problem Category',
+      'Problem Type',
+      'Problem Description',
+      'Priority',
+      'Status',
+      'Assigned Technician',
+      'Call Date Time',
+      'Expected Resolution',
+      'Resolution Details',
+      'Remarks',
+      'Close Date',
+      'Reopened',
+      'Created By'
+    ]],
+
+    body: data.map((row: TableRow) => [
+
+      row.callLoggingId || '',
+      row.departmentId || '',
+      row.employeeId || '',
+      row.contactNumber || '',
+      row.emailAddress || '',
+      row.location || '',
+      row.assetId || '',
+      row.problemCategory || '',
+      row.problemType || '',
+      row.problemDescription || '',
+      row.callPriority || '',
+      row.callStatus || '',
+      row.assignedTechnician || '',
+      row.callDateTime || '',
+      row.expectedResolutionTime || '',
+      row.resolutionDetails || '',
+      row.remarks || '',
+      row.closeDate || '',
+      row.isReopened || '',
+      row.createdBy || ''
+
+    ]),
+
+    theme: 'grid',
+
+    tableWidth: 'auto',
+
+    styles: {
+      fontSize: 7,
+      cellPadding: 3,
+      overflow: 'linebreak',
+      halign: 'center',
+      valign: 'middle',
+    },
+
+    headStyles: {
+      fillColor: [0, 92, 179],
+      textColor: 255,
+      fontStyle: 'bold',
+      halign: 'center',
+    },
+
+    margin: { left: 20, right: 20 },
+
+    pageBreak: 'auto',
+  });
+
+  // --------------------------
+  // SAVE
+  // --------------------------
+
+  doc.save('Filtered_Call_Logging_Report.pdf');
+}
 
   showTimelineModal = false;
 

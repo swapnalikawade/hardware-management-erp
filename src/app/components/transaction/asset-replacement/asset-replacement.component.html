@@ -109,293 +109,251 @@
       <!-- Table -->
       <div class="table-wrapper">
         <table>
-          <thead>
-            <tr>
-              <th><input type="checkbox" (change)="toggleAll($event)" /></th>
+<thead>
+  <tr>
+    <th><input type="checkbox" (change)="toggleAll($event)" /></th>
 
-              <th>
-                Replacement ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetReplacementId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetReplacementId', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Replacement ID
+      <i (click)="sortTable('replacementId','asc')"></i>
+      <i (click)="sortTable('replacementId','desc')"></i>
+    </th>
 
-              <th>
-                Replacement Code
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetReplacementCode', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetReplacementCode', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Replacement Number
+      <i (click)="sortTable('replacementNumber','asc')"></i>
+      <i (click)="sortTable('replacementNumber','desc')"></i>
+    </th>
 
-              <th>
-                Replacement Date
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetReplacementDate', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetReplacementDate', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Replacement Date
+      <i (click)="sortTable('replacementDate','asc')"></i>
+      <i (click)="sortTable('replacementDate','desc')"></i>
+    </th>
 
-              <th>
-                Replacement Type
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetReplacementType', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetReplacementType', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Call ID
+      <i (click)="sortTable('callLoggingId','asc')"></i>
+      <i (click)="sortTable('callLoggingId','desc')"></i>
+    </th>
 
-              <th>
-                Call ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetReplacementCallId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetReplacementCallId', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Employee ID
+      <i (click)="sortTable('employeeId','asc')"></i>
+      <i (click)="sortTable('employeeId','desc')"></i>
+    </th>
 
-              <th>
-                Initiated By
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetReplacementInitiatedBy', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetReplacementInitiatedBy', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Department ID
+      <i (click)="sortTable('departmentId','asc')"></i>
+      <i (click)="sortTable('departmentId','desc')"></i>
+    </th>
 
-              <th>
-                Department
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('department', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('department', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Location
+      <i (click)="sortTable('location','asc')"></i>
+      <i (click)="sortTable('location','desc')"></i>
+    </th>
 
-              <th>
-                Old Asset ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('oldAssetId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('oldAssetId', 'desc')"
-                ></i>
-              </th>
+    <th>Old Asset ID
+      <i (click)="sortTable('oldAssetId','asc')"></i>
+      <i (click)="sortTable('oldAssetId','desc')"></i>
+    </th>
 
-              <th>
-                Old Asset Name
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('oldAssetName', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('oldAssetName', 'desc')"
-                ></i>
-              </th>
+    <th>Old Serial
+      <i (click)="sortTable('oldAssetSerialNumber','asc')"></i>
+      <i (click)="sortTable('oldAssetSerialNumber','desc')"></i>
+    </th>
 
-              <th>
-                Old Asset Type
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('oldAssetType', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('oldAssetType', 'desc')"
-                ></i>
-              </th>
+    <th>Condition
+      <i (click)="sortTable('oldAssetCondition','asc')"></i>
+      <i (click)="sortTable('oldAssetCondition','desc')"></i>
+    </th>
 
-              <th>
-                Old Serial No
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('oldAssetSerialNumber', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('oldAssetSerialNumber', 'desc')"
-                ></i>
-              </th>
+    <th>Return Status
+      <i (click)="sortTable('oldAssetReturnStatus','asc')"></i>
+      <i (click)="sortTable('oldAssetReturnStatus','desc')"></i>
+    </th>
 
-              <th>
-                Old AMC Status
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('oldAmcStatus', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('oldAmcStatus', 'desc')"
-                ></i>
-              </th>
+    <th>New Asset ID
+      <i (click)="sortTable('newAssetId','asc')"></i>
+      <i (click)="sortTable('newAssetId','desc')"></i>
+    </th>
 
-              <th>
-                Fault Description
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetFaultDescription', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetFaultDescription', 'desc')"
-                ></i>
-              </th>
+    <th>New Serial
+      <i (click)="sortTable('newAssetSerialNumber','asc')"></i>
+      <i (click)="sortTable('newAssetSerialNumber','desc')"></i>
+    </th>
 
-              <th>
-                New Asset Id
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('newAssetId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('newAssetId', 'desc')"
-                ></i>
-              </th>
+    <th>Category
+      <i (click)="sortTable('assetCategory','asc')"></i>
+      <i (click)="sortTable('assetCategory','desc')"></i>
+    </th>
 
-              <th>
-                New Asset Name
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('newAssetName', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('newAssetName', 'desc')"
-                ></i>
-              </th>
+    <th>Replacement Type
+      <i (click)="sortTable('replacementType','asc')"></i>
+      <i (click)="sortTable('replacementType','desc')"></i>
+    </th>
 
-              <th>
-                New Asset Serial Number
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('newAssetSerialNumber', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('newAssetSerialNumber', 'desc')"
-                ></i>
-              </th>
+    <th>Reason
+      <i (click)="sortTable('reasonForReplacement','asc')"></i>
+      <i (click)="sortTable('reasonForReplacement','desc')"></i>
+    </th>
 
-              <th>
-                Asset Condition
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetCondition', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetCondition', 'desc')"
-                ></i>
-              </th>
+    <th>Cost
+      <i (click)="sortTable('replacementCost','asc')"></i>
+      <i (click)="sortTable('replacementCost','desc')"></i>
+    </th>
 
-              <th>Status</th>
+    <th>Approved By
+      <i (click)="sortTable('approvedBy','asc')"></i>
+      <i (click)="sortTable('approvedBy','desc')"></i>
+    </th>
 
-              <th>Action</th>
-            </tr>
-          </thead>
+    <th>Approval Date
+      <i (click)="sortTable('approvalDate','asc')"></i>
+      <i (click)="sortTable('approvalDate','desc')"></i>
+    </th>
 
-          <tbody>
-            <tr
-              *ngFor="
-                let row of filteredData
-                  | slice
-                    : (currentPage - 1) * itemsPerPage
-                    : currentPage * itemsPerPage;
-                let i = index
-              "
-            >
-              <td>
-                <input
-                  type="checkbox"
-                  [checked]="selectedRows.includes(row)"
-                  (change)="toggleRowSelection(row, $event)"
-                />
-              </td>
+    <th>Technician
+      <i (click)="sortTable('technicianName','asc')"></i>
+      <i (click)="sortTable('technicianName','desc')"></i>
+    </th>
 
-              <td>
-                <span
-                  class="leave-link"
-                  [ngClass]="{
-                    'active-id':
-                      selectedRow?.assetReplacementId ===
-                      row.assetReplacementId,
-                  }"
-                  (click)="openDetails(row)"
-                >
-                  {{ row.assetReplacementId }}
-                </span>
-              </td>
+    <th>Remarks
+      <i (click)="sortTable('remarks','asc')"></i>
+      <i (click)="sortTable('remarks','desc')"></i>
+    </th>
 
-              <td>{{ row.assetReplacementCode }}</td>
-              <td>{{ row.assetReplacementDate }}</td>
-              <td>{{ row.assetReplacementType }}</td>
-              <td>{{ row.assetReplacementCallId }}</td>
-              <td>{{ row.assetReplacementInitiatedBy }}</td>
-              <td>{{ row.department }}</td>
+    <th>Created By
+      <i (click)="sortTable('createdBy','asc')"></i>
+      <i (click)="sortTable('createdBy','desc')"></i>
+    </th>
 
-              <td>{{ row.oldAssetId }}</td>
-              <td>{{ row.oldAssetName }}</td>
-              <td>{{ row.oldAssetType }}</td>
-              <td>{{ row.oldAssetSerialNumber }}</td>
-              <td>{{ row.oldAmcStatus }}</td>
+    <th>Created Date
+      <i (click)="sortTable('createdDate','asc')"></i>
+      <i (click)="sortTable('createdDate','desc')"></i>
+    </th>
 
-              <td class="text-truncate" title="{{ row.assetFaultDescription }}">
-                {{ row.assetFaultDescription }}
-              </td>
-              <td>{{ row.newAssetId }}</td>
-              <td>{{ row.newAssetName }}</td>
-              <td>{{ row.newAssetSerialNumber }}</td>
-              <td>{{ row.assetCondition }}</td>
+    <th>Updated By
+      <i (click)="sortTable('updatedBy','asc')"></i>
+      <i (click)="sortTable('updatedBy','desc')"></i>
+    </th>
 
-              <td>
-                <span
-                  [ngClass]="{
-                    'status-active': row.status === 'Active',
-                    'status-inactive': row.status !== 'Active',
-                  }"
-                >
-                  <span *ngIf="row.status === 'Active'">✔</span>
-                  <span *ngIf="row.status !== 'Active'">❌</span>
-                  {{ row.status }}
-                </span>
-              </td>
+    <th>Updated Date
+      <i (click)="sortTable('updatedDate','asc')"></i>
+      <i (click)="sortTable('updatedDate','desc')"></i>
+    </th>
 
-              <td>
-                <button class="btn-edit" (click)="onEdit(row, i)">
-                  <i class="bi bi-pencil-fill"></i> Edit
-                </button>
-              </td>
-            </tr>
-          </tbody>
+    <th>Status
+      <i (click)="sortTable('replacementStatus','asc')"></i>
+      <i (click)="sortTable('replacementStatus','desc')"></i>
+    </th>
+
+    <th>Action</th>
+  </tr>
+</thead>
+
+      <tbody>
+  <tr
+    *ngFor="
+      let row of filteredData
+        | slice
+          : (currentPage - 1) * itemsPerPage
+          : currentPage * itemsPerPage;
+      let i = index
+    "
+  >
+    <!-- Checkbox -->
+    <td>
+      <input
+        type="checkbox"
+        [checked]="selectedRows.includes(row)"
+        (change)="toggleRowSelection(row, $event)"
+      />
+    </td>
+
+    <!-- Replacement ID -->
+    <td>
+      <span
+        class="leave-link"
+        [ngClass]="{
+          'active-id': selectedRow?.replacementId === row.replacementId
+        }"
+        (click)="openDetails(row)"
+      >
+        {{ row.replacementId }}
+      </span>
+    </td>
+
+    <!-- Basic -->
+    <td>{{ row.replacementNumber }}</td>
+    <td>{{ row.replacementDate }}</td>
+    <td>{{ row.callLoggingId }}</td>
+    <td>{{ row.employeeId }}</td>
+    <td>{{ row.departmentId }}</td>
+    <td>{{ row.location }}</td>
+
+    <!-- Old Asset -->
+    <td>{{ row.oldAssetId }}</td>
+    <td>{{ row.oldAssetSerialNumber }}</td>
+    <td>{{ row.oldAssetCondition }}</td>
+    <td>{{ row.oldAssetReturnStatus }}</td>
+
+    <!-- New Asset -->
+    <td>{{ row.newAssetId }}</td>
+    <td>{{ row.newAssetSerialNumber }}</td>
+
+    <!-- Replacement Details -->
+    <td>{{ row.assetCategory }}</td>
+    <td>{{ row.replacementType }}</td>
+
+    <td class="text-truncate" title="{{ row.reasonForReplacement }}">
+      {{ row.reasonForReplacement }}
+    </td>
+
+    <td>{{ row.replacementCost }}</td>
+
+    <!-- Approval -->
+    <td>{{ row.approvedBy }}</td>
+    <td>{{ row.approvalDate }}</td>
+
+    <!-- Technician -->
+    <td>{{ row.technicianName }}</td>
+
+    <!-- Remarks -->
+    <td class="text-truncate" title="{{ row.remarks }}">
+      {{ row.remarks }}
+    </td>
+
+    <!-- Audit -->
+    <td>{{ row.createdBy }}</td>
+    <td>{{ row.createdDate }}</td>
+    <td>{{ row.updatedBy }}</td>
+    <td>{{ row.updatedDate }}</td>
+
+    <!-- Status -->
+    <td>
+      <span
+        [ngClass]="{
+          'status-active': row.replacementStatus === 'Active',
+          'status-inactive': row.replacementStatus === 'Inactive'
+        }"
+      >
+        <span *ngIf="row.replacementStatus === 'Active'">✔</span>
+        <span *ngIf="row.replacementStatus === 'Inactive'">❌</span>
+        {{ row.replacementStatus }}
+      </span>
+    </td>
+
+    <!-- Action -->
+    <td>
+      <button class="btn-edit" (click)="onEdit(row, i)">
+        <i class="bi bi-pencil-fill"></i> Edit
+      </button>
+    </td>
+  </tr>
+</tbody>
         </table>
       </div>
       <div class="no-data-message" *ngIf="filteredData.length === 0">
@@ -461,7 +419,7 @@
             {{
               isEditMode
                 ? "Update Asset Replacement Details (ID: " +
-                  tableData[editIndex!].assetReplacementId +
+                  tableData[editIndex!].replacementId +
                   ")"
                 : "Add Asset Type Details " + (i + 1)
             }}
@@ -477,243 +435,219 @@
         </div>
 
         <!-- FORM -->
-        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
-          <div class="row mb-3">
-            <!-- Replacement Code -->
-            <div class="col-md-4">
-              <label class="form-label"
-                >Replacement Code <span class="text-danger">*</span></label
-              >
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetReplacementCode"
-                name="assetReplacementCode{{ i }}"
-                required
-                #assetReplacementCode="ngModel"
-              />
-            </div>
+       <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
 
-            <!-- Replacement Date -->
-            <div class="col-md-4">
-              <label class="form-label"
-                >Replacement Date <span class="text-danger">*</span></label
-              >
-              <input
-                type="date"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetReplacementDate"
-                name="assetReplacementDate{{ i }}"
-                required
-                #assetReplacementDate="ngModel"
-              />
-            </div>
+<div class="row mb-3">
 
-            <!-- Replacement Type -->
-            <div class="col-md-4">
-              <label class="form-label"
-                >Replacement Type <span class="text-danger">*</span></label
-              >
-              <select
-                class="form-select"
-                [(ngModel)]="form.newRecord.assetReplacementType"
-                name="assetReplacementType{{ i }}"
-                required
-                #assetReplacementType="ngModel"
-              >
-                <option value="">Select Type</option>
-                <option value="Permanent">Permanent</option>
-                <option value="Temporary">Temporary</option>
-              </select>
-            </div>
+<!-- Replacement Code -->
+<div class="col-md-4">
+  <label class="form-label">Replacement Code <span class="text-danger">*</span></label>
+  <input
+    type="text"
+    class="form-control"
+    placeholder="Enter Replacement Code (e.g. REP-001)"
+    [(ngModel)]="form.newRecord.replacementNumber"
+    name="replacementNumber{{ i }}"
+    required minlength="3"
+    #replacementNumber="ngModel"
+  />
+  <small class="text-danger" *ngIf="replacementNumber.invalid && replacementNumber.touched">
+    Required (min 3 chars)
+  </small>
+</div>
 
-            <!-- Call ID -->
-            <div class="col-md-4 mt-2">
-              <label class="form-label"
-                >Call ID <span class="text-danger">*</span></label
-              >
-              <select
-                class="form-select"
-                [(ngModel)]="form.newRecord.assetReplacementCallId"
-                name="assetReplacementCallId{{ i }}"
-                (change)="
-                  onCallSelect(form.newRecord.assetReplacementCallId, i)
-                "
-                required
-              >
-                <option value="">-- Select Call ID --</option>
+<!-- Replacement Date -->
+<div class="col-md-4">
+  <label class="form-label">Replacement Date <span class="text-danger">*</span></label>
+  <input
+    type="date"
+    class="form-control"
+    [(ngModel)]="form.newRecord.replacementDate"
+    name="replacementDate{{ i }}"
+    required
+    #replacementDate="ngModel"
+  />
+  <small class="text-danger" *ngIf="replacementDate.invalid && replacementDate.touched">
+    Required
+  </small>
+</div>
 
-                <option *ngFor="let call of callList" [value]="call.callLogId">
-                  {{ call.callLogId }} - {{ call.assetName }}
-                </option>
-              </select>
-            </div>
+<!-- Replacement Type -->
+<div class="col-md-4">
+  <label class="form-label">Replacement Type <span class="text-danger">*</span></label>
+  <select
+    class="form-select"
+    [(ngModel)]="form.newRecord.replacementType"
+    name="replacementType{{ i }}"
+    required
+    #replacementType="ngModel"
+  >
+    <option value="">Select Type</option>
+    <option value="Warranty">Warranty</option>
+    <option value="Upgrade">Upgrade</option>
+    <option value="Damage">Damage</option>
+    <option value="Breakdown">Breakdown</option>
+  </select>
+  <small class="text-danger" *ngIf="replacementType.invalid && replacementType.touched">
+    Required
+  </small>
+</div>
 
-            <!-- Initiated By -->
-            <div class="col-md-4 mt-2">
-              <label class="form-label"
-                >Initiated By <span class="text-danger">*</span></label
-              >
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetReplacementInitiatedBy"
-                name="assetReplacementInitiatedBy{{ i }}"
-                required
-              />
-            </div>
+<!-- Call ID -->
+<div class="col-md-4 mt-2">
+  <label class="form-label">Call ID <span class="text-danger">*</span></label>
 
-            <!-- Department -->
-            <div class="col-md-4 mt-2">
-              <label class="form-label"
-                >Department <span class="text-danger">*</span></label
-              >
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.department"
-                name="department{{ i }}"
-                required
-              />
-            </div>
+  <select
+    class="form-select"
+    [(ngModel)]="form.newRecord.callLoggingId"
+    name="callLoggingId{{ i }}"
+    (change)="onCallChange(form.newRecord.callLoggingId, i)"
+    required
+  >
+    <option value="">-- Select Call ID --</option>
 
-            <!-- Old Asset ID -->
-            <div class="col-md-4 mt-2">
-              <label class="form-label"
-                >Old Asset ID <span class="text-danger">*</span></label
-              >
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.oldAssetId"
-                name="oldAssetId{{ i }}"
-                required
-              />
-            </div>
+    <option *ngFor="let call of callList" [value]="call.callLoggingId">
+      {{ call.callLoggingId }} - {{ call.assetName }}
+    </option>
+  </select>
+</div>
 
-            <!-- Old Asset Name -->
-            <div class="col-md-4 mt-2">
-              <label class="form-label">Old Asset Name</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.oldAssetName"
-                name="oldAssetName{{ i }}"
-              />
-            </div>
+<!-- Employee -->
+<div class="col-md-4 mt-2">
+  <label class="form-label">Employee <span class="text-danger">*</span></label>
 
-            <!-- Old Asset Type -->
-            <div class="col-md-4 mt-2">
-              <label class="form-label">Old Asset Type</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.oldAssetType"
-                name="oldAssetType{{ i }}"
-              />
-            </div>
+  <select
+    class="form-select"
+    [(ngModel)]="form.newRecord.employeeId"
+    name="employeeId{{ i }}"
+    required
+  >
+    <option value="">-- Select Employee --</option>
 
-            <!-- Old Serial Number -->
-            <div class="col-md-4 mt-2">
-              <label class="form-label">Old Serial Number</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.oldAssetSerialNumber"
-                name="oldAssetSerialNumber{{ i }}"
-              />
-            </div>
+    <option *ngFor="let emp of employeeList" [value]="emp.employeeId">
+      {{ emp.employeeId }} - {{ emp.employeeName }}
+    </option>
+  </select>
+</div>
+<!-- Department -->
+<div class="col-md-4 mt-2">
+  <label class="form-label">Department <span class="text-danger">*</span></label>
 
-            <!-- AMC Status -->
-            <div class="col-md-4 mt-2">
-              <label class="form-label">AMC Status</label>
-              <select
-                class="form-select"
-                [(ngModel)]="form.newRecord.oldAmcStatus"
-                name="oldAmcStatus{{ i }}"
-              >
-                <option value="AMC">AMC</option>
-                <option value="Warranty">Warranty</option>
-                <option value="Out of AMC">Out of AMC</option>
-              </select>
-            </div>
+  <select
+    class="form-select"
+    [(ngModel)]="form.newRecord.departmentId"
+    name="departmentId{{ i }}"
+    required
+  >
+    <option value="">-- Select Department --</option>
 
-            <!-- Asset Condition -->
-            <div class="col-md-4 mt-2">
-              <label class="form-label">Asset Condition</label>
-              <select
-                class="form-select"
-                [(ngModel)]="form.newRecord.assetCondition"
-                name="assetCondition{{ i }}"
-              >
-                <option value="Working">Working</option>
-                <option value="Not Working">Not Working</option>
-                <option value="Damaged">Damaged</option>
-              </select>
-            </div>
+    <option *ngFor="let dept of departmentList" [value]="dept.departmentId">
+      {{ dept.departmentId }} - {{ dept.departmentName }}
+    </option>
+  </select>
+</div>
 
-            <!-- Fault Description -->
-            <div class="col-md-12 mt-2">
-              <label class="form-label">Fault Description</label>
-              <textarea
-                class="form-control"
-                rows="2"
-                [(ngModel)]="form.newRecord.assetFaultDescription"
-                name="assetFaultDescription{{ i }}"
-              ></textarea>
-            </div>
+<!-- Location -->
+<div class="col-md-4 mt-2">
+  <label class="form-label">Location</label>
+  <input
+    type="text"
+    class="form-control"
+    placeholder="Enter Location"
+    [(ngModel)]="form.newRecord.location"
+    name="location{{ i }}"
+  />
+</div>
 
-            <!-- New Asset Id -->
-            <div class="col-md-4 mt-2">
-              <label class="form-label">New Asset Id</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.newAssetId"
-                name="newAssetId{{ i }}"
-              />
-            </div>
+<!-- OLD ASSET -->
+<!-- Old Asset ID -->
+<div class="col-md-4 mt-2">
+  <label class="form-label">Old Asset ID</label>
+  <input
+    type="text"
+    class="form-control"
+    [(ngModel)]="form.newRecord.oldAssetId"
+    name="oldAssetId{{ i }}"
+    readonly
+  />
+</div>
 
-            <!-- New Asset Name -->
-            <div class="col-md-12 mt-2">
-              <label class="form-label">New Asset Name </label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.newAssetName"
-                name="newAssetName{{ i }}"
-              />
-            </div>
+<div class="col-md-4 mt-2">
+  <label class="form-label">Old Serial Number</label>
+  <input
+    type="text"
+    class="form-control"
+    placeholder="Enter Serial Number"
+    [(ngModel)]="form.newRecord.oldAssetSerialNumber"
+    name="oldAssetSerialNumber{{ i }}"
+  />
+</div>
 
-            <!--New Asset SR.NO -->
-            <div class="col-md-12 mt-2">
-              <label class="form-label">New Asset SR.NO</label>
+<!-- Condition -->
+<div class="col-md-4 mt-2">
+  <label class="form-label">Condition</label>
+  <select class="form-select" [(ngModel)]="form.newRecord.oldAssetCondition" name="oldAssetCondition{{ i }}">
+    <option value="">Select</option>
+    <option value="Faulty">Faulty</option>
+    <option value="Damaged">Damaged</option>
+    <option value="Obsolete">Obsolete</option>
+  </select>
+</div>
 
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.newAssetSerialNumber"
-                name="newAssetSerialNumber{{ i }}"
-              />
-            </div>
+<!-- NEW ASSET -->
+<div class="col-md-4 mt-2">
+  <label class="form-label">New Asset <span class="text-danger">*</span></label>
 
-            <!-- Status -->
-            <div class="col-md-4 mt-2">
-              <label class="form-label">Status</label>
-              <select
-                class="form-select"
-                [(ngModel)]="form.newRecord.status"
-                name="status{{ i }}"
-              >
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-              </select>
-            </div>
-          </div>
+  <select
+    class="form-select"
+    [(ngModel)]="form.newRecord.newAssetId"
+    name="newAssetId{{ i }}"
+    (change)="onNewAssetChange(form.newRecord.newAssetId, i)"
+    required
+  >
+    <option value="">-- Select New Asset --</option>
 
-          <!-- Buttons -->
-          <div
+    <option *ngFor="let asset of assetList" [value]="asset.assetId">
+      {{ asset.assetId }} - {{ asset.assetName }}
+    </option>
+  </select>
+</div>
+
+<!-- Reason -->
+<div class="col-md-12 mt-2">
+  <label class="form-label">Reason</label>
+  <textarea
+    class="form-control"
+    rows="2"
+    placeholder="Enter reason for replacement"
+    [(ngModel)]="form.newRecord.reasonForReplacement"
+    name="reasonForReplacement{{ i }}"
+  ></textarea>
+</div>
+
+<!-- Cost -->
+<div class="col-md-4 mt-2">
+  <label class="form-label">Cost</label>
+  <input
+    type="number"
+    class="form-control"
+    placeholder="Enter Cost"
+    [(ngModel)]="form.newRecord.replacementCost"
+    name="replacementCost{{ i }}"
+  />
+</div>
+
+<!-- STATUS -->
+<div class="col-md-4 mt-2">
+  <label class="form-label">Status</label>
+  <select class="form-select" [(ngModel)]="form.newRecord.replacementStatus" name="replacementStatus{{ i }}">
+    <option value="Active">Active</option>
+    <option value="Inactive">Inactive</option>
+  </select>
+</div>
+
+</div>
+<div
             class="mt-3 d-flex gap-2 justify-content-end"
             *ngIf="activeForm === i"
           >
@@ -735,10 +669,10 @@
               Reset
             </button>
           </div>
-        </form>
+</form>
       </div>
     </div>
-
+  
     <!-- BULK IMPORT FORM -->
     <div
       *ngIf="activeTab === 'bulkImport'"
@@ -1047,70 +981,63 @@
     </div>
   </div>
 </div>
-<div class="simple-toast" *ngIf="toastMessage" [ngClass]="toastType">
-  {{ toastMessage }}
-</div>
+
 <!-- ASSET TYPE VIEW MODAL -->
 <div class="modal" [class.show]="showViewModal">
   <div class="modal-content">
+
+    <!-- HEADER -->
     <div class="modal-header">
       <h5>
-        Asset Replacement Details (ID: {{ selectedRow?.assetReplacementId }})
+        Asset Replacement Details (ID: {{ selectedRow?.replacementId }})
       </h5>
       <button class="close-btn1" (click)="closeViewModal()">×</button>
     </div>
 
+    <!-- BODY -->
     <div class="modal-body">
       <table class="popup-table">
+
+        <!-- BASIC -->
         <tr>
           <th>Replacement ID</th>
-          <td>{{ selectedRow?.assetReplacementId }}</td>
+          <td>{{ selectedRow?.replacementId }}</td>
         </tr>
 
         <tr>
-          <th>Replacement Code</th>
-          <td>{{ selectedRow?.assetReplacementCode }}</td>
+          <th>Replacement Number</th>
+          <td>{{ selectedRow?.replacementNumber }}</td>
         </tr>
 
         <tr>
           <th>Replacement Date</th>
-          <td>{{ selectedRow?.assetReplacementDate }}</td>
-        </tr>
-
-        <tr>
-          <th>Replacement Type</th>
-          <td>{{ selectedRow?.assetReplacementType }}</td>
+          <td>{{ selectedRow?.replacementDate }}</td>
         </tr>
 
         <tr>
           <th>Call ID</th>
-          <td>{{ selectedRow?.assetReplacementCallId }}</td>
+          <td>{{ selectedRow?.callLoggingId }}</td>
         </tr>
 
         <tr>
-          <th>Initiated By</th>
-          <td>{{ selectedRow?.assetReplacementInitiatedBy }}</td>
+          <th>Employee ID</th>
+          <td>{{ selectedRow?.employeeId }}</td>
         </tr>
 
         <tr>
           <th>Department</th>
-          <td>{{ selectedRow?.department }}</td>
+          <td>{{ selectedRow?.departmentId }}</td>
         </tr>
 
-        <!-- OLD ASSET DETAILS -->
+        <tr>
+          <th>Location</th>
+          <td>{{ selectedRow?.location }}</td>
+        </tr>
+
+        <!-- OLD ASSET -->
         <tr>
           <th>Old Asset ID</th>
           <td>{{ selectedRow?.oldAssetId }}</td>
-        </tr>
-
-        <tr>
-          <th>Old Asset Name</th>
-          <td>{{ selectedRow?.oldAssetName }}</td>
-        </tr>
-
-        <tr>
-          <th>Old Asset Type</th>
-          <td>{{ selectedRow?.oldAssetType }}</td>
         </tr>
 
         <tr>
@@ -1119,23 +1046,108 @@
         </tr>
 
         <tr>
-          <th>Old AMC Status</th>
-          <td>{{ selectedRow?.oldAmcStatus }}</td>
+          <th>Old Condition</th>
+          <td>{{ selectedRow?.oldAssetCondition }}</td>
         </tr>
 
         <tr>
-          <th>Fault Description</th>
-          <td>{{ selectedRow?.assetFaultDescription }}</td>
+          <th>Return Status</th>
+          <td>{{ selectedRow?.oldAssetReturnStatus }}</td>
+        </tr>
+
+        <!-- NEW ASSET -->
+        <tr>
+          <th>New Asset ID</th>
+          <td>{{ selectedRow?.newAssetId }}</td>
         </tr>
 
         <tr>
-          <th>Asset Condition</th>
-          <td>{{ selectedRow?.assetCondition }}</td>
+          <th>New Serial Number</th>
+          <td>{{ selectedRow?.newAssetSerialNumber }}</td>
         </tr>
+
+        <!-- REPLACEMENT -->
+        <tr>
+          <th>Category</th>
+          <td>{{ selectedRow?.assetCategory }}</td>
+        </tr>
+
+        <tr>
+          <th>Replacement Type</th>
+          <td>{{ selectedRow?.replacementType }}</td>
+        </tr>
+
+        <tr>
+          <th>Reason</th>
+          <td>{{ selectedRow?.reasonForReplacement }}</td>
+        </tr>
+
+        <tr>
+          <th>Cost</th>
+          <td>{{ selectedRow?.replacementCost }}</td>
+        </tr>
+
+        <!-- APPROVAL -->
+        <tr>
+          <th>Approved By</th>
+          <td>{{ selectedRow?.approvedBy }}</td>
+        </tr>
+
+        <tr>
+          <th>Approval Date</th>
+          <td>{{ selectedRow?.approvalDate }}</td>
+        </tr>
+
+        <!-- TECH -->
+        <tr>
+          <th>Technician</th>
+          <td>{{ selectedRow?.technicianName }}</td>
+        </tr>
+
+        <!-- REMARKS -->
+        <tr *ngIf="selectedRow?.remarks">
+          <th>Remarks</th>
+          <td>{{ selectedRow?.remarks }}</td>
+        </tr>
+
+        <!-- AUDIT -->
+        <tr>
+          <th>Created By</th>
+          <td>{{ selectedRow?.createdBy }}</td>
+        </tr>
+
+        <tr>
+          <th>Created Date</th>
+          <td>{{ selectedRow?.createdDate }}</td>
+        </tr>
+
+        <tr *ngIf="selectedRow?.updatedBy">
+          <th>Updated By</th>
+          <td>{{ selectedRow?.updatedBy }}</td>
+        </tr>
+
+        <tr *ngIf="selectedRow?.updatedDate">
+          <th>Updated Date</th>
+          <td>{{ selectedRow?.updatedDate }}</td>
+        </tr>
+
+        <!-- STATUS -->
         <tr>
           <th>Status</th>
-          <td>{{ selectedRow?.status }}</td>
+          <td>
+            <span
+              [ngClass]="{
+                'status-active': selectedRow?.replacementStatus === 'Active',
+                'status-inactive': selectedRow?.replacementStatus === 'Inactive'
+              }"
+            >
+              <span *ngIf="selectedRow?.replacementStatus === 'Active'">✔</span>
+              <span *ngIf="selectedRow?.replacementStatus === 'Inactive'">❌</span>
+              {{ selectedRow?.replacementStatus }}
+            </span>
+          </td>
         </tr>
+
       </table>
     </div>
   </div>

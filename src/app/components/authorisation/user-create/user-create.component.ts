@@ -73,7 +73,7 @@ export class UserCreateComponent {
     this.userRoles = this.authService.getUserRoles();
     this.date = this.authService.getCurrentDate();
     this.headCompanyName = this.authService.getEmployeeName();
-    this.loginId = this.authService.getEmployeeCode();
+ this.loginId = this.authService.getEmployeeId();
     alert(this.loginId);
     if (!this.token) {
       this.router.navigate(['/login-page']);
@@ -837,25 +837,23 @@ export class UserCreateComponent {
 
     console.log('FINAL PAYLOAD:', payload);
 
-    // 🔥 EDIT MODE
-    if (this.isEditMode) {
-      let p = empCode.substring(0, 3); // EMP
-      let c = empCode.substring(3); // 005
-      let y = new Date().getFullYear().toString(); // 2026
+   if (this.isEditMode) {
 
-      this.commanService.updateUser(p, y, c, payload).subscribe({
-        next: () => {
-          this.showToast('User updated successfully ✅', 'success');
-          this.loadUsers();
-          this.activeTab = 'details';
-        },
-        error: (err) => {
-          console.error('UPDATE ERROR:', err);
-          console.log('BACKEND ERROR:', err.error);
-          this.showToast('User update failed ❌', 'error');
-        },
-      });
-    }
+  this.commanService.updateUser(empCode, payload).subscribe({
+    next: () => {
+      this.showToast('User updated successfully ✅', 'success');
+      this.loadUsers();
+      this.activeTab = 'details';
+    },
+    error: (err) => {
+      console.error('UPDATE ERROR:', err);
+      console.log('BACKEND ERROR:', err.error);
+      this.showToast('User update failed ❌', 'error');
+    },
+  });
+
+}
+    
     // 🔥 CREATE MODE
     else {
       this.commanService.submitUser(payload).subscribe({

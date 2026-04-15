@@ -110,345 +110,207 @@
       <!-- Table -->
       <div class="table-wrapper">
         <table>
-          <thead>
-            <tr>
-              <th><input type="checkbox" (change)="toggleAll($event)" /></th>
+        <thead>
+  <tr>
+    <th><input type="checkbox" (change)="toggleAll($event)" /></th>
 
-              <!-- Asset ID -->
-              <th>
-                Asset Bought ID
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtMiscPurchaseId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtMiscPurchaseId', 'desc')"
-                ></i>
-              </th>
+    <!-- Purchase ID -->
+    <th>
+      Purchase ID
+      <i class="bi bi-arrow-up" (click)="sortTable('purchaseId','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('purchaseId','desc')"></i>
+    </th>
 
-              <!-- Asset Code -->
-              <th>
-                Asset Bought Code
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtMiscPurchaseCode', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtMiscPurchaseCode', 'desc')"
-                ></i>
-              </th>
+    <!-- Purchase Number -->
+    <th>
+      Purchase No
+      <i class="bi bi-arrow-up" (click)="sortTable('purchaseNumber','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('purchaseNumber','desc')"></i>
+    </th>
 
-              <!-- Category -->
-              <th>
-                Asset Category
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtAssetCategory', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtAssetCategory', 'desc')"
-                ></i>
-              </th>
+    <!-- Vendor -->
+    <th>
+      Vendor
+      <i class="bi bi-arrow-up" (click)="sortTable('vendorName','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('vendorName','desc')"></i>
+    </th>
 
-              <!-- Asset Type -->
-              <th>
-                Asset Type
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtAssetType', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtAssetType', 'desc')"
-                ></i>
-              </th>
+    <!-- Item -->
+    <th>
+      Item Name
+      <i class="bi bi-arrow-up" (click)="sortTable('itemName','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('itemName','desc')"></i>
+    </th>
 
-              <!-- Item Name -->
-              <th>
-                Item Name
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtItemName', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtItemName', 'desc')"
-                ></i>
-              </th>
+    <!-- Category -->
+    <th>
+      Category
+      <i class="bi bi-arrow-up" (click)="sortTable('itemCategory','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('itemCategory','desc')"></i>
+    </th>
 
-              <!-- Department -->
-              <th>
-                Department
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtDepartment', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtDepartment', 'desc')"
-                ></i>
-              </th>
-              <!-- Asset Bought Vendor -->
-              <th>
-                Asset Bought Vendor
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtVendor', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtVendor', 'desc')"
-                ></i>
-              </th>
+    <!-- Quantity -->
+    <th>
+      Qty
+      <i class="bi bi-arrow-up" (click)="sortTable('quantity','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('quantity','desc')"></i>
+    </th>
 
-              <!-- Asset Bought Serial Nuber -->
-              <th>
-                Asset Bought SR.No
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtSerialNumber', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtSerialNumber', 'desc')"
-                ></i>
-              </th>
+    <!-- Unit Price -->
+    <th>
+      Unit Price
+      <i class="bi bi-arrow-up" (click)="sortTable('unitPrice','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('unitPrice','desc')"></i>
+    </th>
 
-              <!-- Asset Status -->
-              <th>
-                Asset Status
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtAssetStatus', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtAssetStatus', 'desc')"
-                ></i>
-              </th>
+    <!-- Total -->
+    <th>
+      Total
+      <i class="bi bi-arrow-up" (click)="sortTable('totalAmount','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('totalAmount','desc')"></i>
+    </th>
 
-              <!-- Purchase Date -->
-              <th>
-                Purchase Date
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtPurchaseDate', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtPurchaseDate', 'desc')"
-                ></i>
-              </th>
+    <!-- Department -->
+    <th>
+      Department
+      <i class="bi bi-arrow-up" (click)="sortTable('departmentId','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('departmentId','desc')"></i>
+    </th>
 
-              <!-- Purchased By -->
-              <th>
-                Purchased By
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtPurchasedBy', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtPurchasedBy', 'desc')"
-                ></i>
-              </th>
+    <!-- Status -->
+    <th>
+      Status
+      <i class="bi bi-arrow-up" (click)="sortTable('stockStatus','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('stockStatus','desc')"></i>
+    </th>
 
-              <!--Remarks-->
-              <th>
-                Remarks
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtRemarks', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtRemarks', 'desc')"
-                ></i>
-              </th>
+    <!-- Purchase Date -->
+    <th>
+      Purchase Date
+      <i class="bi bi-arrow-up" (click)="sortTable('purchaseDate','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('purchaseDate','desc')"></i>
+    </th>
 
-              <!-- Created Date -->
-              <th>
-                Created Date
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtCreatedDate', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtCreatedDate', 'desc')"
-                ></i>
-              </th>
+    <!-- Invoice -->
+    <th>
+      Invoice No
+      <i class="bi bi-arrow-up" (click)="sortTable('invoiceNumber','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('invoiceNumber','desc')"></i>
+    </th>
 
-              <!-- Updated Date -->
-              <th>
-                Updated Date
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtUpdatedDate', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtUpdatedDate', 'desc')"
-                ></i>
-              </th>
+    <!-- Remarks -->
+    <th>
+      Remarks
+      <i class="bi bi-arrow-up" (click)="sortTable('remarks','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('remarks','desc')"></i>
+    </th>
 
-              <!-- Bill Invoice No -->
-              <th>
-                Bill Invoice No
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtBillInvoiceNo', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtBillInvoiceNo', 'desc')"
-                ></i>
-              </th>
+    <!-- Created Date -->
+    <th>
+      Created Date
+      <i class="bi bi-arrow-up" (click)="sortTable('createdDate','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('createdDate','desc')"></i>
+    </th>
 
-              <!-- Asset Bought Attachment -->
-              <th>
-                Asset Bought Attachment
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtAttachment', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtAttachment', 'desc')"
-                ></i>
-              </th>
+    <!-- Updated Date -->
+    <th>
+      Updated Date
+      <i class="bi bi-arrow-up" (click)="sortTable('updatedDate','asc')"></i>
+      <i class="bi bi-arrow-down" (click)="sortTable('updatedDate','desc')"></i>
+    </th>
 
-              <!-- Status -->
-              <th>
-                Status
-                <i
-                  class="bi bi-arrow-up"
-                  (click)="sortTable('assetBoughtStatus', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down"
-                  (click)="sortTable('assetBoughtStatus', 'desc')"
-                ></i>
-              </th>
+    <th>Action</th>
+  </tr>
+</thead>
+       <tbody>
+  <tr
+    *ngFor="
+      let row of filteredData
+        | slice:(currentPage - 1) * itemsPerPage: currentPage * itemsPerPage;
+      let i = index
+    "
+  >
+    <!-- Select Row -->
+    <td>
+      <input
+        type="checkbox"
+        [checked]="selectedRows.includes(row)"
+        (change)="toggleRowSelection(row, $event)"
+      />
+    </td>
 
-              <th>Action</th>
-            </tr>
-          </thead>
+    <!-- Purchase ID -->
+    <td>
+      <span
+        class="leave-link"
+        [ngClass]="{
+          'active-id': selectedRow?.purchaseId === row.purchaseId
+        }"
+        (click)="openDetails(row)"
+      >
+        {{ row.purchaseId }}
+      </span>
+    </td>
 
-          <tbody>
-            <tr
-              *ngFor="
-                let row of filteredData
-                  | slice
-                    : (currentPage - 1) * itemsPerPage
-                    : currentPage * itemsPerPage;
-                let i = index
-              "
-            >
-              <!-- Select Row -->
-              <td>
-                <input
-                  type="checkbox"
-                  [checked]="selectedRows.includes(row)"
-                  (change)="toggleRowSelection(row, $event)"
-                />
-              </td>
+    <!-- Purchase Number -->
+    <td>{{ row.purchaseNumber }}</td>
 
-              <!-- Asset ID -->
-              <td>
-                <span
-                  class="leave-link"
-                  [ngClass]="{
-                    'active-id':
-                      selectedRow?.assetBoughtMiscPurchaseId ===
-                      row.assetBoughtMiscPurchaseId,
-                  }"
-                  (click)="openDetails(row)"
-                >
-                  {{ row.assetBoughtMiscPurchaseId }}
-                </span>
-              </td>
+    <!-- Vendor -->
+    <td>{{ row.vendorName }}</td>
 
-              <!-- Asset Code -->
-              <td>{{ row.assetBoughtMiscPurchaseCode }}</td>
+    <!-- Item Name -->
+    <td>{{ row.itemName }}</td>
 
-              <!-- Category -->
-              <td>{{ row.assetBoughtAssetCategory }}</td>
+    <!-- Category -->
+    <td>{{ row.itemCategory }}</td>
 
-              <!-- Asset Type -->
-              <td>{{ row.assetBoughtAssetType }}</td>
+    <!-- Quantity -->
+    <td>{{ row.quantity }}</td>
 
-              <!-- Item Name -->
-              <td>{{ row.assetBoughtItemName }}</td>
+    <!-- Unit Price -->
+    <td>{{ row.unitPrice }}</td>
 
-              <!-- Department -->
-              <td>{{ row.assetBoughtDepartment }}</td>
+    <!-- Total -->
+    <td>{{ row.totalAmount }}</td>
 
-              <td>{{ row.assetBoughtVendor }}</td>
+    <!-- Department -->
+    <td>{{ row.departmentId }}</td>
 
-              <td>{{ row.assetBoughtSerialNumber }}</td>
+    <!-- Status -->
+    <td>
+      <span
+        [ngClass]="{
+          'status-active': row.stockStatus === 'Active',
+          'status-inactive': row.stockStatus === 'Inactive'
+        }"
+      >
+        {{ row.stockStatus }}
+      </span>
+    </td>
 
-              <!-- Asset Status -->
-              <td>
-                <span
-                  [ngClass]="{
-                    'status-working': row.assetBoughtAssetStatus === 'Working',
-                    'status-not-working':
-                      row.assetBoughtAssetStatus === 'Not Working',
-                    'status-repair':
-                      row.assetBoughtAssetStatus === 'Under Repair',
-                  }"
-                >
-                  {{ row.assetBoughtAssetStatus }}
-                </span>
-              </td>
+    <!-- Purchase Date -->
+    <td>{{ row.purchaseDate }}</td>
 
-              <!-- Purchase Date -->
-              <td>{{ row.assetBoughtPurchaseDate }}</td>
+    <!-- Invoice -->
+    <td>{{ row.invoiceNumber }}</td>
 
-              <!-- Purchased By -->
-              <td>{{ row.assetBoughtPurchasedBy }}</td>
+    <!-- Remarks -->
+    <td>{{ row.remarks }}</td>
 
-              <!-- Remarks -->
-              <td>{{ row.assetBoughtRemarks }}</td>
+    <!-- Created Date -->
+    <td>{{ row.createdDate }}</td>
 
-              <!-- Created Date -->
-              <td>{{ row.assetBoughtCreatedDate }}</td>
+    <!-- Updated Date -->
+    <td>{{ row.updatedDate }}</td>
 
-              <!-- Updated Date -->
-              <td>{{ row.assetBoughtUpdatedDate }}</td>
-
-              <!-- Bill Invoice No -->
-              <td>{{ row.assetBoughtBillInvoiceNo }}</td>
-
-              <!-- Attachment -->
-              <td>{{ row.assetBoughtAttachment }}</td>
-
-              <!-- Record Status -->
-              <td>
-                <span
-                  [ngClass]="{
-                    'status-active': row.assetBoughtStatus === 'Active',
-                    'status-inactive': row.assetBoughtStatus === 'Inactive',
-                  }"
-                >
-                  <span *ngIf="row.assetBoughtStatus === 'Active'">✔</span>
-                  <span *ngIf="row.assetBoughtStatus === 'Inactive'">❌</span>
-                  {{ row.assetBoughtStatus }}
-                </span>
-              </td>
-
-              <!-- Action -->
-              <td>
-                <button class="btn-edit" (click)="onEdit(row, i)">
-                  <i class="bi bi-pencil-square me-1"></i> Edit
-                </button>
-              </td>
-            </tr>
-          </tbody>
+    <!-- Action -->
+    <td>
+      <button class="btn-edit" (click)="onEdit(row, i)">
+        <i class="bi bi-pencil-square me-1"></i> Edit
+      </button>
+    </td>
+  </tr>
+</tbody>
         </table>
       </div>
       <div class="no-data-message" *ngIf="filteredData.length === 0">
@@ -517,7 +379,7 @@
             {{
               isEditMode
                 ? "Update Assets Bought Details (ID: " +
-                  tableData[editIndex!].assetBoughtMiscPurchaseId +
+                  tableData[editIndex!].purchaseId +
                   ")"
                 : "Add  Assets Bought  Details " + (i + 1)
             }}
@@ -533,267 +395,223 @@
         </div>
 
         <!-- FORM -->
-        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
-          <div class="row mb-3">
-            <!-- Hidden ID -->
-            <input
-              type="hidden"
-              [(ngModel)]="form.newRecord.assetBoughtMiscPurchaseId"
-              name="assetBoughtMiscPurchaseId{{ i }}"
-            />
+    <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
+  <div class="row mb-3">
 
-            <!-- Misc Purchase Code -->
-            <div class="col-md-4">
-              <label class="form-label">Misc Purchase Code</label>
+    <!-- Purchase Number -->
+    <div class="col-md-4">
+      <label class="form-label">Purchase Number *</label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Enter Purchase Number"
+        [(ngModel)]="form.newRecord.purchaseNumber"
+        name="purchaseNumber{{ i }}"
+        required
+        #purchaseNumber="ngModel"
+      />
+      <small class="text-danger" *ngIf="purchaseNumber.invalid && purchaseNumber.touched">
+        Purchase Number is required
+      </small>
+    </div>
 
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetBoughtMiscPurchaseCode"
-                name="assetBoughtMiscPurchaseCode{{ i }}"
-                required
-              />
-            </div>
+    <!-- Vendor -->
+    <div class="col-md-4">
+      <label class="form-label">Vendor Name *</label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Enter Vendor Name"
+        [(ngModel)]="form.newRecord.vendorName"
+        name="vendorName{{ i }}"
+        required
+        #vendorName="ngModel"
+      />
+    </div>
 
-            <!-- Asset Category -->
-            <div class="col-md-4">
-              <label class="form-label">Asset Category *</label>
+    <!-- Purchase Date -->
+    <div class="col-md-4">
+      <label class="form-label">Purchase Date *</label>
+      <input
+        type="date"
+        class="form-control"
+        [(ngModel)]="form.newRecord.purchaseDate"
+        name="purchaseDate{{ i }}"
+        required
+      />
+    </div>
 
-              <select
-                class="form-select"
-                [(ngModel)]="form.newRecord.assetBoughtAssetCategory"
-                name="assetBoughtAssetCategory{{ i }}"
-                required
-              >
-                <option value="">Select Category</option>
-                <option value="IT">IT</option>
-                <option value="Non-IT">Non-IT</option>
-                <option value="Electrical">Electrical</option>
-                <option value="Mechanical">Mechanical</option>
-              </select>
-            </div>
+    <!-- Item Name -->
+    <div class="col-md-4">
+      <label class="form-label">Item Name *</label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Enter Item Name"
+        [(ngModel)]="form.newRecord.itemName"
+        name="itemName{{ i }}"
+        required
+      />
+    </div>
 
-            <!-- Asset Type -->
-            <div class="col-md-4">
-              <label class="form-label">Asset Type *</label>
+    <!-- Category -->
+    <div class="col-md-4">
+      <label class="form-label">Category *</label>
+      <select
+        class="form-select"
+        [(ngModel)]="form.newRecord.itemCategory"
+        name="itemCategory{{ i }}"
+        required
+      >
+        <option value="">Select Category</option>
+        <option value="IT">IT</option>
+        <option value="Non-IT">Non-IT</option>
+        <option value="Electrical">Electrical</option>
+        <option value="Mechanical">Mechanical</option>
+      </select>
+    </div>
 
-              <select
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetBoughtAssetType"
-                name="assetBoughtAssetType{{ i }}"
-                required
-              >
-                <option value="">Select Asset Type</option>
+    <!-- Quantity -->
+    <div class="col-md-4">
+      <label class="form-label">Quantity *</label>
+      <input
+        type="number"
+        class="form-control"
+        placeholder="Enter Quantity"
+        [(ngModel)]="form.newRecord.quantity"
+        name="quantity{{ i }}"
+        required
+        min="1"
+      />
+    </div>
 
-                <option
-                  *ngFor="let type of assetTypes"
-                  [value]="type.assetTypeName"
-                >
-                  {{ type.assetTypeName }}
-                </option>
-              </select>
-            </div>
+    <!-- Unit Price -->
+    <div class="col-md-4">
+      <label class="form-label">Unit Price *</label>
+      <input
+        type="number"
+        class="form-control"
+        placeholder="Enter Unit Price"
+        [(ngModel)]="form.newRecord.unitPrice"
+        name="unitPrice{{ i }}"
+        required
+        min="0"
+      />
+    </div>
 
-            <!-- Item Name -->
-            <div class="col-md-4">
-              <label class="form-label">Item Name *</label>
+    <!-- Total (Auto) -->
+    <div class="col-md-4">
+      <label class="form-label">Total Amount</label>
+      <input
+        type="number"
+        class="form-control"
+        [value]="form.newRecord.quantity * form.newRecord.unitPrice"
+        readonly
+      />
+    </div>
 
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetBoughtItemName"
-                name="assetBoughtItemName{{ i }}"
-                required
-              />
-            </div>
+    <!-- Department -->
+    <div class="col-md-4">
+      <label class="form-label">Department *</label>
+      <select
+        class="form-select"
+        [(ngModel)]="form.newRecord.departmentId"
+        name="departmentId{{ i }}"
+        required
+      >
+        <option value="">Select Department</option>
+    <option *ngFor="let d of departments" [value]="d.departmentName">
+  {{ d.departmentName }}
+</option>
+      </select>
+    </div>
 
-            <!-- Department -->
-            <div class="col-md-4">
-              <label class="form-label">Department *</label>
+    <!-- Invoice -->
+    <div class="col-md-4">
+      <label class="form-label">Invoice Number *</label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Enter Invoice Number"
+        [(ngModel)]="form.newRecord.invoiceNumber"
+        name="invoiceNumber{{ i }}"
+        required
+      />
+    </div>
 
-              <select
-                class="form-select"
-                [(ngModel)]="form.newRecord.assetBoughtDepartment"
-                name="assetBoughtDepartment{{ i }}"
-                required
-              >
-                <option value="">Select Department</option>
+    <!-- Location -->
+    <div class="col-md-4">
+      <label class="form-label">Location</label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Enter Location"
+        [(ngModel)]="form.newRecord.location"
+        name="location{{ i }}"
+      />
+    </div>
 
-                <option
-                  *ngFor="let d of departments"
-                  [value]="d.departmentName"
-                >
-                  {{ d.departmentName }}
-                </option>
-              </select>
-            </div>
+    <!-- Status -->
+    <div class="col-md-4">
+      <label class="form-label">Stock Status *</label>
+      <select
+        class="form-select"
+        [(ngModel)]="form.newRecord.stockStatus"
+        name="stockStatus{{ i }}"
+        required
+      >
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+      </select>
+    </div>
 
-            <!--Asset Bought Vendor -->
-            <div class="col-md-4">
-              <label class="form-label">Asset Bought Vendor</label>
+    <!-- Remarks -->
+    <div class="col-md-12">
+      <label class="form-label">Remarks</label>
+      <textarea
+        class="form-control"
+        rows="2"
+        placeholder="Enter remarks..."
+        [(ngModel)]="form.newRecord.remarks"
+        name="remarks{{ i }}"
+      ></textarea>
+    </div>
 
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetBoughtVendor"
-                name="assetBoughtVendor{{ i }}"
-                required
-              />
-            </div>
+    <!-- CREATED BY (AUTO) -->
+    <div class="col-md-4">
+      <label class="form-label">Created By</label>
+      <input
+        type="text"
+        class="form-control"
+        [value]="loginId"
+        readonly
+      />
+    </div>
 
-            <!-- Asset Bought SR.NO By -->
-            <div class="col-md-4">
-              <label class="form-label"> Asset Bought SR.NO *</label>
+    <!-- CREATED DATE -->
+    <div class="col-md-4">
+      <label class="form-label">Created Date</label>
+      <input
+        type="text"
+        class="form-control"
+        [value]="form.newRecord.createdDate"
+        readonly
+      />
+    </div>
 
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetBoughtSerialNumber"
-                name="assetBoughtSerialNumber{{ i }}"
-                required
-              />
-            </div>
+  </div>
 
-            <!-- Asset Status -->
-            <div class="col-md-4">
-              <label class="form-label">Asset Status *</label>
+  <!-- BUTTONS -->
+  <div class="mt-3 d-flex gap-2 justify-content-end">
+    <button type="button" class="btn-save" (click)="saveAllRecords()">
+      {{ isEditMode ? "Update" : "Save" }}
+    </button>
 
-              <select
-                class="form-select"
-                [(ngModel)]="form.newRecord.assetBoughtAssetStatus"
-                name="assetBoughtAssetStatus{{ i }}"
-                required
-              >
-                <option value="">Select Status</option>
-                <option value="Working">Working</option>
-                <option value="Not Working">Not Working</option>
-                <option value="Under Repair">Under Repair</option>
-              </select>
-            </div>
-
-            <!-- Purchase Date -->
-            <div class="col-md-4">
-              <label class="form-label">Purchase Date *</label>
-
-              <input
-                type="date"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetBoughtPurchaseDate"
-                name="assetBoughtPurchaseDate{{ i }}"
-                required
-              />
-            </div>
-
-            <!-- Purchased By -->
-            <div class="col-md-3">
-              <label class="form-label">Purchased By *</label>
-
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetBoughtPurchasedBy"
-                name="assetBoughtPurchasedBy{{ i }}"
-                required
-              />
-            </div>
-
-            <!-- Created Date -->
-            <div class="col-md-3">
-              <label class="form-label">Created Date *</label>
-
-              <input
-                type="text"
-                class="form-control"
-                [value]="form.newRecord.assetBoughtCreatedDate"
-                readonly
-              />
-            </div>
-
-            <!-- Updated Date -->
-            <div class="col-md-3" *ngIf="form.newRecord.assetBoughtUpdatedDate">
-              <label class="form-label">Updated Date *</label>
-
-              <input
-                type="text"
-                class="form-control"
-                [value]="form.newRecord.assetBoughtUpdatedDate"
-                readonly
-              />
-            </div>
-
-            <!-- Invoice Number -->
-            <div class="col-md-3">
-              <label class="form-label">Bill / Invoice No *</label>
-
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="form.newRecord.assetBoughtBillInvoiceNo"
-                name="assetBoughtBillInvoiceNo{{ i }}"
-                required
-              />
-            </div>
-
-            <!-- Attachment -->
-            <div class="col-md-3">
-              <label class="form-label">Attachment *</label>
-
-              <input
-                type="file"
-                class="form-control"
-                (change)="onFileSelect($event, i)"
-              />
-            </div>
-
-            <!-- Remarks -->
-            <div class="col-md-12">
-              <label class="form-label">Remarks *</label>
-
-              <textarea
-                class="form-control"
-                rows="2"
-                [(ngModel)]="form.newRecord.assetBoughtRemarks"
-                name="assetBoughtRemarks{{ i }}"
-                required
-              ></textarea>
-            </div>
-
-            <!-- Record Status -->
-            <!-- <div class="col-md-4">
-              <label class="form-label">Status *</label>
-
-              <select
-                class="form-select"
-                [(ngModel)]="form.newRecord.assetBoughtStatus"
-                name="assetBoughtStatus{{ i }}"
-                required
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div> -->
-          </div>
-
-          <!-- Buttons -->
-          <div
-            *ngIf="i === forms.length - 1"
-            class="mt-3 d-flex gap-2 justify-content-end"
-          >
-            <button type="button" class="btn-save" (click)="saveAllRecords()">
-              <i class="bi bi-floppy"></i>
-              {{ isEditMode ? "Update" : "Save" }}
-            </button>
-
-            <button
-              type="button"
-              class="btn-cancel"
-              (click)="cancelRecord(recordForm)"
-            >
-              <i class="bi bi-arrow-counterclockwise"></i>
-              Reset
-            </button>
-          </div>
-        </form>
+    <button type="button" class="btn-cancel" (click)="cancelRecord(recordForm)">
+      Reset
+    </button>
+  </div>
+</form>
       </div>
     </div>
 
@@ -1131,93 +949,135 @@
   {{ toastMessage }}
 </div>
 <!-- Department VIEW MODAL -->
+<!-- ================= VIEW MODAL ================= -->
 <div class="modal" [class.show]="showViewModal">
   <div class="modal-content">
+
     <div class="modal-header">
-      <h5>Asset Details (ID: {{ selectedRow?.assetBoughtMiscPurchaseId }})</h5>
+      <h5>Asset Details (ID: {{ selectedRow?.purchaseId }})</h5>
       <button class="close-btn1" (click)="closeViewModal()">×</button>
     </div>
 
     <div class="modal-body">
       <table class="popup-table">
-        <!-- ================= PRIMARY DETAILS ================= -->
+
+        <!-- ================= PRIMARY ================= -->
         <tr>
-          <th>Asset ID</th>
-          <td>{{ selectedRow?.assetBoughtMiscPurchaseId }}</td>
+          <th>Purchase ID</th>
+          <td>{{ selectedRow?.purchaseId }}</td>
         </tr>
         <tr>
-          <th>Asset Code</th>
-          <td>{{ selectedRow?.assetBoughtMiscPurchaseCode }}</td>
+          <th>Purchase Number</th>
+          <td>{{ selectedRow?.purchaseNumber }}</td>
         </tr>
 
-        <!-- ================= CLASSIFICATION ================= -->
-        <tr>
-          <th>Asset Category</th>
-          <td>{{ selectedRow?.assetBoughtAssetCategory }}</td>
-        </tr>
-        <tr>
-          <th>Asset Type</th>
-          <td>{{ selectedRow?.assetBoughtAssetType }}</td>
-        </tr>
-        <tr>
-          <th>Item Name</th>
-          <td>{{ selectedRow?.assetBoughtItemName }}</td>
-        </tr>
-
-        <!-- ================= OWNERSHIP / LOCATION ================= -->
-        <tr>
-          <th>Department</th>
-          <td>{{ selectedRow?.assetBoughtDepartment }}</td>
-        </tr>
-
-        <!-- ================= ASSET STATUS ================= -->
-        <tr>
-          <th>Asset Status</th>
-          <td>{{ selectedRow?.assetBoughtAssetStatus }}</td>
-        </tr>
-
+        <!-- ================= PURCHASE ================= -->
         <tr>
           <th>Purchase Date</th>
-          <td>{{ selectedRow?.assetBoughtPurchaseDate }}</td>
+          <td>{{ selectedRow?.purchaseDate }}</td>
+        </tr>
+        <tr>
+          <th>Vendor</th>
+          <td>{{ selectedRow?.vendorName }}</td>
+        </tr>
+        <tr>
+          <th>Invoice Number</th>
+          <td>{{ selectedRow?.invoiceNumber }}</td>
+        </tr>
+        <tr>
+          <th>Invoice Date</th>
+          <td>{{ selectedRow?.invoiceDate }}</td>
         </tr>
 
-        <!-- ================= DOCUMENTS ================= -->
+        <!-- ================= ITEM ================= -->
         <tr>
-          <th>Bill / Invoice No</th>
-          <td>{{ selectedRow?.assetBoughtBillInvoiceNo }}</td>
+          <th>Item Name</th>
+          <td>{{ selectedRow?.itemName }}</td>
         </tr>
-        <tr *ngIf="selectedRow?.attachment">
-          <th>Attachment</th>
-          <td>
-            <a href="javascript:void(0)">
-              {{ selectedRow?.assetBoughtAttachment }}
-            </a>
-          </td>
+        <tr>
+          <th>Category</th>
+          <td>{{ selectedRow?.itemCategory }}</td>
+        </tr>
+        <tr>
+          <th>Description</th>
+          <td>{{ selectedRow?.itemDescription }}</td>
         </tr>
 
-        <!-- ================= ADMIN / SYSTEM ================= -->
+        <!-- ================= QUANTITY ================= -->
         <tr>
-          <th>Purchased By</th>
-          <td>{{ selectedRow?.assetBoughtPurchasedBy }}</td>
+          <th>Quantity</th>
+          <td>{{ selectedRow?.quantity }}</td>
         </tr>
+        <tr>
+          <th>Unit Price</th>
+          <td>{{ selectedRow?.unitPrice }}</td>
+        </tr>
+        <tr>
+          <th>Total Amount</th>
+          <td>{{ selectedRow?.totalAmount }}</td>
+        </tr>
+
+        <!-- ================= LOCATION ================= -->
+        <tr>
+          <th>Location</th>
+          <td>{{ selectedRow?.location }}</td>
+        </tr>
+        <tr>
+          <th>Department</th>
+          <td>{{ selectedRow?.departmentId }}</td>
+        </tr>
+
+        <!-- ================= PURPOSE ================= -->
+        <tr>
+          <th>Purpose</th>
+          <td>{{ selectedRow?.purpose }}</td>
+        </tr>
+
+        <!-- ================= APPROVAL ================= -->
+        <tr>
+          <th>Requested By</th>
+          <td>{{ selectedRow?.requestedBy }}</td>
+        </tr>
+        <tr>
+          <th>Approved By</th>
+          <td>{{ selectedRow?.approvedBy }}</td>
+        </tr>
+        <tr>
+          <th>Approval Date</th>
+          <td>{{ selectedRow?.approvalDate }}</td>
+        </tr>
+
+        <!-- ================= STOCK ================= -->
+        <tr>
+          <th>Stock Status</th>
+          <td>{{ selectedRow?.stockStatus }}</td>
+        </tr>
+
+        <!-- ================= REMARKS ================= -->
         <tr *ngIf="selectedRow?.remarks">
           <th>Remarks</th>
-          <td>{{ selectedRow?.assetBoughtRemarks }}</td>
+          <td>{{ selectedRow?.remarks }}</td>
         </tr>
 
-        <!-- ================= SYSTEM AUDIT ================= -->
+        <!-- ================= AUDIT ================= -->
+        <tr>
+          <th>Created By</th>
+          <td>{{ selectedRow?.createdBy }}</td>
+        </tr>
         <tr>
           <th>Created Date</th>
-          <td>{{ selectedRow?.assetBoughtCreatedDate }}</td>
+          <td>{{ selectedRow?.createdDate }}</td>
+        </tr>
+
+        <tr *ngIf="selectedRow?.updatedDate">
+          <th>Updated By</th>
+          <td>{{ selectedRow?.updatedBy }}</td>
         </tr>
         <tr *ngIf="selectedRow?.updatedDate">
           <th>Updated Date</th>
-          <td>{{ selectedRow?.assetBoughtUpdatedDate }}</td>
+          <td>{{ selectedRow?.updatedDate }}</td>
         </tr>
-        <tr>
-          <th>Record Status</th>
-          <td>{{ selectedRow?.assetBoughtStatus }}</td>
-        </tr>
+
       </table>
     </div>
   </div>

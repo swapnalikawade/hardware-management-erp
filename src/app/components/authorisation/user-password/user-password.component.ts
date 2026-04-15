@@ -31,8 +31,11 @@ export interface ChangePassword {
 export class UserPasswordComponent {
   activeTab = 'change password';
   today = new Date();
+  success = false;
   showStatusModal = false;
   statusReason: string = '';
+  showNew: boolean = false;
+showConfirm: boolean = false;
   statusRow: any = null; // session variable
   token: string | null = null;
   userName: any | null = null;
@@ -41,7 +44,11 @@ export class UserPasswordComponent {
   date: string | null = null;
   headCompanyName: any | null = null;
   // State Flags
-  success = false;
+  strength: number = 0;
+strengthLabel: string = '';
+strengthClass: string = '';
+isMatch: boolean = false;
+  showSuccess: boolean = false;
   hasNumber: boolean = false;
   hasLength: boolean = false;
   hasSpecial: boolean = false;
@@ -85,11 +92,11 @@ export class UserPasswordComponent {
       this.router.navigate(['/login-page']);
       return;
     }
-
+this.loadUserId();
     // 🔥 AUTO FILL START
     if (this.loginId) {
-      this.form.userId = Number(this.loginId.split('/')[2]); // 001 → 1
-      this.form.employeeCode = this.loginId; // full code
+      // this.form.userId = Number(this.loginId.split('/')[2]); // 001 → 1
+this.form.userId = 1; // test user id      this.form.employeeCode = this.loginId; // full code
       this.form.userName = this.headCompanyName || this.userName;
     }
   }
@@ -125,7 +132,12 @@ export class UserPasswordComponent {
     this.showViewModal = false;
     this.selectedRow = null;
   }
-
+loadUserId() {
+ this.commonService.fetchUserByEmployeeCode(this.loginId)
+    .subscribe((res: any) => {
+      this.form.userId = res.userId;
+    });
+}
   applyFilter(event: any) {
     this.searchText = event.target.value.toLowerCase().trim();
 
@@ -305,40 +317,24 @@ export class UserPasswordComponent {
   //      },
   //    });
   //  }
-  changePassword() {
-    if (!this.form.newPassword || !this.form.confirmPassword) {
-      this.showToast('All fields required', 'error');
-      return;
+changePassword() {
+  const payload = {
+    userId: this.form.userId,
+    newPassword: this.form.newPassword
+  };
+
+  console.log("Payload:", payload);
+
+  this.commonService.changePassword(payload).subscribe({
+    next: (res: any) => {
+      this.showToast("Password changed successfully ✅", "success");
+    },
+    error: (err) => {
+      console.error("Error:", err);
+      this.showToast("Failed ❌", "error");
     }
-
-    if (this.form.newPassword !== this.form.confirmPassword) {
-      this.showToast('Passwords do not match', 'error');
-      return;
-    }
-
-    const payload = {
-      userId: this.form.userId,
-      newPassword: this.form.newPassword,
-    };
-
-    console.log('Payload:', payload);
-
-    this.commonService.changePassword(payload).subscribe({
-      next: (res: any) => {
-        console.log('Success:', res);
-
-        this.showToast('Password Changed Successfully', 'success');
-        this.success = true;
-
-        this.form.newPassword = '';
-        this.form.confirmPassword = '';
-      },
-      error: (err) => {
-        console.log('Error:', err);
-        this.showToast('Error while changing password', 'error');
-      },
-    });
-  }
+  });
+}
   goBack() {
     this.router.navigate(['/dashboard']); // किंवा तुझा page route
   }
@@ -350,5 +346,39 @@ export class UserPasswordComponent {
     this.hasSpecial = /[^A-Za-z0-9]/.test(pwd);
     this.noRepeat = !/(.)\1/.test(pwd);
   }
+  checkStrength(password: string) {
+  let strength = 0;
+
+  if (password.length >= 8) strength++;
+  if (/[A-Z]/.test(password)) strength++;
+  if (/\d/.test(password)) strength++;
+  if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+  this.strength = strength;
+
+  if (strength <= 1) {
+    this.strengthLabel = 'Weak';
+    this.strengthClass = 'text-danger';
+  } else if (strength === 2 || strength === 3) {
+    this.strengthLabel = 'Medium';
+    this.strengthClass = 'text-warning';
+  } else {
+    this.strengthLabel = 'Strong';
+    this.strengthClass = 'text-success';
+  }
+}
+
+checkMatch() {
+  this.isMatch = this.form.newPassword === this.form.confirmPassword;
+}
+onSubmit() {
+  this.changePassword();
+}
+onCancel() {
+  this.form.newPassword = '';
+  this.form.confirmPassword = '';
+  this.isMatch = false;
+  this.strength = 0;
+}
   // --------------------------
 }

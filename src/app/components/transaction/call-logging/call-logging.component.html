@@ -109,268 +109,195 @@
       <!-- Table -->
       <div class="table-scroll-wrapper">
         <table class="table table-bordered w-auto big-table">
-          <thead class="table-light">
-            <tr>
-              <th>
-                <input type="checkbox" (change)="toggleAll($event)" />
-              </th>
+      <thead class="table-light">
+  <tr>
+    <th>
+      <input type="checkbox" (change)="toggleAll($event)" />
+    </th>
 
-              <!-- Call ID -->
-              <th>
-                Call ID
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('callLogId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('callLogId', 'desc')"
-                ></i>
-              </th>
+    <!-- Call Logging ID -->
+    <th>
+      Call Logging ID
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('callLoggingId', 'asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('callLoggingId', 'desc')"></i>
+    </th>
 
-              <!-- Department -->
-              <th>
-                Department
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('departmentId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('departmentId', 'desc')"
-                ></i>
-              </th>
+    <!-- Department -->
+    <th>
+      Department
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('departmentId', 'asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('departmentId', 'desc')"></i>
+    </th>
 
-              <!-- Employee ID -->
-              <th>
-                Employee ID
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('EmployeeId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('EmployeeId', 'desc')"
-                ></i>
-              </th>
+    <!-- Employee -->
+    <th>
+      Employee ID
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('employeeId', 'asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('employeeId', 'desc')"></i>
+    </th>
 
-              <!-- Employee Name -->
-              <th>
-                Employee Name
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('EmployeeName', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('EmployeeName', 'desc')"
-                ></i>
-              </th>
+    <!-- Contact -->
+    <th>
+      Contact Number
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('contactNumber', 'asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('contactNumber', 'desc')"></i>
+    </th>
 
-              <!-- Contact -->
-              <th>
-                Contact Number
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('ContactNumber', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('ContactNumber', 'desc')"
-                ></i>
-              </th>
+    <!-- Email -->
+    <th>
+      Email
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('emailAddress', 'asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('emailAddress', 'desc')"></i>
+    </th>
 
-              <!-- Email -->
-              <th>
-                Email
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('emailAddress', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('emailAddress', 'desc')"
-                ></i>
-              </th>
+    <!-- Location -->
+    <th>
+      Location
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('location', 'asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('location', 'desc')"></i>
+    </th>
 
-              <!-- Location -->
-              <th>
-                Locatio
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('location', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('location', 'desc')"
-                ></i>
-              </th>
+    <!-- Asset -->
+    <th>
+      Asset ID
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('assetId', 'asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('assetId', 'desc')"></i>
+    </th>
 
-              <!-- Asset -->
-              <th>
-                Asset ID
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetId', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetId', 'desc')"
-                ></i>
-              </th>
+    <!-- Problem -->
+    <th>
+      Problem Category
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('problemCategory', 'asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('problemCategory', 'desc')"></i>
+    </th>
 
-              <th>
-                Asset Name
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assetName', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assetName', 'desc')"
-                ></i>
-              </th>
+    <th>
+      Problem Type
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('problemType', 'asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('problemType', 'desc')"></i>
+    </th>
 
-              <!-- Problem -->
-              <th>
-                Problem Type
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('problemType', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('problemType', 'desc')"
-                ></i>
-              </th>
+    <!-- Priority -->
+    <th>
+      Priority
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('callPriority', 'asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('callPriority', 'desc')"></i>
+    </th>
 
-              <!-- Priority -->
-              <th>
-                Priority
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('callPriority', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('callPriority', 'desc')"
-                ></i>
-              </th>
+    <!-- Status -->
+    <th>
+      Status
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('callStatus', 'asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('callStatus', 'desc')"></i>
+    </th>
 
-              <!-- Status -->
-              <th>
-                Status
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('callStatus', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('callStatus', 'desc')"
-                ></i>
-              </th>
+    <!-- Technician -->
+    <th>
+      Assigned Technician
+      <i class="bi bi-arrow-up sort-icon" (click)="sortTable('assignedTechnician', 'asc')"></i>
+      <i class="bi bi-arrow-down sort-icon" (click)="sortTable('assignedTechnician', 'desc')"></i>
+    </th>
 
-              <!-- Technician -->
-              <th>
-                Assigned Technician
-                <i
-                  class="bi bi-arrow-up sort-icon"
-                  (click)="sortTable('assignedTechnician', 'asc')"
-                ></i>
-                <i
-                  class="bi bi-arrow-down sort-icon"
-                  (click)="sortTable('assignedTechnician', 'desc')"
-                ></i>
-              </th>
-
-              <th>Action</th>
-            </tr>
-          </thead>
+    <th>Action</th>
+  </tr>
+</thead>
           <!-- ================= TABLE BODY ================= -->
-          <tbody>
-            <tr
-              *ngFor="
-                let row of filteredData
-                  | slice
-                    : (currentPage - 1) * itemsPerPage
-                    : currentPage * itemsPerPage;
-                let i = index
-              "
-            >
-              <!-- Checkbox -->
-              <td>
-                <input
-                  type="checkbox"
-                  [checked]="selectedRows.includes(row)"
-                  (change)="toggleRowSelection(row, $event)"
-                />
-              </td>
+  <tbody>
+  <tr
+    *ngFor="
+      let row of filteredData
+        | slice
+          : (currentPage - 1) * itemsPerPage
+          : currentPage * itemsPerPage;
+      let i = index
+    "
+  >
 
-              <!-- Call ID -->
-              <td>
-                <span
-                  class="leave-link"
-                  [ngClass]="{
-                    'active-id': selectedRow?.callLogId === row.callLogId,
-                  }"
-                  (click)="openDetails(row)"
-                >
-                  {{ row.callLogId }}
-                </span>
-              </td>
+    <!-- Checkbox -->
+    <td>
+      <input
+        type="checkbox"
+        [checked]="selectedRows.includes(row)"
+        (change)="toggleRowSelection(row, $event)"
+      />
+    </td>
 
-              <!-- Department -->
-              <td>{{ row.departmentId }}</td>
+    <!-- Call Logging ID -->
+    <td>
+      <span
+        class="leave-link"
+        [ngClass]="{
+          'active-id': selectedRow?.callLoggingId === row.callLoggingId
+        }"
+        (click)="openDetails(row)"
+      >
+        {{ row.callLoggingId || '-' }}
+      </span>
+    </td>
 
-              <!-- Employee -->
-              <td>{{ row.EmployeeId }}</td>
-              <td>{{ row.EmployeeName }}</td>
+    <!-- Department -->
+    <td>{{ row.departmentId || '-' }}</td>
 
-              <!-- Contact -->
-              <td>{{ row.ContactNumber }}</td>
+    <!-- Employee -->
+    <td>{{ row.employeeId || '-' }}</td>
 
-              <!-- Email -->
-              <td>{{ row.emailAddress }}</td>
+    <!-- Contact -->
+    <td>{{ row.contactNumber || '-' }}</td>
 
-              <!-- Location -->
-              <td>{{ row.location }}</td>
+    <!-- Email -->
+    <td>{{ row.emailAddress || '-' }}</td>
 
-              <!-- Asset -->
-              <td>{{ row.assetId }}</td>
-              <td>{{ row.assetName }}</td>
+    <!-- Location -->
+    <td>{{ row.location || '-' }}</td>
 
-              <!-- Problem -->
-              <td>{{ row.problemType }}</td>
+    <!-- Asset -->
+    <td>{{ row.assetId || '-' }}</td>
 
-              <!-- Priority -->
-              <td>{{ row.callPriority }}</td>
+    <!-- Problem -->
+    <td>{{ row.problemCategory || '-' }}</td>
+    <td>{{ row.problemType || '-' }}</td>
 
-              <!-- Status -->
-              <td>
-                <span
-                  [ngClass]="{
-                    'status-active': row.callStatus === 'Active',
-                    'status-inactive': row.callStatus !== 'Active',
-                  }"
-                >
-                  <span *ngIf="row.callStatus === 'Active'">✔</span>
-                  <span *ngIf="row.callStatus !== 'Active'">❌</span>
-                  {{ row.callStatus }}
-                </span>
-              </td>
+    <!-- Priority -->
+    <td>
+      <span
+        [ngClass]="{
+          'badge bg-success': row.callPriority === 'Low',
+          'badge bg-warning text-dark': row.callPriority === 'Medium',
+          'badge bg-danger': row.callPriority === 'High'
+        }"
+      >
+        {{ row.callPriority || '-' }}
+      </span>
+    </td>
 
-              <!-- Technician -->
-              <td>{{ row.assignedTechnician }}</td>
+    <!-- Status -->
+    <td>
+      <span
+        [ngClass]="{
+          'badge bg-success': row.callStatus === 'Active',
+          'badge bg-secondary': row.callStatus !== 'Active'
+        }"
+      >
+        {{ row.callStatus === 'Active' ? '✔ Active' : '❌ Inactive' }}
+      </span>
+    </td>
 
-              <!-- Action -->
-              <td class="text-center">
-                <button class="btn btn-sm btn-primary" (click)="onEdit(row, i)">
-                  <i class="bi bi-pencil-square me-1"></i>
-                  Edit
-                </button>
-              </td>
-            </tr>
-          </tbody>
+    <!-- Technician -->
+    <td>{{ row.assignedTechnician || '-' }}</td>
+
+    <!-- Action -->
+    <td class="text-center">
+      <button
+        class="btn btn-sm btn-primary"
+        (click)="onEdit(row, i)"
+      >
+        <i class="bi bi-pencil-square me-1"></i>
+        Edit
+      </button>
+    </td>
+
+  </tr>
+</tbody>
         </table>
       </div>
       <div class="no-data-message" *ngIf="filteredData.length === 0">
@@ -435,7 +362,7 @@
             {{
               isEditMode
                 ? "Update Spare Entry  Details (ID: " +
-                  tableData[editIndex!].callLogId +
+                  tableData[editIndex!].callLoggingId +
                   ")"
                 : "Add Spare Entry  Details " + (i + 1)
             }}
@@ -451,357 +378,251 @@
         </div>
 
         <!-- FORM -->
-        <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
-          <div class="row mb-3">
-            <!-- Call Code -->
+      <form #recordForm="ngForm" class="new-record-form container-fluid p-0">
+  <div class="row mb-3">
 
-            <div class="col-md-6">
-              <label>Department <span class="text-danger">*</span></label>
+    <!-- Department -->
+    <div class="col-md-6">
+      <label>Department <span class="text-danger">*</span></label>
 
-              <select
-                class="form-control"
-                required
-                #department="ngModel"
-                [(ngModel)]="forms[i].departmentId"
-                name="departmentId"
-                [ngClass]="{
-                  'is-invalid':
-                    department.invalid &&
-                    (department.touched || department.dirty),
-                }"
-              >
-                <option value="">Select Department</option>
+      <select class="form-control"
+        required
+        [(ngModel)]="forms[i].departmentId"
+        name="departmentId"
+        #department="ngModel"
+        [ngClass]="{'is-invalid': department.invalid && (department.touched || department.dirty)}">
 
-                <option
-                  *ngFor="let dept of departments"
-                  [value]="dept.departmentId"
-                >
-                  {{ dept.departmentName }}
-                </option>
-              </select>
+        <option value="">Select Department</option>
+        <option *ngFor="let dept of departments" [value]="dept.departmentId">
+          {{ dept.departmentName }}
+        </option>
+      </select>
 
-              <div
-                class="invalid-feedback"
-                *ngIf="
-                  department.invalid && (department.touched || department.dirty)
-                "
-              >
-                Department is required
-              </div>
-            </div>
-            <div class="col-md-6">
-              <label> Employee <span class="text-danger">*</span> </label>
+      <div class="invalid-feedback">Department is required</div>
+    </div>
 
-              <select
-                class="form-control"
-                name="EmployeeId"
-                required
-                [(ngModel)]="forms[i].EmployeeId"
-                #employee="ngModel"
-                (change)="onEmployeeChange(i)"
-                [ngClass]="{
-                  'is-invalid':
-                    employee.invalid && (employee.touched || employee.dirty),
-                }"
-              >
-                <option value="">Select Employee</option>
+    <!-- Employee -->
+    <div class="col-md-6">
+      <label>Employee <span class="text-danger">*</span></label>
 
-                <option *ngFor="let emp of employees" [value]="emp.employeeId">
-                  {{ emp.employeeId }} - {{ emp.employeeName }}
-                </option>
-              </select>
+      <select class="form-control"
+        required
+        [(ngModel)]="forms[i].employeeId"
+        name="employeeId"
+        #employee="ngModel"
+        (change)="onEmployeeChange(i)"
+        [ngClass]="{'is-invalid': employee.invalid && (employee.touched || employee.dirty)}">
 
-              <!-- Validation Message -->
-              <div
-                class="invalid-feedback"
-                *ngIf="employee.invalid && (employee.touched || employee.dirty)"
-              >
-                Employee is required
-              </div>
-            </div>
-            <!-- Contact Number -->
-            <!-- Contact Number -->
-            <div class="col-md-6">
-              <label>Contact Number <span class="text-danger">*</span></label>
+        <option value="">Select Employee</option>
+        <option *ngFor="let emp of employees" [value]="emp.employeeId">
+          {{ emp.employeeId }} - {{ emp.employeeName }}
+        </option>
+      </select>
 
-              <input
-                class="form-control"
-                required
-                placeholder="9876543210"
-                pattern="^[6-9]\d{9}$"
-                maxlength="10"
-                #contactNumber="ngModel"
-                [(ngModel)]="forms[i].ContactNumber"
-                name="ContactNumber"
-                [ngClass]="{
-                  'is-invalid':
-                    contactNumber.invalid &&
-                    (contactNumber.touched || contactNumber.dirty),
-                }"
-              />
+      <div class="invalid-feedback">Employee is required</div>
+    </div>
 
-              <div
-                class="invalid-feedback"
-                *ngIf="contactNumber.errors?.['required']"
-              >
-                Contact Number is required
-              </div>
+    <!-- Contact -->
+  <div class="col-md-4">
+  <label>Contact Number <span class="text-danger">*</span></label>
 
-              <div
-                class="invalid-feedback"
-                *ngIf="contactNumber.errors?.['pattern']"
-              >
-                Enter valid 10 digit number
-              </div>
-            </div>
-            <!-- Email Address -->
-            <div class="col-md-6">
-              <label>Email Address <span class="text-danger">*</span></label>
+  <input type="text"
+    class="form-control"
+    placeholder="Enter 10 digit mobile number"
+    required
+    pattern="^[0-9]{10}$" 
+    maxlength="10"
+    [(ngModel)]="forms[i].contactNumber"
+    name="contactNumber"
+    #contact="ngModel"
+    [ngClass]="{'is-invalid': contact.invalid && (contact.touched || contact.dirty)}" />
 
-              <input
-                type="email"
-                class="form-control"
-                required
-                placeholder="example@gmail.com"
-                #emailAddress="ngModel"
-                [(ngModel)]="forms[i].emailAddress"
-                name="emailAddress"
-                [ngClass]="{
-                  'is-invalid':
-                    emailAddress.invalid &&
-                    (emailAddress.touched || emailAddress.dirty),
-                }"
-              />
+  <div class="invalid-feedback">
+    Enter valid 10 digit number
+  </div>
+</div>
+    <!-- Email -->
+    <div class="col-md-4">
+      <label>Email <span class="text-danger">*</span></label>
 
-              <div
-                class="invalid-feedback"
-                *ngIf="emailAddress.errors?.['required']"
-              >
-                Email address is required
-              </div>
+      <input type="email"
+        class="form-control"
+        placeholder="example@gmail.com"
+        required
+        [(ngModel)]="forms[i].emailAddress"
+        name="emailAddress"
+        #email="ngModel"
+        [ngClass]="{'is-invalid': email.invalid && (email.touched || email.dirty)}" />
 
-              <div
-                class="invalid-feedback"
-                *ngIf="emailAddress.errors?.['email']"
-              >
-                Enter valid email address
-              </div>
-            </div>
-            <!-- Location -->
-            <div class="col-md-4">
-              <label>Location <span class="text-danger">*</span></label>
+      <div class="invalid-feedback">Enter valid email</div>
+    </div>
 
-              <input
-                class="form-control"
-                required
-                placeholder="e.g. Pune Office"
-                #location="ngModel"
-                [(ngModel)]="forms[i].location"
-                name="location"
-                [ngClass]="{
-                  'is-invalid':
-                    location.invalid && (location.touched || location.dirty),
-                }"
-              />
+    <!-- Location -->
+    <div class="col-md-4">
+      <label>Location <span class="text-danger">*</span></label>
 
-              <div
-                class="invalid-feedback"
-                *ngIf="location.errors?.['required']"
-              >
-                Location is required
-              </div>
-            </div>
-            <div class="col-md-4">
-              <label> Asset <span class="text-danger">*</span> </label>
+      <input class="form-control"
+        placeholder="e.g. Pune Office"
+        required
+        [(ngModel)]="forms[i].location"
+        name="location"
+        #location="ngModel"
+        [ngClass]="{'is-invalid': location.invalid && (location.touched || location.dirty)}" />
 
-              <select
-                class="form-control"
-                name="assetId"
-                required
-                [(ngModel)]="forms[i].assetId"
-                #asset="ngModel"
-                (change)="onAssetChange(form.assetId, i)"
-                [ngClass]="{
-                  'is-invalid': asset.invalid && (asset.touched || asset.dirty),
-                }"
-              >
-                <option value="">Select Asset</option>
+      <div class="invalid-feedback">Location is required</div>
+    </div>
 
-                <option *ngFor="let asset of assets" [value]="asset.assetId">
-                  {{ asset.assetId }} - {{ asset.assetName }}
-                </option>
-              </select>
+    <!-- Asset -->
+    <div class="col-md-4">
+      <label>Asset <span class="text-danger">*</span></label>
 
-              <!-- Validation -->
-              <div
-                class="invalid-feedback"
-                *ngIf="asset.invalid && (asset.touched || asset.dirty)"
-              >
-                Asset is required
-              </div>
-            </div>
-            <div class="col-md-4">
-              <label>Problem Type <span class="text-danger">*</span></label>
+      <select class="form-control"
+        required
+        [(ngModel)]="forms[i].assetId"
+        name="assetId"
+        #asset="ngModel"
+        [ngClass]="{'is-invalid': asset.invalid && (asset.touched || asset.dirty)}">
 
-              <select
-                class="form-control"
-                required
-                #problemType="ngModel"
-                [(ngModel)]="forms[i].problemType"
-                name="problemType"
-                [ngClass]="{
-                  'is-invalid':
-                    problemType.invalid &&
-                    (problemType.touched || problemType.dirty),
-                }"
-              >
-                <option value="">Select Problem Type</option>
-                <option value="Hardware">Hardware</option>
-                <option value="Software">Software</option>
-                <option value="Network">Network</option>
-              </select>
+        <option value="">Select Asset</option>
+        <option *ngFor="let a of assets" [value]="a.assetId">
+          {{ a.assetId }} - {{ a.assetName }}
+        </option>
+      </select>
 
-              <div
-                class="invalid-feedback"
-                *ngIf="problemType.errors?.['required']"
-              >
-                Problem type is required
-              </div>
-            </div>
-            <div class="col-md-12">
-              <label
-                >Problem Description <span class="text-danger">*</span></label
-              >
+      <div class="invalid-feedback">Asset is required</div>
+    </div>
 
-              <textarea
-                class="form-control"
-                rows="3"
-                required
-                #problemDescription="ngModel"
-                [(ngModel)]="forms[i].problemDescription"
-                name="problemDescription"
-                [ngClass]="{
-                  'is-invalid':
-                    problemDescription.invalid &&
-                    (problemDescription.touched || problemDescription.dirty),
-                }"
-              ></textarea>
+    <!-- Problem Category -->
+    <div class="col-md-4">
+      <label>Problem Category <span class="text-danger">*</span></label>
 
-              <div
-                class="invalid-feedback"
-                *ngIf="problemDescription.errors?.['required']"
-              >
-                Problem description required
-              </div>
-            </div>
-            <div class="col-md-4">
-              <label>Call Priority <span class="text-danger">*</span></label>
+      <input class="form-control"
+        placeholder="Hardware / Software / Network"
+        required
+        [(ngModel)]="forms[i].problemCategory"
+        name="problemCategory"
+        #category="ngModel"
+        [ngClass]="{'is-invalid': category.invalid && (category.touched || category.dirty)}" />
 
-              <select
-                class="form-control"
-                required
-                #callPriority="ngModel"
-                [(ngModel)]="forms[i].callPriority"
-                name="callPriority"
-              >
-                <option value="">Select Priority</option>
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <label>Call Status <span class="text-danger">*</span></label>
+      <div class="invalid-feedback">Problem category required</div>
+    </div>
 
-              <select
-                class="form-control"
-                required
-                [(ngModel)]="forms[i].callStatus"
-                name="callStatus"
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
-            <!-- Assigned Technician -->
-            <div class="col-md-4">
-              <label
-                >Assigned Technician <span class="text-danger">*</span></label
-              >
+    <!-- Problem Type -->
+    <div class="col-md-4">
+      <label>Problem Type <span class="text-danger">*</span></label>
 
-              <input
-                class="form-control"
-                required
-                placeholder="Technician Name"
-                #assignedTechnician="ngModel"
-                [(ngModel)]="forms[i].assignedTechnician"
-                name="assignedTechnician"
-                [ngClass]="{
-                  'is-invalid':
-                    assignedTechnician.invalid &&
-                    (assignedTechnician.touched || assignedTechnician.dirty),
-                }"
-              />
+      <input class="form-control"
+        placeholder="Enter problem type"
+        required
+        [(ngModel)]="forms[i].problemType"
+        name="problemType"
+        #ptype="ngModel"
+        [ngClass]="{'is-invalid': ptype.invalid && (ptype.touched || ptype.dirty)}" />
 
-              <div
-                class="invalid-feedback"
-                *ngIf="assignedTechnician.errors?.['required']"
-              >
-                Technician name required
-              </div>
-            </div>
-            <div class="col-md-4">
-              <label>Call Date Time</label>
+      <div class="invalid-feedback">Problem type required</div>
+    </div>
 
-              <input
-                type="datetime-local"
-                class="form-control"
-                [(ngModel)]="forms[i].callDateTime"
-                name="callDateTime"
-              />
-            </div>
-            <div class="col-md-4">
-              <label>Close Date</label>
+    <!-- Problem Description -->
+    <div class="col-md-12">
+      <label>Problem Description <span class="text-danger">*</span></label>
 
-              <input
-                type="date"
-                class="form-control"
-                [(ngModel)]="forms[i].closeDate"
-                name="closeDate"
-              />
-            </div>
+      <textarea class="form-control"
+        rows="3"
+        placeholder="Describe the issue..."
+        required
+        [(ngModel)]="forms[i].problemDescription"
+        name="problemDescription"
+        #desc="ngModel"
+        [ngClass]="{'is-invalid': desc.invalid && (desc.touched || desc.dirty)}">
+      </textarea>
 
-            <div class="col-md-4">
-              <label>Login ID</label>
+      <div class="invalid-feedback">Description required</div>
+    </div>
 
-              <input
-                class="form-control"
-                readonly
-                [(ngModel)]="forms[i].loginId"
-                name="loginId"
-              />
-            </div>
-            <div class="col-md-12">
-              <label>Remarks</label>
+    <!-- Priority -->
+    <div class="col-md-4">
+      <label>Call Priority</label>
 
-              <textarea
-                class="form-control"
-                rows="2"
-                [(ngModel)]="forms[i].remarks"
-                name="remarks"
-              ></textarea>
-            </div>
-          </div>
+      <select class="form-control"
+        [(ngModel)]="forms[i].callPriority"
+        name="callPriority">
 
-          <!-- Buttons -->
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+      </select>
+    </div>
 
-          <div
-            class="mt-3 d-flex gap-2 justify-content-end"
+    <!-- Status -->
+    <div class="col-md-4">
+      <label>Status</label>
+
+      <select class="form-control"
+        [(ngModel)]="forms[i].callStatus"
+        name="callStatus">
+
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+      </select>
+    </div>
+
+    <!-- Technician -->
+    <div class="col-md-4">
+      <label>Technician <span class="text-danger">*</span></label>
+
+      <input class="form-control"
+        placeholder="Enter technician name"
+        required
+        [(ngModel)]="forms[i].assignedTechnician"
+        name="assignedTechnician"
+        #tech="ngModel"
+        [ngClass]="{'is-invalid': tech.invalid && (tech.touched || tech.dirty)}" />
+
+      <div class="invalid-feedback">Technician required</div>
+    </div>
+
+    <!-- Dates -->
+    <div class="col-md-4">
+      <label>Call Date</label>
+      <input type="datetime-local" class="form-control"
+        [(ngModel)]="forms[i].callDateTime"
+        name="callDateTime" />
+    </div>
+
+    <div class="col-md-4">
+      <label>Expected Resolution</label>
+      <input type="datetime-local" class="form-control"
+        [(ngModel)]="forms[i].expectedResolutionTime"
+        name="expectedResolutionTime" />
+    </div>
+
+    <div class="col-md-4">
+      <label>Close Date</label>
+      <input type="date" class="form-control"
+        [(ngModel)]="forms[i].closeDate"
+        name="closeDate" />
+    </div>
+
+    <!-- Remarks -->
+    <div class="col-md-12">
+      <label>Remarks</label>
+      <textarea class="form-control"
+        placeholder="Additional notes..."
+        [(ngModel)]="forms[i].remarks"
+        name="remarks">
+      </textarea>
+    </div>
+
+  </div>
+
+  <!-- Buttons -->
+   <div
             *ngIf="i === forms.length - 1"
+            class="mt-3 d-flex gap-2 justify-content-end"
           >
             <button type="button" class="btn-save" (click)="saveAllRecords()">
-              <i class="bi bi-floppy-fill"></i>
-              {{ isEditMode ? "Update" : "Save All" }}
+              <i class="bi bi-floppy"></i>
+              {{ isEditMode ? "Update" : "Save" }}
             </button>
 
             <button
@@ -809,10 +630,11 @@
               class="btn-cancel"
               (click)="cancelRecord(recordForm)"
             >
-              <i class="bi bi-arrow-counterclockwise"></i> Reset
+              <i class="bi bi-arrow-counterclockwise"></i>
+              Reset
             </button>
           </div>
-        </form>
+</form>
       </div>
     </div>
 
@@ -1123,11 +945,12 @@
 <!-- Call VIEW MODAL -->
 <div class="modal" [class.show]="showViewModal">
   <div class="modal-content">
+
     <!-- HEADER -->
     <div class="modal-header">
       <h5>
         <i class="fa-solid fa-phone"></i>
-        Call Details (ID: {{ selectedRow?.callLogId }})
+        Call Details (ID: {{ selectedRow?.callLoggingId }})
       </h5>
       <button class="close-btn1" (click)="closeViewModal()">×</button>
     </div>
@@ -1135,9 +958,10 @@
     <!-- BODY -->
     <div class="modal-body">
       <table class="popup-table">
+
         <tr>
-          <th>Call ID</th>
-          <td>{{ selectedRow?.callLogId }}</td>
+          <th>Call Logging ID</th>
+          <td>{{ selectedRow?.callLoggingId }}</td>
         </tr>
 
         <tr>
@@ -1147,17 +971,12 @@
 
         <tr>
           <th>Employee ID</th>
-          <td>{{ selectedRow?.EmployeeId }}</td>
-        </tr>
-
-        <tr>
-          <th>Employee Name</th>
-          <td>{{ selectedRow?.EmployeeName }}</td>
+          <td>{{ selectedRow?.employeeId }}</td>
         </tr>
 
         <tr>
           <th>Contact Number</th>
-          <td>{{ selectedRow?.ContactNumber }}</td>
+          <td>{{ selectedRow?.contactNumber }}</td>
         </tr>
 
         <tr>
@@ -1176,8 +995,8 @@
         </tr>
 
         <tr>
-          <th>Asset Name</th>
-          <td>{{ selectedRow?.assetName }}</td>
+          <th>Problem Category</th>
+          <td>{{ selectedRow?.problemCategory }}</td>
         </tr>
 
         <tr>
@@ -1196,6 +1015,22 @@
         </tr>
 
         <tr>
+          <th>Status</th>
+          <td>
+            <span
+              [ngClass]="{
+                'status-active': selectedRow?.callStatus === 'Active',
+                'status-inactive': selectedRow?.callStatus !== 'Active'
+              }"
+            >
+              <span *ngIf="selectedRow?.callStatus === 'Active'">✔</span>
+              <span *ngIf="selectedRow?.callStatus !== 'Active'">❌</span>
+              {{ selectedRow?.callStatus }}
+            </span>
+          </td>
+        </tr>
+
+        <tr>
           <th>Assigned Technician</th>
           <td>{{ selectedRow?.assignedTechnician }}</td>
         </tr>
@@ -1203,6 +1038,16 @@
         <tr>
           <th>Call Date Time</th>
           <td>{{ selectedRow?.callDateTime }}</td>
+        </tr>
+
+        <tr>
+          <th>Expected Resolution</th>
+          <td>{{ selectedRow?.expectedResolutionTime }}</td>
+        </tr>
+
+        <tr>
+          <th>Resolution Details</th>
+          <td>{{ selectedRow?.resolutionDetails }}</td>
         </tr>
 
         <tr>
@@ -1216,20 +1061,15 @@
         </tr>
 
         <tr>
-          <th>Status</th>
-          <td>
-            <span
-              [ngClass]="{
-                'status-active': selectedRow?.callStatus === 'Active',
-                'status-inactive': selectedRow?.callStatus !== 'Active',
-              }"
-            >
-              <span *ngIf="selectedRow?.callStatus === 'Active'">✔</span>
-              <span *ngIf="selectedRow?.callStatus !== 'Active'">❌</span>
-              {{ selectedRow?.callStatus }}
-            </span>
-          </td>
+          <th>Reopened</th>
+          <td>{{ selectedRow?.isReopened }}</td>
         </tr>
+
+        <tr>
+          <th>Created By</th>
+          <td>{{ selectedRow?.createdBy }}</td>
+        </tr>
+
       </table>
     </div>
   </div>

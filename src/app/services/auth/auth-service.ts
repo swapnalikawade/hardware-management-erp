@@ -49,7 +49,7 @@ export class AuthService {
         this.setCookie(this.employeeIdKey, employeeCode, 1); // 🔥 FIX
         this.setCookie(this.currentDateKey, new Date().toDateString(), 1);
         this.setCookie(this.sessionExpiryKey, expiryTime.toString(), 1);
-
+localStorage.setItem('token', response.accessToken);
         this.isLoggedInSubject.next(true);
 
         // Role-based redirection
